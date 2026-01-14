@@ -1,0 +1,317 @@
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button, Modal, Form, Badge, Alert } from 'react-bootstrap';
+import GenericTable from '@/components/GenericTable';
+import { getUsers, createUser, deleteUser, updateUser } from '@/actions/users';
+import { listColumnPresets } from '@/components/GenericTable/useUnifiedColumns';
+import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
+import { useDeleteEntity } from '@/hooks/useDeleteEntity';
+import Box from '@/components/Box';
+import type { FormTemplate } from '@/components/GenericTable';
+// import BoxTitle from '@/components/BoxTitle';
+import PasswordModal from '@/components/PasswordModal';
+import { Divider } from '@/components/Divider';
+
+// Template para creación de usuarios (sin teléfono)
+const userFormTemplate: FormTemplate = [
+  { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre completo del usuario' },
+  { name: 'email', label: 'Email', type: 'text', placeholder: 'correo@ejemplo.com' },
+  { 
+    name: 'role', 
+    label: 'Rol', 
+    type: 'select', 
+    placeholder: 'Seleccionar rol',
+    options: [
+      { value: 'USER', label: 'Operador' },
+      { value: 'ADMIN', label: 'Administrador' }
+    ]
+  },
+  { name: 'notes', label: 'Notas', type: 'text', placeholder: 'Notas adicionales (opcional)' },
+];
+
+interface UsersTableProps {
+  title?: string;
+  showBox?: boolean;
+  onUserSelect?: (user: any) => void;
+  customActions?: Array<{ label: string; onClick: (row: any) => void }>;
+  customColumns?: Array<{ key: string; label: string; render: (user: any) => React.ReactNode }>;
+  allowTemplateEditing?: boolean;
+}
+
+export default function UsersTable({ 
+  title = "Usuarios del Sistema", 
+  showBox = true, 
+  onUserSelect, 
+  customActions = [], 
+  customColumns = [],
+  allowTemplateEditing = true 
+}: UsersTableProps) {
+  const [users, setUsers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [newUserCredentials, setNewUserCredentials] = useState<{
+    name: string;
+    email: string;
+    temporaryPassword: string;
+  } | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const router = useRouter();
+
+  // Wrapper para deleteUser que cumple con la interfaz esperada
+  const deleteUserWrapper = async (id: string) => {
+    const result = await deleteUser(id);
+    return {
+      success: result.success,
+      message: result.success ? (result.message || 'Usuario eliminado correctamente') : (result.error || 'Error al eliminar usuario')
+    };
+  };
+
+  // Usar el hook refactorizado
+  const {
+    showDeleteModal,
+    entityToDelete,
+    isDeleting,
+    openDeleteModal,
+    closeDeleteModal,
+    handleDelete,
+  } = useDeleteEntity(deleteUserWrapper, {
+    entityName: 'Usuario',
+    redirectPath: '/dashboard/users',
+    onSuccess: () => {
+      // Actualizar la lista local después de eliminar
+      if (entityToDelete) {
+        setUsers(prev => prev.filter(user => user.id !== entityToDelete.id));
+      }
+    },
+    onError: (error) => {
+      alert('Error al eliminar el usuario');
+    },
+  });
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const result = await getUsers();
+        if (result.success) {
+          setUsers(result.users);
+        } else {
+          console.error('Error loading users:', result.error);
+          // Si hay error de autenticación, redirigir al login
+          if (result.error?.includes('No autorizado') || result.error?.includes('Solo los administradores')) {
+            window.location.href = '/auth/admin/login';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading users:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const handleAddUser = async (formData: any) => {
+    try {
+      const formDataObj = new FormData();
+      Object.keys(formData).forEach(key => {
+        formDataObj.append(key, formData[key]);
+      });
+      
+      const result = await createUser(formDataObj);
+      if (result.success && result.user) {
+        // Actualizar la lista de usuarios
+        setUsers(prev => [result.user, ...prev]);
+        
+        // Mostrar modal con credenciales si hay contraseña temporal
+        if (result.user.temporaryPassword) {
+          setNewUserCredentials({
+            name: result.user.name,
+            email: result.user.email,
+            temporaryPassword: result.user.temporaryPassword
+          });
+          setShowPasswordModal(true);
+        }
+        
+        return result.user;
+      } else {
+        throw new Error(result.error || 'Error al crear usuario');
+      }
+    } catch (error) {
+      console.error('Error adding user:', error);
+      throw error;
+    }
+  };
+
+  const handleUserCreated = (user: any) => {
+    // Opcional: lógica adicional después de crear usuario
+  };
+
+  const openDeleteModalWithUser = (user: any) => {
+    openDeleteModal(user);
+  };
+
+
+
+  const userColumns = listColumnPresets.users.map(col => ({
+    key: col.key,
+    label: col.label,
+    enableSorting: col.sortable !== false, // Por defecto true, a menos que se especifique false
+    sortingFn: col.sortable !== false ? (a: any, b: any) => {
+      const aValue = a.original[col.key];
+      const bValue = b.original[col.key];
+      
+      // Ordenamiento especial para campos específicos
+      if (col.key === 'createdAt') {
+        const dateA = new Date(aValue);
+        const dateB = new Date(bValue);
+        return dateA.getTime() - dateB.getTime();
+      }
+      
+      return String(aValue).localeCompare(String(bValue));
+    } : undefined,
+    render: (row: any) => {
+      const value = row[col.key];
+      switch (col.key) {
+        case 'role':
+          return (
+            <span className={`badge ${value === 'ADMIN' ? 'bg-primary' : 'bg-info'}`}>
+              {value === 'ADMIN' ? 'Administrador' : 'Operador'}
+            </span>
+          );
+        case 'verificationStatus':
+          const statusConfig = {
+            'NOT_VERIFIED': { class: 'bg-secondary', text: 'No verificado' },
+            'WAITING': { class: 'bg-warning', text: 'En espera' },
+            'VERIFIED': { class: 'bg-success', text: 'Verificado' },
+            'REJECTED': { class: 'bg-danger', text: 'Rechazado' }
+          };
+          const config = statusConfig[value as keyof typeof statusConfig] || { class: 'bg-secondary', text: value };
+          return (
+            <span className={`badge ${config.class}`}>
+              {config.text}
+            </span>
+          );
+        case 'createdAt':
+          return new Date(value).toLocaleDateString('es-ES');
+        case 'actions':
+          return (
+            <div className="btn-group btn-group-sm">
+              <button
+                className="btn btn-outline-primary btn-sm"
+                onClick={() => router.push(`/dashboard/users/${row.id}`)}
+                title="Ver detalle"
+              >
+                <i className="bi bi-eye"></i>
+              </button>
+              <button
+                className="btn btn-outline-secondary btn-sm"
+                onClick={() => router.push(`/dashboard/users/${row.id}/edit`)}
+                title="Editar"
+              >
+                <i className="bi bi-pencil"></i>
+              </button>
+              <button
+                className="btn btn-outline-danger btn-sm"
+                onClick={() => openDeleteModalWithUser(row)}
+                title="Eliminar"
+              >
+                <i className="bi bi-trash"></i>
+              </button>
+            </div>
+          );
+        default:
+          return value || '-';
+      }
+    }
+  }));
+
+  if (isLoading) {
+    return showBox ? (
+      <Box>
+        <div className="text-center py-4">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+          <p className="mt-2">Cargando usuarios...</p>
+        </div>
+      </Box>
+    ) : (
+      <div className="text-center py-4">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+        <p className="mt-2">Cargando usuarios...</p>
+      </div>
+    );
+  }
+
+  const tableContent = (
+    <>
+      {message && (
+        <Alert variant={message.type === 'success' ? 'success' : 'danger'} className="mb-3">
+          {message.text}
+        </Alert>
+      )}
+
+      <GenericTable
+        initialData={users}
+        title={title}
+        icon="bi-people-fill"
+        formTemplate={userFormTemplate}
+        onAddSubmit={handleAddUser}
+        onItemCreated={handleUserCreated}
+        customColumns={customColumns.length > 0 ? customColumns : userColumns}
+        allowTemplateEditing={false}
+        filterPlaceholder="Filtrar por usuario..."
+        addButtonLabel="Añadir usuario"
+      />
+
+      <DeleteConfirmationModal
+        show={showDeleteModal}
+        onHide={closeDeleteModal}
+        onConfirm={() => {
+          if (entityToDelete) {
+            handleDelete();
+          }
+        }}
+        title="Eliminar Usuario"
+        message={`¿Estás seguro de que quieres eliminar el usuario "${entityToDelete?.name}"?`}
+        isLoading={isDeleting}
+      />
+
+
+      {/* Modal de Contraseña Temporal */}
+      <PasswordModal
+        show={showPasswordModal}
+        onHide={() => {
+          setShowPasswordModal(false);
+          setNewUserCredentials(null);
+        }}
+        user={newUserCredentials}
+      />
+    </>
+  );
+
+  return (
+    <>
+      {showBox && (
+        <Box>
+          <h6 className="mb-2">¿Qué es la gestión de usuarios?</h6>
+          <Divider />
+          <p className="mb-0 text-muted">
+            La gestión de usuarios te permite administrar los usuarios del sistema, crear nuevos usuarios, asignar roles (Operador o Administrador) y gestionar sus permisos. 
+            Los usuarios pueden ser verificados mediante KYC y pueden tener diferentes niveles de acceso según su rol en la organización.
+          </p>
+        </Box>
+      )}
+
+      {showBox ? (
+        <Box>
+          {tableContent}
+        </Box>
+      ) : (
+        tableContent
+      )}
+    </>
+  );
+}

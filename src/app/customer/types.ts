@@ -1,0 +1,54 @@
+export interface ItemState {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  backed?: boolean;
+  backedAt?: string;
+  evidenceID?: string;
+  imageUrls?: string[];
+}
+
+export interface ItemCategory {
+  id: string;
+  name: string;
+  description?: string;
+}
+
+export type StateData = {
+  id: string;
+  title: string;
+  description: string;
+  evidenceID: string;
+  backed: boolean;
+  backedAt: string | null;
+  imageUrls: string[];
+  templateConfig: any;
+  createdAt: string;
+  createdBy?: { name: string; email: string } | null;
+  statusType: {
+    id: string;
+    name: string;
+    description: string;
+  };
+};
+
+export type ItemData = {
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  templateFields: Record<string, any> | null;
+  createdAt: string;
+  updatedAt: string;
+  evidenceID?: string | null;
+  antifraudEvidenceId?: string | null;
+  isFirstVerification: boolean;
+  createdBy?: { name: string; email: string } | null;
+  category: {
+    id: string;
+    name: string;
+    description: string;
+  };
+  states: StateData[];
+};

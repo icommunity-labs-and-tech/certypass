@@ -1,0 +1,330 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { Button, Form, Card, Row, Col, Badge, Alert } from 'react-bootstrap';
+
+export interface StatusTypeFieldDefinition {
+  name: string;
+  type: 'text' | 'number' | 'email' | 'date' | 'select' | 'image' | 'geolocation';
+  required?: boolean;
+  options?: string[]; // Para campos de tipo select
+}
+
+interface StatusTypeFieldBuilderProps {
+  fields: StatusTypeFieldDefinition[];
+  onChange: (fields: StatusTypeFieldDefinition[]) => void;
+  className?: string;
+}
+
+const FIELD_TYPES = [
+  { value: 'text', label: 'Texto' },
+  { value: 'number', label: 'Número' },
+  { value: 'email', label: 'Email' },
+  { value: 'date', label: 'Fecha' },
+  { value: 'select', label: 'Opciones' },
+  { value: 'image', label: 'Imagen' },
+  { value: 'geolocation', label: 'Geolocalización' },
+] as const;
+
+// Función para generar colores automáticamente para las opciones
+const getOptionColor = (index: number): string => {
+  const colors = [
+    '#5bc0de', // Bootstrap info (azul)
+    '#5cb85c', // Bootstrap success (verde)
+    '#f0ad4e', // Bootstrap warning (amarillo/naranja)
+    '#d9534f', // Bootstrap danger (rojo)
+    '#337ab7', // Bootstrap primary (azul oscuro)
+    '#6f42c1', // Bootstrap secondary (púrpura)
+    '#20c997', // Bootstrap teal (turquesa)
+    '#fd7e14', // Bootstrap orange (naranja)
+    '#e83e8c', // Bootstrap pink (rosa)
+    '#6c757d', // Bootstrap secondary (gris)
+  ];
+  return colors[index % colors.length];
+};
+
+export default function StatusTypeFieldBuilder({
+  fields,
+  onChange,
+  className = ''
+}: StatusTypeFieldBuilderProps) {
+  const [localFields, setLocalFields] = useState<StatusTypeFieldDefinition[]>(fields);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
+  useEffect(() => {
+    setLocalFields(fields);
+  }, [fields]);
+
+  // Función para validar los campos
+  const validateFields = (fieldsToValidate: StatusTypeFieldDefinition[]): string[] => {
+    const errors: string[] = [];
+    
+    fieldsToValidate.forEach((field, index) => {
+      if (!field.name || field.name.trim() === '') {
+        errors.push(`El campo ${index + 1} debe tener un nombre`);
+      }
+      
+      if (field.type === 'select' && (!field.options || field.options.length === 0)) {
+        errors.push(`El campo "${field.name || `Campo ${index + 1}`}" de tipo Opciones debe tener al menos una opción`);
+      }
+    });
+    
+    return errors;
+  };
+
+  const updateFieldsWithValidation = (newFields: StatusTypeFieldDefinition[]) => {
+    setLocalFields(newFields);
+    
+    // Validar y actualizar errores
+    const errors = validateFields(newFields);
+    setValidationErrors(errors);
+    
+    // Solo llamar onChange si no hay errores
+    if (errors.length === 0) {
+      onChange(newFields);
+    }
+  };
+
+  const addField = () => {
+    const newField: StatusTypeFieldDefinition = {
+      name: '',
+      type: 'text',
+      required: false,
+    };
+    
+    const updatedFields = [...localFields, newField];
+    updateFieldsWithValidation(updatedFields);
+  };
+
+  const removeField = (index: number) => {
+    const updatedFields = localFields.filter((_, i) => i !== index);
+    updateFieldsWithValidation(updatedFields);
+  };
+
+  const updateField = (index: number, field: Partial<StatusTypeFieldDefinition>) => {
+    const updatedFields = localFields.map((f, i) => 
+      i === index ? { ...f, ...field } : f
+    );
+    updateFieldsWithValidation(updatedFields);
+  };
+
+  const addOption = (fieldIndex: number, value?: string) => {
+    const field = localFields[fieldIndex];
+    if (field.type === 'select') {
+      const newOptions = [...(field.options || []), value || 'Nueva opción'];
+      updateField(fieldIndex, { options: newOptions });
+    }
+  };
+
+  const updateOption = (fieldIndex: number, optionIndex: number, value: string) => {
+    const field = localFields[fieldIndex];
+    if (field.type === 'select' && field.options) {
+      const newOptions = [...field.options];
+      newOptions[optionIndex] = value;
+      updateField(fieldIndex, { options: newOptions });
+    }
+  };
+
+  const removeOption = (fieldIndex: number, optionIndex: number) => {
+    const field = localFields[fieldIndex];
+    if (field.type === 'select' && field.options) {
+      const newOptions = field.options.filter((_, i) => i !== optionIndex);
+      updateField(fieldIndex, { options: newOptions });
+    }
+  };
+
+  return (
+    <div className={`status-type-field-builder ${className}`}>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h6 className="mb-0">Campos específicos del tipo de estado</h6>
+        <Button
+          variant="outline-primary"
+          size="sm"
+          onClick={addField}
+          className="d-flex align-items-center gap-1"
+        >
+          <i className="bi bi-plus-lg"></i>
+          Agregar campo
+        </Button>
+      </div>
+
+      {/* Mostrar errores de validación */}
+      {validationErrors.length > 0 && (
+        <Alert variant="danger" className="mb-3">
+          <Alert.Heading className="h6">Errores de validación:</Alert.Heading>
+          <ul className="mb-0">
+            {validationErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
+
+      {localFields.length === 0 ? (
+        <div className="text-center py-4 text-muted">
+          <p className="mb-0">No hay campos específicos definidos</p>
+          <small>Haz clic en &quot;Agregar campo&quot; para comenzar</small>
+        </div>
+      ) : (
+        <div className="fields-list">
+          {localFields.map((field, index) => (
+            <Card key={index} className="mb-3">
+              <Card.Header className="d-flex justify-content-between align-items-center py-2">
+                <div className="d-flex align-items-center gap-2">
+                  <Badge bg="primary">Campo {index + 1}</Badge>
+                  {field.required && (
+                    <Badge bg="danger" className="small">Requerido</Badge>
+                  )}
+                </div>
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => removeField(index)}
+                  className="d-flex align-items-center gap-1"
+                >
+                  <i className="bi bi-x-lg"></i>
+                </Button>
+              </Card.Header>
+              <Card.Body className="py-3">
+                <Row>
+                  <Col md={5}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Nombre del campo</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={field.name}
+                        onChange={(e) => updateField(index, { name: e.target.value })}
+                        placeholder="ej: temperatura, presión, etc."
+                        size="sm"
+                      />
+                      <Form.Text className="text-muted">
+                        Nombre descriptivo del campo
+                      </Form.Text>
+                    </Form.Group>
+                  </Col>
+                  <Col md={4}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Tipo de campo</Form.Label>
+                      <Form.Select
+                        value={field.type}
+                        onChange={(e) => updateField(index, { 
+                          type: e.target.value as StatusTypeFieldDefinition['type'],
+                          options: e.target.value === 'select' ? ['Opción 1'] : undefined
+                        })}
+                        size="sm"
+                      >
+                        {FIELD_TYPES.map(type => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Campo requerido</Form.Label>
+                      <div className="d-flex align-items-center h-100">
+                        <Form.Check
+                          type="checkbox"
+                          label="Requerido"
+                          checked={field.required || false}
+                          onChange={(e) => updateField(index, { required: e.target.checked })}
+                        />
+                      </div>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                {field.type === 'select' && (
+                  <Row>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Label className="mb-2">Opciones</Form.Label>
+                        
+                        {/* Bootstrap Tags Input style */}
+                        <div className="bootstrap-tagsinput" style={{
+                          border: '1px solid #ced4da',
+                          borderRadius: '0.375rem',
+                          padding: '2px 6px',
+                          minHeight: '38px',
+                          backgroundColor: '#fff',
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          alignItems: 'center',
+                          gap: '2px'
+                        }}>
+                          {/* Tags display */}
+                          {field.options?.map((option, optionIndex) => (
+                            <span key={optionIndex} className="tag label label-info" style={{
+                              backgroundColor: getOptionColor(optionIndex),
+                              color: '#fff',
+                              padding: '2px 8px',
+                              borderRadius: '3px',
+                              fontSize: '12px',
+                              display: 'inline-block',
+                              margin: '1px'
+                            }}>
+                              {option}
+                              <span 
+                                style={{ 
+                                  marginLeft: '5px', 
+                                  cursor: 'pointer',
+                                  fontSize: '14px',
+                                  fontWeight: 'bold'
+                                }}
+                                onClick={() => removeOption(index, optionIndex)}
+                              >
+                                ×
+                              </span>
+                            </span>
+                          ))}
+                          
+                          {/* Input for new tags */}
+                          <input
+                            type="text"
+                            placeholder="Escribe una opción y presiona Enter"
+                            style={{
+                              border: 'none',
+                              outline: 'none',
+                              background: 'transparent',
+                              padding: '4px',
+                              fontSize: '14px',
+                              minWidth: '120px',
+                              flex: '1'
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ',') {
+                                e.preventDefault();
+                                const value = e.currentTarget.value.trim();
+                                if (value && !field.options?.includes(value)) {
+                                  addOption(index, value);
+                                  e.currentTarget.value = '';
+                                }
+                              }
+                            }}
+                          />
+                          
+                          {(!field.options || field.options.length === 0) && (
+                            <span style={{ 
+                              color: '#6c757d', 
+                              fontSize: '14px',
+                              fontStyle: 'italic'
+                            }}>
+                              No hay opciones definidas
+                            </span>
+                          )}
+                        </div>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                )}
+              </Card.Body>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+

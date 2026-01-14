@@ -1,0 +1,78 @@
+import { flexRender } from '@tanstack/react-table';
+
+type Props = {
+  table: any;
+  selectedRow: Record<string, any> | null;
+  setSelectedRow: (row: Record<string, any> | null) => void;
+  lastAddedId: string | null;
+};
+
+export default function DataTable({
+  table,
+  selectedRow,
+  setSelectedRow,
+  lastAddedId,
+}: Props) {
+  const headerGroups = table.getHeaderGroups();
+  const rows = table.getRowModel().rows;
+
+  return (
+    <table className="custom-table mb-0 table-hover">
+      <thead>
+        {headerGroups.map((headerGroup: any) => (
+          <tr key={headerGroup.id}>
+            {headerGroup.headers.map((header: any) => {
+              const canSort = header.column.getCanSort?.() ?? true;
+              const sortDir = header.column.getIsSorted?.();
+              const indicator = sortDir === 'asc' ? 
+                <i className="bi bi-arrow-up ms-1"></i> : 
+                sortDir === 'desc' ? 
+                <i className="bi bi-arrow-down ms-1"></i> : 
+                <i className="bi bi-arrow-up-down ms-1 text-muted" style={{opacity: 0.5}}></i>;
+              return (
+                <th
+                  key={header.id}
+                  onClick={canSort ? header.column.getToggleSortingHandler?.() : undefined}
+                  style={{ cursor: canSort ? 'pointer' : 'default', userSelect: 'none' }}
+                  className={canSort ? 'sortable-column' : ''}
+                >
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {canSort && indicator}
+                </th>
+              );
+            })}
+          </tr>
+        ))}
+      </thead>
+      <tbody>
+        {rows.map((row: any) => {
+          const rowId = row.original.id;
+          const isSelected = selectedRow?.id === rowId;
+          const isNewlyAdded = rowId === lastAddedId;
+          const className = isSelected ? 'table-active' : isNewlyAdded ? 'table-success' : '';
+
+          return (
+            <tr
+              key={row.id}
+              className={className}
+              onClick={(e) => {
+                // No seleccionar la fila si se hace click en una imagen clickeable
+                if (e.target instanceof HTMLElement && e.target.closest('[data-image-clickable]')) {
+                  return;
+                }
+                setSelectedRow(isSelected ? null : row.original);
+              }}
+              style={{ cursor: 'default' }}
+            >
+              {row.getVisibleCells().map((cell: any) => (
+                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+              ))}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+

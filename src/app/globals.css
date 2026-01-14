@@ -1,0 +1,201 @@
+/* Leaflet Map Styles - must be at the top */
+@import 'leaflet/dist/leaflet.css';
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: radial-gradient(1200px 800px at 10% 0%, rgba(13,110,253,0.10), transparent 60%),
+              radial-gradient(1000px 700px at 90% 10%, rgba(96,165,250,0.06), transparent 60%),
+              linear-gradient(180deg, var(--background), var(--background));
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Root container margins and max-width */
+.root-container {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 100%;
+  max-width: 1600px;
+}
+
+@media (min-width: 992px) {
+  .root-container {
+    padding-left: 24px;
+    padding-right: 24px;
+    max-width: 1680px;
+  }
+}
+
+@media (max-width: 576px) {
+  .root-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+/* Utility: show skip link on focus */
+.visually-hidden-focusable {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.visually-hidden-focusable:focus,
+.visually-hidden-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 8px;
+  padding: 8px 12px;
+  background: #1d4ed8;
+  color: #fff;
+  border-radius: 6px;
+  z-index: 2000;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* el ol que crea bootstrap por debajo del breadcrumb 
+tiene otro margin-bottom y se descruadra del header*/
+.breadcrumb {
+  margin-bottom: 0 !important;
+}
+
+/* Footer glass effect */
+.footer-glass {
+  background: rgba(255, 255, 255, 0.65);
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+  border-top: 1px solid rgba(255,255,255,0.55);
+  backdrop-filter: saturate(1.3) blur(14px);
+  -webkit-backdrop-filter: saturate(1.3) blur(14px);
+  box-shadow: 0 -6px 18px rgba(13,110,253,0.08);
+}
+
+/* Sidebar móvil effects */
+.sidebar-open-mobile {
+  position: relative;
+}
+
+.sidebar-open-mobile::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 1025;
+  pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .footer-glass {
+    background: rgba(17, 25, 40, 0.55);
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    border-top: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 -12px 36px rgba(0,0,0,0.40);
+  }
+}
+
+/* Estilos específicos para la aplicación móvil del operario */
+.operator-layout {
+  min-height: 100vh;
+  background: transparent;
+}
+
+/* Estilos específicos para móviles */
+@media (max-width: 768px) {
+  .operator-layout { background: transparent; }
+}
+
+/* Prevenir zoom en inputs en iOS */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  font-size: 16px !important;
+}
+
+/* Mejorar la experiencia táctil */
+button, .btn {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+/* Estilos para el escáner */
+.scanner-overlay {
+  z-index: 9999;
+}
+
+.scanner-only {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100vh;
+  margin: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.scan-container {
+  flex: 1;
+  max-width: 100% !important;
+  aspect-ratio: 4/3;
+}
+
+/* Geolocation Map Container Styles */
+.geolocation-map-container {
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.geolocation-map-container .leaflet-container {
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .geolocation-map-container > div > div {
+    height: 250px !important;
+  }
+}

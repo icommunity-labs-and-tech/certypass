@@ -1,0 +1,92 @@
+.sidebar-wrap {
+  color: #0f172a;
+  background:
+    radial-gradient(800px 400px at 0% 0%, rgba(13,110,253,0.08), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.56));
+  border-right: 1px solid rgba(255,255,255,0.55);
+  backdrop-filter: saturate(1.2) blur(14px);
+  -webkit-backdrop-filter: saturate(1.2) blur(14px);
+  box-shadow: 
+    4px 0 24px rgba(13,110,253,0.12),
+    2px 0 12px rgba(0,0,0,0.08),
+    inset -1px 0 0 rgba(255,255,255,0.3);
+}
+
+/* Estilos específicos para móvil */
+@media (max-width: 767.98px) {
+  .sidebar-wrap {
+    background:
+      radial-gradient(800px 400px at 0% 0%, rgba(13,110,253,0.15), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+    border-right: 1px solid rgba(255,255,255,0.75);
+    box-shadow: 
+      6px 0 32px rgba(13,110,253,0.2),
+      4px 0 20px rgba(0,0,0,0.15),
+      0 0 50px rgba(0,0,0,0.12),
+      inset -1px 0 0 rgba(255,255,255,0.4);
+    backdrop-filter: saturate(1.4) blur(20px);
+    -webkit-backdrop-filter: saturate(1.4) blur(20px);
+  }
+}
+
+.sidebar-wrap .nav-link {
+  color: #0f172a;
+  border-radius: 10px;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.sidebar-wrap .nav-link.bg-primary {
+  color: #fff;
+}
+
+.sidebar-wrap .nav-link:not(.bg-primary):hover {
+  background: rgba(13,110,253,0.08);
+}
+
+.sidebar-wrap .nav-link:focus-visible {
+  outline: 2px solid rgba(13,110,253,0.45);
+  outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-wrap {
+    color: #e5e7eb;
+    background:
+      radial-gradient(800px 400px at 0% 0%, rgba(13,110,253,0.08), transparent 60%),
+      linear-gradient(180deg, rgba(17,25,40,0.75), rgba(17,25,40,0.55));
+    border-right: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 
+      4px 0 32px rgba(0,0,0,0.5),
+      2px 0 16px rgba(0,0,0,0.4),
+      0 0 8px rgba(13,110,253,0.15),
+      inset -1px 0 0 rgba(255,255,255,0.1);
+  }
+
+  /* Estilos específicos para móvil en modo oscuro */
+  @media (max-width: 767.98px) {
+    .sidebar-wrap {
+      background:
+        radial-gradient(800px 400px at 0% 0%, rgba(13,110,253,0.2), transparent 60%),
+        linear-gradient(180deg, rgba(17,25,40,0.95), rgba(17,25,40,0.85));
+      border-right: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 
+        6px 0 40px rgba(0,0,0,0.6),
+        4px 0 24px rgba(0,0,0,0.5),
+        0 0 60px rgba(0,0,0,0.4),
+        0 0 12px rgba(13,110,253,0.2),
+        inset -1px 0 0 rgba(255,255,255,0.15);
+      backdrop-filter: saturate(1.4) blur(20px);
+      -webkit-backdrop-filter: saturate(1.4) blur(20px);
+    }
+  }
+
+  .sidebar-wrap .nav-link:not(.bg-primary):hover {
+    background: rgba(255,255,255,0.08);
+  }
+
+  .sidebar-wrap .nav-link:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.35);
+  }
+}
+
+
