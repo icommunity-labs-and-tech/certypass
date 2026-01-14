@@ -69,7 +69,7 @@ export default function CustomerPage() {
       </div>
 
       <div className="customer-footer">
-        <p>&copy; 2026 CertyPass - Pasaporte Digital</p>
+        <p>&copy; 2026 certypass - Pasaporte Digital</p>
       </div>
     </div>
   );

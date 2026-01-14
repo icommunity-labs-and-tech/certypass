@@ -50,8 +50,8 @@ export async function signOperatorJWT(payload: JWTPayload): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(new Date(exp * 1000))
-    .setIssuer('CertyPass-operator')
-    .setAudience('CertyPass-operator-app')
+    .setIssuer('certypass-operator')
+    .setAudience('certypass-operator-app')
     .sign(secret);
 }
 
@@ -63,8 +63,8 @@ export async function verifyOperatorJWT(token: string): Promise<JWTPayload | nul
     const secret = new TextEncoder().encode(operatorAuthConfig.jwtSecret);
     
     const { payload } = await jwtVerify(token, secret, {
-      issuer: 'CertyPass-operator',
-      audience: 'CertyPass-operator-app',
+      issuer: 'certypass-operator',
+      audience: 'certypass-operator-app',
     });
     
     const decoded = payload as JWTPayload;

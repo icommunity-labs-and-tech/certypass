@@ -84,7 +84,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             >
               <i className="bi bi-shield-lock-fill text-danger" style={{ fontSize: '1.25rem' }}></i>
             </div>
-            <div style={{ lineHeight: 1.2, color: '#1f2937' }}>CertyPass</div>
+            <div style={{ lineHeight: 1.2, color: '#1f2937' }}>certypass</div>
           </Navbar.Brand>
           <Nav className="ms-auto align-items-center">
             <Nav.Link
@@ -166,7 +166,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             <div className="d-flex align-items-center justify-content-center mb-2">
               <i className="bi bi-shield-check text-danger me-2"></i>
               <small className="text-muted" style={{ fontWeight: 500 }}>
-                Panel de Super Administrador - CertyPass
+                Panel de Super Administrador - certypass
               </small>
             </div>
             <small className="text-muted" style={{ fontSize: '0.75rem' }}>

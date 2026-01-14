@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export const metadata: Metadata = {
-  title: 'Escáner QR - CertyPass',
+  title: 'Escáner QR - certypass',
   description: 'Escáner de códigos QR para items',
 };
 

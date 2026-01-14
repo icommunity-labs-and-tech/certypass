@@ -23,7 +23,7 @@ async function createAdmin() {
     
     const admin = await prisma.user.create({
       data: {
-        email: 'admin@CertyPass.com',
+        email: 'admin@certypass.com',
         password: hashedPassword,
         name: 'Administrador',
         role: 'ADMIN',
@@ -38,7 +38,7 @@ async function createAdmin() {
     console.log(`   Verification: ${admin.verificationStatus}\n`);
     
     console.log('🔑 Credenciales de acceso:');
-    console.log('   Email: admin@CertyPass.com');
+    console.log('   Email: admin@certypass.com');
     console.log('   Contraseña: admin123\n');
     
     console.log('🌐 Puedes acceder a:');

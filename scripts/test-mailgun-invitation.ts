@@ -43,7 +43,7 @@ async function testInvitationEmail() {
       recipientEmail: TEST_EMAIL,
       recipientName: TEST_NAME,
       organizationName: TEST_ORG,
-      appName: 'CertyPass',
+      appName: 'certypass',
       activationToken: TEST_TOKEN,
       activationUrl: ACTIVATION_URL,
     });

@@ -12,7 +12,7 @@ function getConfig() {
   const apiKey = process.env.MAILGUN_API_KEY;
   const domain = process.env.MAILGUN_DOMAIN;
   const fromEmail = process.env.MAILGUN_FROM_EMAIL || 'ibs@icommunity.io';
-  const fromName = process.env.MAILGUN_FROM_NAME || 'CertyPass';
+  const fromName = process.env.MAILGUN_FROM_NAME || 'certypass';
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   if (!apiKey) {

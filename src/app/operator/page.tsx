@@ -114,12 +114,12 @@ export default function OperatorPage() {
   }, [isMobile, viewType]);
 
   return (
-    <Container id="main" fluid className="operator-page" role="main" aria-label="Aplicación de operador - Operador CertyPass">
+    <Container id="main" fluid className="operator-page" role="main" aria-label="Aplicación de operador - Operador certypass">
       <Row className="mb-4 operator-header" role="region" aria-label="Encabezado y acciones">
         <Col>
           <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div className="me-2">
-              <h1 className="h3 mb-0">Operador CertyPass</h1>
+              <h1 className="h3 mb-0">Operador certypass</h1>
               <p className="text-muted mb-0">Bienvenido, {user?.name}</p>
             </div>
             <div className="d-flex gap-2 flex-wrap">

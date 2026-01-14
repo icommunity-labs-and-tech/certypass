@@ -8,7 +8,7 @@ async function bootstrapE2EUsers() {
     console.log('🔧 Seeding E2E users in SQLite...\n');
 
     // Create admin user
-    const adminEmail = 'admin@CertyPass.com';
+    const adminEmail = 'admin@certypass.com';
     const adminPassword = 'admin123';
     const adminHashed = await bcrypt.hash(adminPassword, 10);
 
@@ -32,7 +32,7 @@ async function bootstrapE2EUsers() {
     }
 
     // Create operator user
-    const operatorEmail = 'operator@CertyPass.com';
+    const operatorEmail = 'operator@certypass.com';
     const operatorPassword = 'operator123';
     const operatorHashed = await bcrypt.hash(operatorPassword, 10);
 

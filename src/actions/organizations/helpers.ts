@@ -28,7 +28,7 @@ export async function sendInvitationEmail(params: SendInvitationEmailParams): Pr
     recipientEmail,
     recipientName,
     organizationName,
-    appName: 'CertyPass',
+    appName: 'certypass',
     activationToken,
     activationUrl,
   });

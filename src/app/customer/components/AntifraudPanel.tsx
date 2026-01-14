@@ -302,7 +302,7 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
               }}
             >
               Este es el primer registro de este producto en nuestro sistema.
-              CertyPass garantiza la autenticidad de este artículo.
+              certypass garantiza la autenticidad de este artículo.
             </p>
             {item.antifraudEvidenceId && item.antifraudEvidenceId !== 'NO_SIGNATURE' && (
               <a

@@ -10,8 +10,8 @@ async function verifyAdminJWT(token: string) {
   try {
     const secret = new TextEncoder().encode(ADMIN_JWT_SECRET);
     const { payload } = await jwtVerify(token, secret, {
-      issuer: 'CertyPass-admin',
-      audience: 'CertyPass-dashboard',
+      issuer: 'certypass-admin',
+      audience: 'certypass-dashboard',
     });
     
     if (payload.context !== 'admin' || payload.role !== 'ADMIN') {
@@ -28,8 +28,8 @@ async function verifyOperatorJWT(token: string) {
   try {
     const secret = new TextEncoder().encode(OPERATOR_JWT_SECRET);
     const { payload } = await jwtVerify(token, secret, {
-      issuer: 'CertyPass-operator',
-      audience: 'CertyPass-operator-app',
+      issuer: 'certypass-operator',
+      audience: 'certypass-operator-app',
     });
     
     if (payload.context !== 'operator' || payload.role !== 'USER') {

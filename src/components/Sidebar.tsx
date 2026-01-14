@@ -58,7 +58,7 @@ export default function Sidebar() {
     <Container fluid className="sidebar-wrap min-vh-100 p-3 d-flex flex-column">
       <div className="px-2">
         <Navbar.Brand href="#" className="d-flex align-items-center mb-3">
-          <span className="fs-5 fw-semibold">CertyPass</span>
+          <span className="fs-5 fw-semibold">certypass</span>
         </Navbar.Brand>
         <hr className="opacity-75 border" />
         <Nav className="flex-column mb-auto">

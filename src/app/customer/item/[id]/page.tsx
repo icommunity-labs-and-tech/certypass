@@ -86,7 +86,7 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
           </div>
         </div>
         <div className="customer-footer">
-          <p>&copy; 2026 CertyPass - Pasaporte Digital</p>
+          <p>&copy; 2026 certypass - Pasaporte Digital</p>
         </div>
       </div>
     );
@@ -113,7 +113,7 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
           </div>
         </div>
         <div className="customer-footer">
-          <p>&copy; 2026 CertyPass - Pasaporte Digital</p>
+          <p>&copy; 2026 certypass - Pasaporte Digital</p>
         </div>
       </div>
     );
@@ -140,7 +140,7 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
           </div>
         </div>
         <div className="customer-footer">
-          <p>&copy; 2026 CertyPass - Pasaporte Digital</p>
+          <p>&copy; 2026 certypass - Pasaporte Digital</p>
         </div>
       </div>
     );
@@ -163,7 +163,7 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
       )}
       
       <div className="customer-footer">
-        <p>&copy; 2026 CertyPass - Pasaporte Digital</p>
+        <p>&copy; 2026 certypass - Pasaporte Digital</p>
       </div>
     </div>
   );

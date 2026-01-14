@@ -50,8 +50,8 @@ export async function signAdminJWT(payload: JWTPayload): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(new Date(exp * 1000))
-    .setIssuer('CertyPass-admin')
-    .setAudience('CertyPass-dashboard')
+    .setIssuer('certypass-admin')
+    .setAudience('certypass-dashboard')
     .sign(secret);
 }
 
@@ -63,8 +63,8 @@ export async function verifyAdminJWT(token: string): Promise<JWTPayload | null> 
     const secret = new TextEncoder().encode(adminAuthConfig.jwtSecret);
     
     const { payload } = await jwtVerify(token, secret, {
-      issuer: 'CertyPass-admin',
-      audience: 'CertyPass-dashboard',
+      issuer: 'certypass-admin',
+      audience: 'certypass-dashboard',
     });
     
     const decoded = payload as JWTPayload;

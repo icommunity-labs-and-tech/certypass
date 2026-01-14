@@ -310,7 +310,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/pablocumpiandiaz/icommunity/repos/CertyPass/src/generated/prisma-e2e",
+      "value": "/Users/pablocumpiandiaz/icommunity/repos/certypass/src/generated/prisma-e2e",
       "fromEnvVar": null
     },
     "config": {
@@ -324,7 +324,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/pablocumpiandiaz/icommunity/repos/CertyPass/prisma/schema.e2e.prisma",
+    "sourceFilePath": "/Users/pablocumpiandiaz/icommunity/repos/certypass/prisma/schema.e2e.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

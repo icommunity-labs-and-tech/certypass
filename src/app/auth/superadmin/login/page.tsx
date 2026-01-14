@@ -101,7 +101,7 @@ export default function SuperAdminLoginPage() {
             <div className="mb-3">
               <i className="bi bi-shield-lock-fill text-danger" style={{ fontSize: '3rem' }}></i>
             </div>
-            <h2 className="mb-2" style={{ fontWeight: 700 }}>CertyPass</h2>
+            <h2 className="mb-2" style={{ fontWeight: 700 }}>certypass</h2>
             <p className="text-muted">Panel de Super Administrador</p>
           </div>
 

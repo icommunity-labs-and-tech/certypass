@@ -6,9 +6,9 @@ export function getSwaggerSpec() {
     definition: {
       openapi: '3.0.0',
       info: {
-        title: 'CertyPass API',
+        title: 'certypass API',
         version: '1.0.0',
-        description: 'RESTful API for CertyPass platform',
+        description: 'RESTful API for certypass platform',
       },
       servers: [
         {
