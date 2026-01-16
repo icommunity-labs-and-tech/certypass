@@ -10,7 +10,10 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Generar cliente Prisma principal
 RUN npx prisma generate
+# Generar cliente Prisma e2e (necesario para compilación aunque no se use en producción)
+RUN npx prisma generate --schema prisma/schema.e2e.prisma || echo "Warning: e2e schema generation failed, continuing..."
 RUN npm run build
 
 FROM node:18-alpine AS runner
