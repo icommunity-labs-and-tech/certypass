@@ -29,12 +29,19 @@ export default async function ProfilePage() {
       role: true,
       phone: true,
       signsWithCertificate: true, 
-      verificationStatus: true, 
-      kycURL: true,
-      signatureID: true,
       notes: true,
       createdAt: true,
-      updatedAt: true
+      updatedAt: true,
+      organizationId: true,
+      Organization: {
+        select: {
+          id: true,
+          nombre: true,
+          signatureID: true,
+          kycURL: true,
+          verificationStatus: true,
+        },
+      },
     },
   });
 

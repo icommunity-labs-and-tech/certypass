@@ -9,9 +9,6 @@ export interface UserSession {
   email: string;
   name: string;
   role: string;
-  verificationStatus: string;
-  signatureID?: string | null;
-  kycURL?: string | null;
   context: 'admin' | 'operator';
 }
 
@@ -33,7 +30,6 @@ export async function getCurrentUserSession(): Promise<UserSession | null> {
           email: adminUser.email,
           name: adminUser.name,
           role: adminUser.role,
-          verificationStatus: adminUser.verificationStatus,
           context: 'admin'
         };
       }
@@ -49,7 +45,6 @@ export async function getCurrentUserSession(): Promise<UserSession | null> {
           email: operatorUser.email,
           name: operatorUser.name,
           role: operatorUser.role,
-          verificationStatus: operatorUser.verificationStatus,
           context: 'operator'
         };
       }
@@ -80,9 +75,6 @@ export async function getCurrentUserWithDetails(): Promise<UserSession | null> {
         email: true,
         name: true,
         role: true,
-        verificationStatus: true,
-        signatureID: true,
-        kycURL: true,
       }
     });
 
@@ -90,8 +82,6 @@ export async function getCurrentUserWithDetails(): Promise<UserSession | null> {
 
     return {
       ...session,
-      signatureID: user.signatureID,
-      kycURL: user.kycURL,
     };
   } catch (error) {
     console.error('Error getting user with details:', error);

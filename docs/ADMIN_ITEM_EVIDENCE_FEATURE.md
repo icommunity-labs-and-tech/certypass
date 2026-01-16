@@ -18,11 +18,13 @@ Implementar la creación automática de evidencias en iCommunity cuando los admi
 ## Estado Actual del Sistema
 
 ### 1. Sistema de KYC Existente
-- **Usuarios (Operadores y Admins)** ya tienen:
+**⚠️ ACTUALIZACIÓN (Enero 2026):** El KYC ahora es a nivel de organización, no de usuario.
+
+- **Organizaciones** tienen:
   - `verificationStatus`: NOT_VERIFIED | WAITING | VERIFIED | REJECTED
   - `signatureID`: ID único de firma en iCommunity
   - `kycURL`: URL para completar el proceso KYC
-  - `signsWithCertificate`: Flag booleano
+- **Usuarios** ya no tienen campos de KYC (eliminados en migración 20260115113558)
 
 ### 2. Flujo de Creación de Estados (Operadores)
 Los operadores actualmente crean evidencias cuando cambian estados:

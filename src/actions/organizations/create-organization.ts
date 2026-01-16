@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { isSuperAdmin } from "@/lib/auth/tenant";
 import { sendInvitationEmail } from "./helpers";
+import { icommunityService } from "@/infrastructure/icommunity/ICommunityServiceImpl";
 import crypto from "crypto";
 
 export interface CreateOrganizationInput {
@@ -29,6 +30,7 @@ export interface CreateOrganizationResult {
     email: string;
     activationToken: string;
   };
+  kycURL?: string | null;
   error?: string;
 }
 
@@ -75,10 +77,30 @@ export async function createOrganizationWithAdmin(
     const activationToken = crypto.randomBytes(32).toString("hex");
     const activationExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 días
     
+    // Crear firma en iCommunity para la organización con webhooks configurados
+    let signatureID: string | null = null;
+    let kycURL: string | null = null;
+    try {
+      // Obtener la URL base de la aplicación para los webhooks
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL 
+        ? `https://${process.env.VERCEL_URL}` 
+        : process.env.APP_URL || 'http://localhost:3000';
+      
+      const okUrl = `${baseUrl}/api/hooks/signature/ok`;
+      const koUrl = `${baseUrl}/api/hooks/signature/ko`;
+      
+      const signatureResult = await icommunityService.createSignature(input.nombre, okUrl, koUrl);
+      signatureID = signatureResult.signature_id;
+      kycURL = signatureResult.url || null;
+    } catch (error) {
+      console.error("Error creating signature for organization:", error);
+      // Continuar sin firma - se puede crear después
+    }
+    
     // Crear organización y admin en una transacción
     // Si falla el email después, se eliminará todo
     const result = await prisma.$transaction(async (tx) => {
-      // Crear organización
+      // Crear organización con KYC
       const now = new Date();
       const organization = await tx.organization.create({
         data: {
@@ -87,6 +109,9 @@ export async function createOrganizationWithAdmin(
           slug: input.slug,
           plan: input.plan || "basic",
           activa: true,
+          signatureID: signatureID,
+          kycURL: kycURL,
+          verificationStatus: signatureID ? 'WAITING' : 'NOT_VERIFIED',
           updatedAt: now,
         },
       });
@@ -145,6 +170,7 @@ export async function createOrganizationWithAdmin(
         email: result.admin.email,
         activationToken: result.admin.activationToken!,
       },
+      kycURL: kycURL,
     };
   } catch (error) {
     console.error("Error creating organization:", error);

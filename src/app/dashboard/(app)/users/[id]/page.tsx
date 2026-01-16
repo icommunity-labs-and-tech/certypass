@@ -105,7 +105,6 @@ export default function UserDetailPage() {
         <div className="row">
           <div className="col-md-6">
             <p><strong>Rol:</strong> {user?.role === 'ADMIN' ? 'Administrador' : 'Operador'}</p>
-            <p><strong>Verificación:</strong> {user?.verificationStatus}</p>
           </div>
           <div className="col-md-6">
             <p><strong>Teléfono:</strong> {user?.phone || 'No especificado'}</p>

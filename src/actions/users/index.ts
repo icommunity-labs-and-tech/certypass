@@ -4,7 +4,6 @@ export * from './create';
 export * from './delete';
 export * from './get';
 export * from './list';
-export * from './retryVerification';
 export * from './update';
 export * from './updateSigningPreference';
 

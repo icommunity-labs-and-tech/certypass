@@ -27,9 +27,6 @@ export async function GET(request: NextRequest) {
         email: true,
         name: true,
         role: true,
-        verificationStatus: true,
-        signatureID: true,
-        kycURL: true
       }
     });
 

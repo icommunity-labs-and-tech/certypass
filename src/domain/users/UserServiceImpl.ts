@@ -1,7 +1,5 @@
-import { UserService, type CreateUserRequest, type UpdateUserRequest, type ChangePasswordRequest, type UserResponse, type VerificationResponse } from './UserService';
-import { UserInputError, UserAlreadyExistsError, UserNotFoundError, AuthorizationError, InvalidCredentialsError, PasswordValidationError, KycUrlGenerationError } from './errors';
-import type { ICommunityService } from '@/infrastructure/icommunity/ICommunityService';
-import { ICommunityConfigError, ICommunityHTTPError } from '@/infrastructure/icommunity/errors';
+import { UserService, type CreateUserRequest, type UpdateUserRequest, type ChangePasswordRequest, type UserResponse } from './UserService';
+import { UserInputError, UserAlreadyExistsError, UserNotFoundError, AuthorizationError, InvalidCredentialsError, PasswordValidationError } from './errors';
 import type { UserRepository } from './UserRepository';
 import { DbError } from './UserRepository';
 import { requireOrganizationId } from '@/lib/auth/tenant';
@@ -15,16 +13,12 @@ const toUserResponse = (u: any): UserResponse => ({
   role: u.role,
   phone: u.phone ?? null,
   notes: u.notes ?? null,
-  verificationStatus: u.verificationStatus,
-  signatureID: u.signatureID ?? null,
-  kycURL: u.kycURL ?? null,
 });
 
 export function createUserServiceImpl(deps: {
   userRepository: UserRepository;
-  icommunityService: ICommunityService;
 }): UserService {
-  const { userRepository: userRepo, icommunityService: icommunity } = deps;
+  const { userRepository: userRepo } = deps;
 
   return {
     async createUser(data: CreateUserRequest): Promise<{ user: UserResponse; temporaryPassword: string }> {
@@ -97,9 +91,6 @@ export function createUserServiceImpl(deps: {
           role: data.role ?? null,
           phone: data.phone ?? null,
           notes: data.notes ?? null,
-          verificationStatus: (data.verificationStatus as any) ?? null,
-          signatureID: data.signatureID ?? null,
-          kycURL: data.kycURL ?? null,
         });
 
         return { user: toUserResponse(updated) };
@@ -159,73 +150,5 @@ export function createUserServiceImpl(deps: {
       }
     },
 
-    async getOrCreateKycUrl(userId: string): Promise<{ kycURL: string }> {
-      try {
-        console.log('[UserService.getOrCreateKycUrl] Start for userId:', userId);
-        const user = await userRepo.getById(userId);
-
-        console.log('[UserService.getOrCreateKycUrl] User found:', {
-          id: user.id,
-          organizationId: user.organizationId,
-          hasKycURL: !!user.kycURL,
-          hasSignatureID: !!user.signatureID
-        });
-
-        if (user.kycURL) {
-          console.log('[UserService.getOrCreateKycUrl] Returning existing KYC URL');
-          return { kycURL: user.kycURL };
-        }
-
-        const userOrgId = user.organizationId ?? null;
-        console.log('[UserService.getOrCreateKycUrl] userOrgId:', userOrgId);
-        
-        // retry existing signature
-        if (user.signatureID) {
-          console.log('[UserService.getOrCreateKycUrl] Retrying existing signature:', user.signatureID);
-          const r = await icommunity.retrySignature(user.signatureID!);
-          if (r.url) {
-            console.log('[UserService.getOrCreateKycUrl] Got retry URL, updating user');
-            await userRepo.update(user.id, userOrgId!, { kycURL: r.url, verificationStatus: 'WAITING' as any });
-            return { kycURL: r.url };
-          }
-        }
-
-        // create new signature
-        console.log('[UserService.getOrCreateKycUrl] Creating new signature for:', user.name);
-        const res = await icommunity.createSignature(user.name || 'Firma');
-        console.log('[UserService.getOrCreateKycUrl] Signature created:', { url: res.url, signatureId: res.signature_id });
-        const url = res.url ?? '';
-        if (!url) {
-          throw new KycUrlGenerationError(userId, 'No se pudo crear firma KYC');
-        }
-        console.log('[UserService.getOrCreateKycUrl] Updating user with new signature');
-        await userRepo.update(user.id, userOrgId!, { kycURL: url, verificationStatus: 'WAITING' as any, signatureID: res.signature_id ?? null });
-        console.log('[UserService.getOrCreateKycUrl] Success, returning URL');
-        return { kycURL: url };
-      } catch (e) {
-        console.error('[UserService.getOrCreateKycUrl] Final error:', e);
-        if (e instanceof UserNotFoundError || e instanceof KycUrlGenerationError || e instanceof ICommunityConfigError || e instanceof ICommunityHTTPError) throw e;
-        if (e instanceof DbError) throw new KycUrlGenerationError(userId, 'No se pudo guardar la URL de KYC');
-        throw e;
-      }
-    },
-
-    async retryVerification(userId: string): Promise<VerificationResponse> {
-      try {
-        const ensured = await userRepo.getById(userId);
-        if (!ensured.signatureID) {
-          throw new KycUrlGenerationError(userId, 'Usuario sin firma para reintentar verificación');
-        }
-        const sig = ensured.signatureID!;
-
-        const r = await icommunity.retrySignature(sig);
-        const response: VerificationResponse = { verificationStatus: r.url ? 'WAITING' : 'NOT_VERIFIED', kycURL: r.url };
-        return response;
-      } catch (e) {
-        if (e instanceof UserNotFoundError || e instanceof KycUrlGenerationError || e instanceof ICommunityConfigError || e instanceof ICommunityHTTPError) throw e;
-        if (e instanceof DbError) throw new UserNotFoundError(userId, 'Usuario no encontrado');
-        throw e;
-      }
-    },
   };
 }

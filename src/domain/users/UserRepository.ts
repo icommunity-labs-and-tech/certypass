@@ -1,6 +1,4 @@
 import { UserInputError, UserNotFoundError, UserAlreadyExistsError } from './errors';
-// Avoid importing Prisma types in domain contracts
-export type VerificationStatus = 'NOT_VERIFIED' | 'WAITING' | 'VERIFIED';
 
 export interface CreateUserInput {
   organizationId?: string | null; // NULL para SUPER_ADMIN
@@ -17,9 +15,6 @@ export interface UpdateUserInput {
   role?: 'USER' | 'ADMIN' | null;
   phone?: string | null;
   notes?: string | null;
-  verificationStatus?: VerificationStatus | null;
-  signatureID?: string | null;
-  kycURL?: string | null;
   passwordHash?: string | null;
 }
 
@@ -31,9 +26,6 @@ export interface UserRecord {
   role: 'USER' | 'ADMIN' | 'SUPER_ADMIN';
   phone: string | null;
   notes: string | null;
-  verificationStatus: VerificationStatus;
-  signatureID: string | null;
-  kycURL: string | null;
   signsWithCertificate: boolean;
   createdAt: Date;
   updatedAt: Date;

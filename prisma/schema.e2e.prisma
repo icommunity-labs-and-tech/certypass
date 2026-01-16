@@ -11,16 +11,19 @@ datasource db {
 // Models mirrored from prisma/schema.prisma for SQLite-based e2e
 
 model Organization {
-  id            String   @id @default(uuid())
-  nombre        String
-  slug          String   @unique
-  dominio       String?  @unique
-  activa        Boolean  @default(true)
-  plan          String   @default("basic")
-  limites       Json?
-  configuracion Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String             @id @default(uuid())
+  nombre            String
+  slug              String             @unique
+  dominio           String?            @unique
+  activa            Boolean            @default(true)
+  plan              String             @default("basic")
+  limites           Json?
+  configuracion      Json?
+  signatureID        String?            @unique
+  kycURL            String?
+  verificationStatus VerificationStatus @default(NOT_VERIFIED)
+  createdAt         DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
   
   users         User[]
   categories    Category[]
@@ -29,6 +32,8 @@ model Organization {
   notifications Notification[]
   invitations   Invitation[]
   statusTypes   StatusType[]
+  
+  @@index([signatureID])
 }
 
 model User {
@@ -39,9 +44,6 @@ model User {
   name                 String
   role                 UserRole             @default(USER)
   status               UserStatus           @default(PENDING)
-  verificationStatus   VerificationStatus   @default(NOT_VERIFIED)
-  kycURL               String?
-  signatureID          String?              @unique
   signsWithCertificate Boolean              @default(false)
   phone                String?
   permissions          Json?

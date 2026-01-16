@@ -105,7 +105,8 @@ class CommunityApiClient implements ICommunityClient {
     const signatureId: string | undefined = body?.data?.signature_id || body?.signature_id;
     if (!signatureId) throw new Error('signature_id missing in webhook payload');
     const verificationStatus = status === 'ok' ? 'VERIFIED' : 'REJECTED';
-    await prisma.user.update({
+    // Update organization instead of user
+    await prisma.organization.updateMany({
       where: { signatureID: signatureId },
       data: { verificationStatus },
     });

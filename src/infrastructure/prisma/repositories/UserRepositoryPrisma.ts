@@ -1,4 +1,4 @@
-import { UserRepository, type UserRecord, type CreateUserInput, type UpdateUserInput, DbError, type VerificationStatus } from '@/domain/users/UserRepository';
+import { UserRepository, type UserRecord, type CreateUserInput, type UpdateUserInput, DbError } from '@/domain/users/UserRepository';
 import { prisma } from '@/lib/prisma';
 import { UserAlreadyExistsError, UserInputError, UserNotFoundError } from '@/domain/users/errors';
 import crypto from 'crypto';
@@ -11,9 +11,6 @@ const toDomain = (u: any): UserRecord => ({
   role: u.role,
   phone: u.phone ?? null,
   notes: u.notes ?? null,
-  verificationStatus: u.verificationStatus as VerificationStatus,
-  signatureID: u.signatureID ?? null,
-  kycURL: u.kycURL ?? null,
   signsWithCertificate: !!u.signsWithCertificate,
   createdAt: u.createdAt,
   updatedAt: u.updatedAt,
@@ -94,9 +91,6 @@ export const userRepository: UserRepository = {
           status: 'ACTIVE', // Si se crea con password, está activo
           phone: input.phone ?? null,
           notes: input.notes ?? null,
-          verificationStatus: 'NOT_VERIFIED',
-          signatureID: null,
-          kycURL: null,
           signsWithCertificate: false,
           updatedAt: now,
         },
@@ -131,9 +125,6 @@ export const userRepository: UserRepository = {
       if (changes.role !== undefined && changes.role !== null) data.role = changes.role;
       if (changes.phone !== undefined) data.phone = changes.phone;
       if (changes.notes !== undefined) data.notes = changes.notes;
-      if (changes.verificationStatus !== undefined && changes.verificationStatus !== null) data.verificationStatus = changes.verificationStatus as any;
-      if (changes.signatureID !== undefined) data.signatureID = changes.signatureID;
-      if (changes.kycURL !== undefined) data.kycURL = changes.kycURL;
       if (changes.passwordHash !== undefined && changes.passwordHash !== null) data.password = changes.passwordHash;
       
       const updated = await prisma.user.update({ where: { id }, data });
@@ -181,16 +172,9 @@ export const userRepository: UserRepository = {
   },
 
   async countVerifiedUsers(organizationId: string): Promise<number> {
-    try {
-      return await prisma.user.count({ 
-        where: { 
-          organizationId,
-          verificationStatus: 'VERIFIED' 
-        }
-      });
-    } catch (e) {
-      throw new DbError(e);
-    }
+    // KYC is now at organization level, not user level
+    // Return 0 as users are no longer individually verified
+    return 0;
   },
 
   async countAdmins(organizationId: string): Promise<number> {

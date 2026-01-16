@@ -11,7 +11,6 @@ import DynamicImageField from './DynamicImageField';
 import Alert from 'react-bootstrap/Alert';
 import ListGroup from 'react-bootstrap/ListGroup';
 import ItemCreationWizard from './ItemCreationWizard';
-import { useAdminVerificationNotification } from '@/hooks/useAdminVerificationNotification';
 import { checkEmailExists } from '@/actions/users';
 
 type AddItemModalProps = {
@@ -56,16 +55,6 @@ export default function AddItemModal({
   const [selectedCopyItemId, setSelectedCopyItemId] = useState<string>('');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
-  
-  // Hook de verificación de firma para admins (solo para productos, no para issues/users)
-  const { isVerified, isAdmin, verificationStatus } = useAdminVerificationNotification({
-    showNotification: false, // No mostrar notificación automática en el modal
-    context: 'creación de productos'
-  });
-  
-  // Determinar si se necesita verificación (solo para creación de productos, no issues ni usuarios)
-  const isItemCreation = uploadType === 'item';
-  const needsVerification = isItemCreation && isAdmin;
 
   useEffect(() => {
     // Only for issue creation, estimate payload size and warn
@@ -477,28 +466,6 @@ export default function AddItemModal({
             </Alert>
           )}
 
-          {/* Alerta de verificación de firma para admins creando productos */}
-          {needsVerification && !isVerified && (
-            <Alert variant="warning" className="mb-3">
-              <div className="d-flex align-items-start">
-                <i className="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
-                <div>
-                  <strong>Verificación de firma requerida</strong>
-                  <p className="mb-0 mt-1">
-                    {verificationStatus === 'NOT_VERIFIED' && 
-                      'Para certificar automáticamente la creación de productos en blockchain, necesitas verificar tu identidad. Completa el proceso KYC en tu perfil.'}
-                    {verificationStatus === 'WAITING' && 
-                      'Tu verificación de identidad está en proceso. Podrás crear productos con evidencias una vez completada.'}
-                    {verificationStatus === 'REJECTED' && 
-                      'Tu verificación de identidad fue rechazada. Contacta al administrador para resolver el problema.'}
-                    {verificationStatus === 'VERIFIED' && 
-                      'Tu identidad está verificada pero necesitas una signature ID. Contacta al administrador.'}
-                  </p>
-                </div>
-              </div>
-            </Alert>
-          )}
-          
           {preflight?.overLimit && (
             <Alert variant="warning">
               <div className="mb-2">
@@ -563,10 +530,9 @@ export default function AddItemModal({
         <Button 
           variant="primary" 
           onClick={handleSubmit}
-          disabled={(needsVerification && !isVerified) || isCheckingEmail || !!emailError}
+          disabled={isCheckingEmail || !!emailError}
         >
           {isCheckingEmail ? 'Verificando email...' : 
-           needsVerification && !isVerified ? 'Verificación requerida' : 
            emailError ? 'Corrija los errores' : 
            'Guardar'}
         </Button>

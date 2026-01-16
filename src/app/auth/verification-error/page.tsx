@@ -1,59 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Card, Alert, Button } from 'react-bootstrap';
 import Link from 'next/link';
-import { retryVerification } from '@/actions/users';
 
 export default function VerificationErrorPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Obtener el ID del usuario desde la sesión o parámetros
-    // Por ahora usaremos un approach simple, pero podrías mejorarlo
-    const getCurrentUser = async () => {
-      try {
-        const response = await fetch('/api/auth/me');
-        if (response.ok) {
-          const user = await response.json();
-          setUserId(user.id);
-        }
-      } catch (error) {
-        console.error('Error getting user:', error);
-      }
-    };
-    getCurrentUser();
-  }, []);
-
-  const handleRetry = async () => {
-    if (!userId) {
-      setMessage({ type: 'error', text: 'No se pudo identificar al usuario. Por favor, inicia sesión nuevamente.' });
-      return;
-    }
-
-    setIsLoading(true);
-    setMessage(null);
-
-    try {
-      const result = await retryVerification();
-      
-      if (result.success && 'kycURL' in result && result.kycURL) {
-        setMessage({ type: 'success', text: 'Nueva URL de verificación generada. Redirigiendo...' });
-        // Redirigir a la nueva URL de KYC
-        setTimeout(() => {
-          window.location.href = (result as any).kycURL!;
-        }, 1500);
-      } else {
-        setMessage({ type: 'error', text: (result as any).error || 'Error al generar nueva URL de verificación' });
-      }
-    } catch {
-      setMessage({ type: 'error', text: 'Error inesperado al reintentar la verificación' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // KYC is now at organization level, not user level
+  // This page is kept for backward compatibility but functionality is removed
 
   const handleContactSupport = () => {
     // Aquí podrías redirigir a una página de contacto o abrir un modal
@@ -92,40 +45,14 @@ export default function VerificationErrorPage() {
                 </Alert>
 
                 <Alert variant="info" className="mb-4">
-                  <Alert.Heading>¿Qué puedes hacer?</Alert.Heading>
+                  <Alert.Heading>Nota Importante</Alert.Heading>
                   <p className="mb-0">
-                    Puedes intentar el proceso de verificación nuevamente o contactar 
-                    con nuestro equipo de soporte si el problema persiste.
+                    La verificación de identidad ahora se realiza a nivel de organización. 
+                    Contacta con el administrador de tu organización para completar el proceso KYC.
                   </p>
                 </Alert>
 
-                {message && (
-                  <Alert variant={message.type === 'success' ? 'success' : 'danger'} className="mb-3">
-                    {message.text}
-                  </Alert>
-                )}
-
                 <div className="d-grid gap-2">
-                  <Button 
-                    variant="primary" 
-                    size="lg" 
-                    onClick={handleRetry}
-                    disabled={isLoading || !userId}
-                    className="mb-2"
-                  >
-                    {isLoading ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Generando nueva verificación...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-redo me-2"></i>
-                        Reintentar Verificación
-                      </>
-                    )}
-                  </Button>
-                  
                   <Button 
                     variant="outline-secondary" 
                     size="lg" 

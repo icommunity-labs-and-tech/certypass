@@ -3,7 +3,6 @@ export interface JWTPayload {
   email: string;
   name: string;
   role: string;
-  verificationStatus: string;
   organizationId: string | null; // NULL para SUPER_ADMIN
   context: 'admin' | 'operator' | 'superadmin'; // Nuevo campo para identificar el contexto
   iat?: number;
@@ -18,7 +17,6 @@ export interface AuthResult {
     email: string;
     name: string;
     role: string;
-    verificationStatus: string;
   };
   error?: string;
   token?: string;

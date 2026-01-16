@@ -7,7 +7,6 @@ import DashboardKPIs from '@/components/charts/DashboardKPIs';
 import MonthlyActivityChart from '@/components/charts/MonthlyActivityChart';
 import CategoryDistributionChart from '@/components/charts/CategoryDistributionChart';
 import { BackupStatusByUserChart } from '@/components/charts/BackupStatusByUserChart';
-import { useVerificationNotification } from '@/hooks/useVerificationNotification';
 import { useAuthSeparated } from '@/hooks/useAuthSeparated';
 import type { DashboardKPIs as DashboardKPIsType, MonthlyActivity, CategoryDistribution, BackupStatus, BackupStatusByUser } from '@/types/dashboard';
 

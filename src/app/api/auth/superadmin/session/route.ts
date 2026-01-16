@@ -24,7 +24,6 @@ export async function GET() {
         email: payload.email,
         name: payload.name,
         role: payload.role,
-        verificationStatus: payload.verificationStatus,
       },
     });
   } catch (error) {

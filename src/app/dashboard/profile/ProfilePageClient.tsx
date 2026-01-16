@@ -1,16 +1,48 @@
 'use client';
 
-import { useState } from 'react';
-import { Button, Badge, Row, Col, Card } from 'react-bootstrap';
+import { Badge, Row, Col, Card, Alert, Button, Spinner } from 'react-bootstrap';
 import Box from '@/components/Box';
 import BoxTitle from '@/components/BoxTitle';
 // ObjectViewer removed - not currently used
 import { formatValueWithSmartDateDetection } from '@/lib/format';
 import ChangePasswordForm from '@/components/ChangePasswordForm';
-import { retryVerification } from '@/actions/users';
+import { retryOrganizationKyc } from '@/actions/organizations/retry-organization-kyc';
+import { useState } from 'react';
 // import { updateSigningPreference } from '@/actions/users';
 
 export default function ProfilePageClient({ user }: { user: any }) {
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
+  const [kycURL, setKycURL] = useState<string | null>(user?.Organization?.kycURL || null);
+
+  const handleRetryKyc = async () => {
+    setRetrying(true);
+    setRetryError(null);
+    
+    try {
+      const result = await retryOrganizationKyc();
+      if (result.success) {
+        if (result.kycURL) {
+          setKycURL(result.kycURL);
+          window.open(result.kycURL, '_blank', 'noopener,noreferrer');
+        } else {
+          setRetryError('No se pudo obtener una URL de verificación. Por favor, intenta más tarde.');
+        }
+      } else {
+        setRetryError(result.error || 'Error al reintentar el KYC');
+      }
+    } catch (error) {
+      setRetryError(error instanceof Error ? error.message : 'Error desconocido');
+    } finally {
+      setRetrying(false);
+    }
+  };
+
+  const handleOpenKyc = () => {
+    if (kycURL) {
+      window.open(kycURL, '_blank', 'noopener,noreferrer');
+    }
+  };
   
 
 
@@ -107,6 +139,111 @@ export default function ProfilePageClient({ user }: { user: any }) {
       </Box>
 
 
+      {/* Verificación de Identidad (KYC) */}
+      {user?.Organization && (
+        <Box>
+          <BoxTitle message='Verificación de Identidad (KYC)'/>
+          
+          <Card className="mb-3">
+            <Card.Body>
+              <h6 className="card-title">Estado de Verificación de la Organización</h6>
+              <div className="mb-3">
+                <strong>Organización:</strong> {user.Organization.nombre}
+              </div>
+              <div className="mb-3">
+                <strong>Estado:</strong>{' '}
+                <Badge 
+                  bg={
+                    user.Organization.verificationStatus === 'VERIFIED' ? 'success' :
+                    user.Organization.verificationStatus === 'WAITING' ? 'warning' :
+                    user.Organization.verificationStatus === 'REJECTED' ? 'danger' :
+                    'secondary'
+                  }
+                >
+                  {user.Organization.verificationStatus === 'VERIFIED' ? 'Verificado' :
+                   user.Organization.verificationStatus === 'WAITING' ? 'En proceso' :
+                   user.Organization.verificationStatus === 'REJECTED' ? 'Rechazado' :
+                   'No verificado'}
+                </Badge>
+              </div>
+
+              {user.Organization.verificationStatus !== 'VERIFIED' && (
+                <>
+                  <Alert variant={user.Organization.verificationStatus === 'REJECTED' ? 'danger' : 'warning'} className="mb-3">
+                    <Alert.Heading>
+                      <i className={`bi bi-${user.Organization.verificationStatus === 'REJECTED' ? 'x-circle' : 'clock'}-fill me-2`}></i>
+                      {user.Organization.verificationStatus === 'REJECTED' 
+                        ? 'Verificación Rechazada' 
+                        : 'Verificación Pendiente'}
+                    </Alert.Heading>
+                    <p className="mb-0">
+                      {user.Organization.verificationStatus === 'REJECTED'
+                        ? 'La verificación de identidad fue rechazada. Por favor, revisa la información y reintenta el proceso.'
+                        : 'La verificación de identidad está pendiente de aprobación. Esto puede tomar unos días.'}
+                    </p>
+                    {user.Organization.verificationStatus === 'WAITING' && (
+                      <p className="mb-0 mt-2 small">
+                        <i className="bi bi-info-circle me-1"></i>
+                        El proceso de verificación está en revisión. Recibirás una notificación cuando se complete.
+                      </p>
+                    )}
+                  </Alert>
+
+                  <div className="d-flex gap-2 flex-wrap">
+                    {kycURL && (
+                      <Button
+                        variant="primary"
+                        onClick={handleOpenKyc}
+                      >
+                        <i className="bi bi-box-arrow-up-right me-2"></i>
+                        {user.Organization.verificationStatus === 'WAITING' 
+                          ? 'Ver Proceso de Verificación' 
+                          : 'Abrir Proceso de Verificación'}
+                      </Button>
+                    )}
+                    <Button
+                      variant={user.Organization.verificationStatus === 'REJECTED' ? 'danger' : 'outline-primary'}
+                      onClick={handleRetryKyc}
+                      disabled={retrying}
+                    >
+                      {retrying ? (
+                        <>
+                          <Spinner size="sm" className="me-2" />
+                          Reintentando...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-arrow-clockwise me-2"></i>
+                          Reintentar KYC
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {retryError && (
+                    <Alert variant="danger" className="mt-3">
+                      {retryError}
+                    </Alert>
+                  )}
+
+                  <p className="text-muted small mt-3 mb-0">
+                    <i className="bi bi-info-circle me-1"></i>
+                    Necesitarás completar el KYC para crear items y estados certificados en blockchain.
+                  </p>
+                </>
+              )}
+
+              {user.Organization.verificationStatus === 'VERIFIED' && (
+                <Alert variant="success">
+                  <i className="bi bi-check-circle-fill me-2"></i>
+                  Tu organización está verificada. Ya puedes crear items y estados certificados.
+                </Alert>
+              )}
+            </Card.Body>
+          </Card>
+        </Box>
+      )}
+
       {/* Cambio de Contraseña */}
       <Box>
         <BoxTitle message='Cambio de contraseña'/>
@@ -116,75 +253,6 @@ export default function ProfilePageClient({ user }: { user: any }) {
         <ChangePasswordForm />
       </Box>
 
-      {/* Oculto: se elimina la gestión de verificación/signature para el dashboard */}
     </>
-  );
-}
-
-// Componente para el botón de reintentar verificación (no utilizado actualmente)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function RetryVerificationButton({ userId }: { userId: string }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-
-  const handleRetry = async () => {
-    setIsLoading(true);
-    setMessage(null);
-
-    try {
-      const result = await retryVerification();
-      
-      if (result.success) {
-        if ('kycURL' in result && result.kycURL) {
-          setMessage({ type: 'success', text: 'Nueva URL de verificación generada. Redirigiendo...' });
-          setTimeout(() => { window.location.href = result.kycURL!; }, 1500);
-        } else {
-          setMessage({ type: 'success', text: 'Verificación reintentada. Estado actualizado.' });
-          setTimeout(() => { window.location.reload(); }, 1500);
-        }
-      } else {
-        setMessage({ type: 'error', text: (result as any).error || 'Error al reintentar la verificación' });
-      }
-    } catch {
-      setMessage({ type: 'error', text: 'Error inesperado al reintentar la verificación' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div>
-      <Button 
-        variant="primary" 
-        size="sm" 
-        onClick={handleRetry}
-        disabled={isLoading}
-        className="mb-2"
-      >
-        {isLoading ? (
-          <>
-            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            Procesando...
-          </>
-        ) : (
-          <>
-            <i className="fas fa-redo me-1"></i>
-            Reintentar Verificación
-          </>
-        )}
-      </Button>
-      
-      {message && (
-        <div className={`alert alert-${message.type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`} role="alert">
-          {message.text}
-          <button 
-            type="button" 
-            className="btn-close" 
-            onClick={() => setMessage(null)}
-            aria-label="Close"
-          ></button>
-        </div>
-      )}
-    </div>
   );
 }

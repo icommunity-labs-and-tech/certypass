@@ -4,7 +4,6 @@ import { revalidatePath } from 'next/cache';
 import { verifyAdminAuth } from './helpers';
 import { createUserServiceImpl } from '@/domain/users/UserServiceImpl';
 import { userRepository } from '@/infrastructure/prisma/repositories/UserRepositoryPrisma';
-import { icommunityService } from '@/infrastructure/icommunity/ICommunityServiceImpl';
 
 export async function deleteUser(id: string) {
   try {
@@ -15,7 +14,6 @@ export async function deleteUser(id: string) {
 
     const userService = createUserServiceImpl({
       userRepository,
-      icommunityService,
     });
     await userService.deleteUser(id);
 

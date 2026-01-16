@@ -19,8 +19,6 @@ export async function GET() {
         email: true,
         name: true,
         role: true,
-        verificationStatus: true,
-        signatureID: true,
         signsWithCertificate: true,
         phone: true,
         createdAt: true,

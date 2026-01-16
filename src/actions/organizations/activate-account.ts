@@ -6,6 +6,7 @@ import { hash } from "bcryptjs";
 export interface ActivateAccountInput {
   activationToken: string;
   password: string;
+  skipKycCheck?: boolean; // Si es true, no verifica KYC antes de activar
 }
 
 export interface ActivateAccountResult {
@@ -36,6 +37,18 @@ export async function activateAccount(
             id: true,
             nombre: true,
             activa: true,
+            verificationStatus: true,
+            User: {
+              where: {
+                role: "ADMIN",
+              },
+              orderBy: {
+                createdAt: "asc",
+              },
+              select: {
+                id: true,
+              },
+            },
           },
         },
       },
@@ -71,6 +84,9 @@ export async function activateAccount(
         error: "La organización está desactivada",
       };
     }
+
+    // El KYC ya no es obligatorio para activar la cuenta
+    // Los usuarios pueden acceder al sistema sin tener el KYC aprobado
     
     // Hash de la contraseña
     const hashedPassword = await hash(input.password, 10);

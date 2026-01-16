@@ -1,7 +1,7 @@
 import { ICommunityConfigError, ICommunityHTTPError } from '@/infrastructure/icommunity/errors';
 import type { ICommunityService } from '@/infrastructure/icommunity/ICommunityService';
 import type { UserRepository } from './UserRepository';
-import { AuthorizationError, InvalidCredentialsError, KycUrlGenerationError, PasswordValidationError, UserAlreadyExistsError, UserInputError, UserNotFoundError } from './errors';
+import { AuthorizationError, InvalidCredentialsError, PasswordValidationError, UserAlreadyExistsError, UserInputError, UserNotFoundError } from './errors';
 
 export interface CreateUserRequest {
   email: string;
@@ -18,9 +18,6 @@ export interface UpdateUserRequest {
   role?: 'USER' | 'ADMIN';
   phone?: string | null;
   notes?: string | null;
-  verificationStatus?: 'NOT_VERIFIED' | 'WAITING' | 'VERIFIED';
-  signatureID?: string | null;
-  kycURL?: string | null;
 }
 
 export interface ChangePasswordRequest {
@@ -37,14 +34,6 @@ export interface UserResponse {
   role: 'USER' | 'ADMIN';
   phone?: string | null;
   notes?: string | null;
-  verificationStatus: 'NOT_VERIFIED' | 'WAITING' | 'VERIFIED';
-  signatureID?: string | null;
-  kycURL?: string | null;
-}
-
-export interface VerificationResponse {
-  verificationStatus: 'NOT_VERIFIED' | 'WAITING' | 'VERIFIED';
-  kycURL?: string;
 }
 
 export interface UserService {
@@ -63,12 +52,4 @@ export interface UserService {
   changePassword(
     data: ChangePasswordRequest
   ): Promise<void>;
-
-  getOrCreateKycUrl(
-    userId: string
-  ): Promise<{ kycURL: string }>;
-
-  retryVerification(
-    userId: string
-  ): Promise<VerificationResponse>;
 }

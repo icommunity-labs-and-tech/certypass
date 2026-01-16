@@ -1,5 +1,5 @@
 import { StateService, type CreateStateRequest, type StateResponse } from './stateService';
-import { StateCreationRollbackError, StateInputError, StateAlreadyExistsError, UserNotVerifiedError } from './errors';
+import { StateCreationRollbackError, StateInputError, StateAlreadyExistsError, OrganizationNotVerifiedError } from './errors';
 import type { StateRepository } from './StateRepository';
 import type { UserRepository } from '../users/UserRepository';
 import type { StatusTypeRepository } from '../status-types/StatusTypeRepository';
@@ -8,6 +8,7 @@ import { requireOrganizationId } from '@/lib/auth/tenant';
 import { getCurrentUserWithDetails } from '@/lib/auth/shared/session';
 import { generateStateTitle } from './stateUtils';
 import { revalidatePath } from 'next/cache';
+import { prisma } from '@/lib/prisma';
 
 export function createStateServiceImpl(deps: {
   stateRepository: StateRepository;
@@ -23,39 +24,49 @@ export function createStateServiceImpl(deps: {
         // Get organizationId from context
         const organizationId = await requireOrganizationId();
         
-        // 1. Get current user and validate signature
+        // 1. Get current user for createdByUserId
         const currentUser = await getCurrentUserWithDetails();
         
         if (!currentUser?.id) {
-          throw new UserNotVerifiedError(
-            'current',
-            'no_signature',
-            'No se pudo obtener el usuario actual'
-          );
+          throw new StateInputError('name', 'No se pudo obtener el usuario actual');
         }
 
         const user = await userRepo.getById(currentUser.id);
-
-        if (!user?.signatureID) {
-          throw new UserNotVerifiedError(
-            user?.id || currentUser.id,
-            'no_signature',
-            'No se pudo certificar la evidencia: tu usuario no tiene una firma verificada. Completa el KYC en tu perfil.'
-          );
-        }
-
-        if (user.verificationStatus !== 'VERIFIED') {
-          throw new UserNotVerifiedError(
-            user.id,
-            'not_verified',
-            'Tu firma no está verificada. Completa el proceso KYC antes de crear estados.'
-          );
-        }
-
-        const signatureID = user.signatureID!;
         const userId = user.id;
 
-        // 2. Get statusType to generate title
+        // 2. Get organization and validate signature
+        const organization = await prisma.organization.findUnique({
+          where: { id: organizationId },
+          select: {
+            id: true,
+            signatureID: true,
+            verificationStatus: true,
+          },
+        });
+
+        if (!organization) {
+          throw new StateInputError('name', 'Organización no encontrada');
+        }
+
+        if (!organization.signatureID) {
+          throw new OrganizationNotVerifiedError(
+            organization.id,
+            'no_signature',
+            'No se pudo certificar la evidencia: tu organización no tiene una firma verificada. Completa el KYC de la organización.'
+          );
+        }
+
+        if (organization.verificationStatus !== 'VERIFIED') {
+          throw new OrganizationNotVerifiedError(
+            organization.id,
+            'not_verified',
+            'La firma de tu organización no está verificada. Completa el proceso KYC de la organización antes de crear estados.'
+          );
+        }
+
+        const signatureID = organization.signatureID;
+
+        // 3. Get statusType to generate title
         let statusType;
         try {
           statusType = await statusTypeRepo.getById(data.statusTypeId, organizationId);
@@ -66,7 +77,7 @@ export function createStateServiceImpl(deps: {
           );
         }
 
-        // 3. Generate state title
+        // 4. Generate state title
         const stateTitle = generateStateTitle(data.name || '', statusType.name);
 
         // Ensure title is not empty
@@ -77,7 +88,7 @@ export function createStateServiceImpl(deps: {
           );
         }
 
-        // 4. Create state in DB (sin rollback automático, lo manejamos manualmente)
+        // 5. Create state in DB (sin rollback automático, lo manejamos manualmente)
         let created;
         try {
           created = await stateRepo.create({
@@ -108,7 +119,7 @@ export function createStateServiceImpl(deps: {
         };
 
         try {
-          // 5. Create evidence with rollback on failure
+          // 6. Create evidence with rollback on failure
           let evidenceID: string;
           try {
             evidenceID = await evidence.createStateEvidence({
@@ -160,7 +171,7 @@ export function createStateServiceImpl(deps: {
             );
           }
 
-          // 6. Revalidate cache
+          // 7. Revalidate cache
           revalidatePath('/dashboard/states');
           revalidatePath(`/dashboard/items/${created.itemId}`);
 
@@ -179,7 +190,7 @@ export function createStateServiceImpl(deps: {
       } catch (error) {
         if (error instanceof StateInputError || 
             error instanceof StateAlreadyExistsError || 
-            error instanceof UserNotVerifiedError || 
+            error instanceof OrganizationNotVerifiedError || 
             error instanceof StateCreationRollbackError) {
           throw error;
         }

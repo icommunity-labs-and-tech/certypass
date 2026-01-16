@@ -178,19 +178,6 @@ export default function UsersTable({
               {value === 'ADMIN' ? 'Administrador' : 'Operador'}
             </span>
           );
-        case 'verificationStatus':
-          const statusConfig = {
-            'NOT_VERIFIED': { class: 'bg-secondary', text: 'No verificado' },
-            'WAITING': { class: 'bg-warning', text: 'En espera' },
-            'VERIFIED': { class: 'bg-success', text: 'Verificado' },
-            'REJECTED': { class: 'bg-danger', text: 'Rechazado' }
-          };
-          const config = statusConfig[value as keyof typeof statusConfig] || { class: 'bg-secondary', text: value };
-          return (
-            <span className={`badge ${config.class}`}>
-              {config.text}
-            </span>
-          );
         case 'createdAt':
           return new Date(value).toLocaleDateString('es-ES');
         case 'actions':

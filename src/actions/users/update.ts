@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache';
 import { createUserServiceImpl } from '@/domain/users/UserServiceImpl';
 import { userRepository } from '@/infrastructure/prisma/repositories/UserRepositoryPrisma';
-import { icommunityService } from '@/infrastructure/icommunity/ICommunityServiceImpl';
 import { AuthorizationError, UserAlreadyExistsError, UserInputError, UserNotFoundError } from '@/domain/users/errors';
 
 export async function updateUser(id: string, formData: FormData) {
@@ -13,15 +12,11 @@ export async function updateUser(id: string, formData: FormData) {
     const role = formData.get('role') as 'USER' | 'ADMIN';
     const phone = (formData.get('phone') as string) || null;
     const notes = (formData.get('notes') as string) || null;
-    const verificationStatus = formData.get('verificationStatus') as any;
-    const signatureID = (formData.get('signatureID') as string) || null;
-    const kycURL = (formData.get('kycURL') as string) || null;
 
     const userService = createUserServiceImpl({
       userRepository,
-      icommunityService,
     });
-    const { user } = await userService.updateUser({ id, name, email, role, phone, notes, verificationStatus, signatureID, kycURL });
+    const { user } = await userService.updateUser({ id, name, email, role, phone, notes });
 
     revalidatePath('/dashboard/users');
 

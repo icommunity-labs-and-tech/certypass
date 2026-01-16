@@ -175,31 +175,35 @@ model Notification {
 }
 
 model Organization {
-  id            String         @id
-  nombre        String
-  slug          String         @unique
-  dominio       String?        @unique
-  activa        Boolean        @default(true)
-  plan          String         @default("basic")
-  limites       Json?
-  configuracion Json?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime
-  ApiCall       ApiCall[]
-  ApiToken      ApiToken[]
-  Category      Category[]
-  EventLog      EventLog[]
-  Invitation    Invitation[]
-  Issue         Issue[]
-  Item          Item[]
-  Notification  Notification[]
-  StatusType    StatusType[]
-  User          User[]
-  Webhook       Webhook[]
-  ImportJob     ImportJob[]
+  id                String             @id
+  nombre            String
+  slug              String             @unique
+  dominio           String?            @unique
+  activa            Boolean            @default(true)
+  plan              String             @default("basic")
+  limites           Json?
+  configuracion      Json?
+  signatureID        String?            @unique
+  kycURL            String?
+  verificationStatus VerificationStatus @default(NOT_VERIFIED)
+  createdAt         DateTime           @default(now())
+  updatedAt          DateTime
+  ApiCall           ApiCall[]
+  ApiToken          ApiToken[]
+  Category          Category[]
+  EventLog          EventLog[]
+  Invitation        Invitation[]
+  Issue             Issue[]
+  Item              Item[]
+  Notification      Notification[]
+  StatusType        StatusType[]
+  User              User[]
+  Webhook           Webhook[]
+  ImportJob         ImportJob[]
 
   @@index([activa])
   @@index([slug])
+  @@index([signatureID])
 }
 
 model PasswordResetToken {
@@ -259,9 +263,6 @@ model User {
   password             String?
   name                 String
   role                 UserRole             @default(USER)
-  verificationStatus   VerificationStatus   @default(NOT_VERIFIED)
-  kycURL               String?
-  signatureID          String?              @unique
   signsWithCertificate Boolean              @default(false)
   phone                String?
   permissions          Json?

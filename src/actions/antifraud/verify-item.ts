@@ -24,12 +24,12 @@ export async function verifyItemAntifalsificacion(
   } = {}
 ): Promise<VerifyItemResult> {
   try {
-    // 1. Get item with creator using Prisma directly (no org context needed)
+    // 1. Get item with organization using Prisma directly (no org context needed)
     const item = await prisma.item.findUnique({
       where: { id: itemId },
       select: {
         id: true,
-        createdByUserId: true,
+        organizationId: true,
         antifraudEvidenceId: true,
       },
     });
@@ -52,14 +52,14 @@ export async function verifyItemAntifalsificacion(
       };
     }
 
-    // 2. Get creator's signatureID if exists
+    // 2. Get organization's signatureID
     let signatureID: string | null = null;
-    if (item.createdByUserId) {
-      const creator = await prisma.user.findUnique({
-        where: { id: item.createdByUserId },
+    if (item.organizationId) {
+      const organization = await prisma.organization.findUnique({
+        where: { id: item.organizationId },
         select: { signatureID: true },
       });
-      signatureID = creator?.signatureID ?? null;
+      signatureID = organization?.signatureID ?? null;
     }
 
     // 3. Verify item using service

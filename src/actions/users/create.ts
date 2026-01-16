@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache';
 import { createUserServiceImpl } from '@/domain/users/UserServiceImpl';
 import { userRepository } from '@/infrastructure/prisma/repositories/UserRepositoryPrisma';
-import { icommunityService } from '@/infrastructure/icommunity/ICommunityServiceImpl';
 import { AuthorizationError, UserAlreadyExistsError, UserInputError } from '@/domain/users/errors';
 
 export async function createUser(formData: FormData) {
@@ -16,7 +15,6 @@ export async function createUser(formData: FormData) {
 
     const userService = createUserServiceImpl({
       userRepository,
-      icommunityService,
     });
     const result = await userService.createUser({ email, name, role, phone, notes });
 

@@ -32,7 +32,6 @@ export async function authenticateAdmin(email: string, password: string): Promis
       email: user.email,
       name: user.name,
       role: user.role,
-      verificationStatus: user.verificationStatus,
     },
     token,
   };

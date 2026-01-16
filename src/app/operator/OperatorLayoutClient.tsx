@@ -8,7 +8,6 @@ interface JWTPayload {
   email: string;
   name: string;
   role: string;
-  verificationStatus: string;
 }
 
 interface OperatorLayoutClientProps {

@@ -15,8 +15,6 @@ import { UnifiedScannerButton } from '@/components';
 import { usePagination } from '@/hooks/usePagination';
 import { useItemFilter } from '@/hooks/useItemFilter';
 import { OPERATOR_CONSTANTS, OPERATOR_MESSAGES, OPERATOR_BUTTONS } from '@/constants/operator';
-import VerificationBanner from '@/components/VerificationBanner';
-import { useOperatorVerificationNotification } from '@/hooks/useOperatorVerificationNotification';
 import { useAdminOperatorAccess } from '@/hooks/useAdminOperatorAccess';
 import './operator.css';
 
@@ -26,9 +24,6 @@ export default function OperatorPage() {
   const { user, logout } = useAuthSeparated();
   const router = useRouter();
   const { clearAdminOperatorAccess } = useAdminOperatorAccess();
-
-  // Hook para notificaciones de verificación
-  useOperatorVerificationNotification();
 
   // State
   const [itemsList, setItemsList] = useState<Item[]>([]);
@@ -147,12 +142,6 @@ export default function OperatorPage() {
       </Row>
 
 
-      {/* Banner de verificación de firma */}
-      <Row className="mb-3" role="region" aria-label="Estado de verificación de firma">
-        <Col>
-          <VerificationBanner variant="warning" />
-        </Col>
-      </Row>
 
       {/* Scanner functionality is now handled by the unified scanner page */}
 

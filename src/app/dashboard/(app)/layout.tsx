@@ -6,7 +6,7 @@ import PageHeader from '@/components/Header';
 import PageBody from '@/components/Body';
 import { SidebarProvider, useSidebar } from '@/components/SidebarContext';
 import { AuthProvider } from '@/hooks/useAuthSeparated';
-import VerificationBanner from '@/components/VerificationBanner';
+import OrganizationKycBanner from '@/components/OrganizationKycBanner';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -63,7 +63,9 @@ function Shell({ children }: { children: React.ReactNode }) {
       >
         <main className="flex-grow-1 px-4 py-3 d-flex flex-column">
           <PageHeader />
-          <VerificationBanner variant="warning" showActionButton={true} className="mt-4" />
+          <div className="mt-4">
+            <OrganizationKycBanner />
+          </div>
           <div className="flex-grow-1 d-flex">
             <PageBody>{children}</PageBody>
           </div>

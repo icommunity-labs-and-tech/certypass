@@ -1,11 +1,12 @@
 import { ItemService, type CreateItemRequest, type ItemResponse } from './ItemService';
-import { ItemCreationRollbackError, ItemInputError, ItemAlreadyExistsError, UserNotVerifiedError } from './errors';
+import { ItemCreationRollbackError, ItemInputError, ItemAlreadyExistsError, OrganizationNotVerifiedError } from './errors';
 import type { ItemRepository } from './ItemRepository';
 import type { UserRepository } from '../users/UserRepository';
 import type { EvidenceService } from '../evidence/EvidenceService';
 import { requireOrganizationId } from '@/lib/auth/tenant';
 import { getCurrentUserWithDetails } from '@/lib/auth/shared/session';
 import { revalidatePath } from 'next/cache';
+import { prisma } from '@/lib/prisma';
 
 export function createItemServiceImpl(deps: {
   itemRepository: ItemRepository;
@@ -34,39 +35,49 @@ export function createItemServiceImpl(deps: {
           // Item doesn't exist, continue
         }
 
-        // 2. Get current user and validate signature
+        // 2. Get current user for createdByUserId
         const currentUser = await getCurrentUserWithDetails();
         
         if (!currentUser?.id) {
-          throw new UserNotVerifiedError(
-            'current',
-            'no_signature',
-            'No se pudo obtener el usuario actual'
-          );
+          throw new ItemInputError('name', 'No se pudo obtener el usuario actual');
         }
 
         const user = await userRepo.getById(currentUser.id);
-
-        if (!user?.signatureID) {
-          throw new UserNotVerifiedError(
-            user?.id || currentUser.id,
-            'no_signature',
-            'No se pudo certificar la evidencia: tu usuario no tiene una firma verificada. Completa el KYC en tu perfil.'
-          );
-        }
-
-        if (user.verificationStatus !== 'VERIFIED') {
-          throw new UserNotVerifiedError(
-            user.id,
-            'not_verified',
-            'Tu firma no está verificada. Completa el proceso KYC antes de crear items.'
-          );
-        }
-
-        const signatureID = user.signatureID!;
         const userId = user.id;
 
-        // 3. Create item in DB with rollback capability
+        // 3. Get organization and validate signature
+        const organization = await prisma.organization.findUnique({
+          where: { id: organizationId },
+          select: {
+            id: true,
+            signatureID: true,
+            verificationStatus: true,
+          },
+        });
+
+        if (!organization) {
+          throw new ItemInputError('name', 'Organización no encontrada');
+        }
+
+        if (!organization.signatureID) {
+          throw new OrganizationNotVerifiedError(
+            organization.id,
+            'no_signature',
+            'No se pudo certificar la evidencia: tu organización no tiene una firma verificada. Completa el KYC de la organización.'
+          );
+        }
+
+        if (organization.verificationStatus !== 'VERIFIED') {
+          throw new OrganizationNotVerifiedError(
+            organization.id,
+            'not_verified',
+            'La firma de tu organización no está verificada. Completa el proceso KYC de la organización antes de crear items.'
+          );
+        }
+
+        const signatureID = organization.signatureID;
+
+        // 4. Create item in DB with rollback capability
         // Note: categoryIds are passed to create() for the legacy categoryId field
         // The many-to-many relationship is handled separately via addCategoriesToItem
         let created;
@@ -100,7 +111,7 @@ export function createItemServiceImpl(deps: {
         };
 
         try {
-          // 3.5. Add categories to item (many-to-many relationship)
+          // 4.5. Add categories to item (many-to-many relationship)
           // Items can have multiple categories via ItemCategory table
           if (data.categoryIds && data.categoryIds.length > 0) {
             try {
@@ -116,7 +127,7 @@ export function createItemServiceImpl(deps: {
           }
           // Note: categoryId (legacy field) is set to first category if provided, but is optional
 
-          // 4. Create evidence with rollback on failure
+          // 5. Create evidence with rollback on failure
           let evidenceID: string;
           try {
             evidenceID = await evidence.createItemEvidence({
@@ -156,7 +167,7 @@ export function createItemServiceImpl(deps: {
             );
           }
 
-          // 5. Revalidate cache
+          // 6. Revalidate cache
           revalidatePath('/dashboard/items');
 
           return {
@@ -173,7 +184,7 @@ export function createItemServiceImpl(deps: {
       } catch (error) {
         if (error instanceof ItemInputError || 
             error instanceof ItemAlreadyExistsError || 
-            error instanceof UserNotVerifiedError || 
+            error instanceof OrganizationNotVerifiedError || 
             error instanceof ItemCreationRollbackError) {
           throw error;
         }

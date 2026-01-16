@@ -42,7 +42,6 @@ const listColumnPresets: Record<string, UnifiedColumn[]> = {
   users: [
     { key: 'name', label: 'Nombre', format: 'text', width: '200px', sortable: true },
     { key: 'role', label: 'Rol', format: 'status', width: '120px', sortable: true },
-    { key: 'verificationStatus', label: 'Verificación', format: 'status', width: '120px', sortable: true },
     { key: 'createdAt', label: 'Creado', format: 'datetime', width: '150px', sortable: true },
     { key: 'actions', label: 'Acciones', format: 'action', width: '120px', sortable: false }
   ]

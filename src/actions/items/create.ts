@@ -4,7 +4,7 @@ import { ItemService, type CreateItemRequest, type ItemResponse } from '@/domain
 import { createItemServiceImpl } from '@/domain/items/ItemServiceImpl';
 import { createEvidenceServiceImpl } from '@/domain/evidence/EvidenceServiceImpl';
 import { icommunityService } from '@/infrastructure/icommunity/ICommunityServiceImpl';
-import { ItemInputError, ItemAlreadyExistsError, UserNotVerifiedError, ItemCreationRollbackError } from '@/domain/items/errors';
+import { ItemInputError, ItemAlreadyExistsError, OrganizationNotVerifiedError, ItemCreationRollbackError } from '@/domain/items/errors';
 import type { FormTemplate } from '@/components/GenericTable';
 import { itemRepository } from '@/infrastructure/prisma/repositories/ItemRepositoryPrisma';
 import { userRepository } from '@/infrastructure/prisma/repositories/UserRepositoryPrisma';
@@ -105,7 +105,7 @@ export async function addItem(
     if (error instanceof ItemAlreadyExistsError) {
       throw new Error(error.message);
     }
-    if (error instanceof UserNotVerifiedError) {
+    if (error instanceof OrganizationNotVerifiedError) {
       throw new Error(error.message);
     }
     if (error instanceof ItemCreationRollbackError) {

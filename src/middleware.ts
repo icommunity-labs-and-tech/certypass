@@ -49,6 +49,7 @@ export async function middleware(request: NextRequest) {
   const publicRoutes = [
     '/auth/admin/login',
     '/auth/operator/login',
+    '/auth/activate',
     '/auth/error',
     '/api/auth/admin',
     '/api/auth/operator',

@@ -8,9 +8,6 @@ export const createUserFixture = (overrides: Partial<UserRecord> = {}): UserReco
   role: 'USER',
   phone: null,
   notes: null,
-  verificationStatus: 'VERIFIED',
-  signatureID: 'sig-123',
-  kycURL: 'https://kyc.example.com',
   signsWithCertificate: true,
   createdAt: new Date('2024-01-01T00:00:00Z'),
   updatedAt: new Date('2024-01-01T00:00:00Z'),
@@ -31,9 +28,6 @@ export const createUnverifiedUserFixture = (overrides: Partial<UserRecord> = {})
     id: 'unverified-123',
     email: 'unverified@example.com',
     name: 'Unverified User',
-    verificationStatus: 'NOT_VERIFIED',
-    signatureID: null,
-    kycURL: null,
     ...overrides,
   });
 

@@ -8,7 +8,6 @@ import { formatValueWithSmartDateDetection } from '@/lib/format';
 import { getItem } from '@/actions/items';
 import { getStatesByItem } from '@/actions/states';
 import { convertStatesToTimeline } from '@/lib/timeline';
-import VerificationBanner from '@/components/VerificationBanner';
 import '@/app/operator/operator.css';
 
 export default function OperatorItemDetailsPage() {
@@ -96,12 +95,6 @@ export default function OperatorItemDetailsPage() {
         </Col>
       </Row>
 
-      {/* Banner de verificación de firma */}
-      <Row className="mb-3" role="region" aria-label="Estado de verificación de firma">
-        <Col>
-          <VerificationBanner variant="warning" />
-        </Col>
-      </Row>
 
       <Row className="mb-4">
         <Col>

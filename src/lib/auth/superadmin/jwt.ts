@@ -32,7 +32,6 @@ export async function authenticateSuperAdmin(email: string, password: string): P
       email: user.email,
       name: user.name,
       role: user.role,
-      verificationStatus: user.verificationStatus,
     },
     token,
   };

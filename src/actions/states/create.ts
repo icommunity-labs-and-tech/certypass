@@ -4,7 +4,7 @@ import { StateService, type CreateStateRequest, type StateResponse } from '@/dom
 import { createStateServiceImpl } from '@/domain/states/StateServiceImpl';
 import { createEvidenceServiceImpl } from '@/domain/evidence/EvidenceServiceImpl';
 import { icommunityService } from '@/infrastructure/icommunity/ICommunityServiceImpl';
-import { StateInputError, StateAlreadyExistsError, UserNotVerifiedError, StateCreationRollbackError } from '@/domain/states/errors';
+import { StateInputError, StateAlreadyExistsError, OrganizationNotVerifiedError, StateCreationRollbackError } from '@/domain/states/errors';
 import { EvidenceInputError, ImageFetchError, ImageSizeExceededError, EvidenceBuildError } from '@/domain/evidence/errors';
 import { ICommunityConfigError, ICommunityHTTPError } from '@/infrastructure/icommunity/errors';
 import { stateRepository } from '@/infrastructure/prisma/repositories/StateRepositoryPrisma';
@@ -87,7 +87,7 @@ export async function createState(data: {
     if (error instanceof StateAlreadyExistsError) {
       throw new Error(error.message);
     }
-    if (error instanceof UserNotVerifiedError) {
+    if (error instanceof OrganizationNotVerifiedError) {
       throw new Error(error.message);
     }
     if (error instanceof StateCreationRollbackError) {

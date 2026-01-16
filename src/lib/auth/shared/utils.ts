@@ -16,7 +16,6 @@ export async function authenticateUser(email: string, password: string): Promise
         name: true,
         password: true,
         role: true,
-        verificationStatus: true,
         organizationId: true, // Incluir organizationId
         status: true, // Verificar si está activo
       }
@@ -46,7 +45,6 @@ export async function authenticateUser(email: string, password: string): Promise
       email: user.email,
       name: user.name,
       role: user.role,
-      verificationStatus: user.verificationStatus,
       organizationId: user.organizationId, // Incluir en el payload
       context: 'admin', // Se sobrescribirá según el contexto
     };

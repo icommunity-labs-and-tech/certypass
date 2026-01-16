@@ -32,7 +32,6 @@ export async function authenticateOperator(email: string, password: string): Pro
       email: user.email,
       name: user.name,
       role: user.role,
-      verificationStatus: user.verificationStatus,
     },
     token,
   };

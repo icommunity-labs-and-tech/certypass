@@ -1,5 +1,12 @@
 # Resumen de Implementación: Evidencias de Items con KYC
 
+## ⚠️ ACTUALIZACIÓN IMPORTANTE (Enero 2026)
+**El sistema KYC ha sido migrado de usuario a nivel de organización.** 
+- El KYC ahora se realiza una vez por organización durante el signup
+- Los campos `signatureID`, `kycURL` y `verificationStatus` han sido movidos de `User` a `Organization`
+- Todas las evidencias (items y states) ahora se firman con la firma de la organización
+- Ver migración: `prisma/migrations/20260115113558_move_kyc_to_organization/`
+
 ## 🎉 Estado: Fase 1 y 2 Completadas
 
 **Rama**: `feature/admin-item-evidence-kyc`
@@ -74,16 +81,16 @@ Archivo: `src/lib/evidenceUtils.ts`
 Archivo: `src/actions/items/create.ts`
 
 **Flujo implementado:**
-1. ✅ Valida que el usuario tenga `signatureID` y estado `VERIFIED`
+1. ✅ Valida que la organización tenga `signatureID` y estado `VERIFIED`
 2. ✅ Crea el item en la base de datos
 3. ✅ Genera evidencia con `EvidenceBuilder`
-4. ✅ Crea evidencia en iCommunity
+4. ✅ Crea evidencia en iCommunity usando la firma de la organización
 5. ✅ Guarda `evidenceID` y `evidenceDataJson` en el item
 6. ✅ **Rollback automático** si falla la evidencia
 
 **Validaciones:**
-- Admin debe tener firma verificada (`VERIFIED`)
-- Admin debe tener `signatureID` válido
+- La organización debe tener firma verificada (`VERIFIED`)
+- La organización debe tener `signatureID` válido
 - Si falla evidencia, se elimina el item (rollback)
 
 ---

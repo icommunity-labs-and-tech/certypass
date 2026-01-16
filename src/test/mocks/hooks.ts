@@ -10,27 +10,4 @@ vi.mock('@/hooks/useAuthSeparated', () => ({
   }))
 }));
 
-vi.mock('@/hooks/useAdminVerificationNotification', () => ({
-  useAdminVerificationNotification: vi.fn(() => ({
-    showNotification: false,
-    message: '',
-    dismissNotification: vi.fn()
-  }))
-}));
-
-vi.mock('@/hooks/useOperatorVerificationNotification', () => ({
-  useOperatorVerificationNotification: vi.fn(() => ({
-    showNotification: false,
-    message: '',
-    dismissNotification: vi.fn()
-  }))
-}));
-
-vi.mock('@/hooks/useVerificationNotification', () => ({
-  useVerificationNotification: vi.fn(() => ({
-    showNotification: false,
-    message: '',
-    dismissNotification: vi.fn()
-  }))
-}));
 
