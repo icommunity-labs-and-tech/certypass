@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useSidebar } from './SidebarContext';
 import { useAuthSeparated } from '@/hooks/useAuthSeparated';
 import { Badge } from 'react-bootstrap';
+import Logo from './Logo';
 import './Sidebar.css';
 
 export default function Sidebar() {
@@ -57,8 +58,8 @@ export default function Sidebar() {
   return (
     <Container fluid className="sidebar-wrap min-vh-100 p-3 d-flex flex-column">
       <div className="px-2">
-        <Navbar.Brand href="#" className="d-flex align-items-center mb-3">
-          <span className="fs-5 fw-semibold">certypass</span>
+        <Navbar.Brand className="d-flex align-items-center mb-3">
+          <Logo href="/dashboard" width={120} height={40} priority />
         </Navbar.Brand>
         <hr className="opacity-75 border" />
         <Nav className="flex-column mb-auto">
