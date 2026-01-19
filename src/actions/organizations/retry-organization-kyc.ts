@@ -33,8 +33,6 @@ export async function retryOrganizationKyc(): Promise<RetryOrganizationKycResult
           select: {
             id: true,
             nombre: true,
-            signatureID: true,
-            verificationStatus: true,
           },
         },
       },
@@ -57,63 +55,27 @@ export async function retryOrganizationKyc(): Promise<RetryOrganizationKycResult
     const okUrl = `${baseUrl}/api/hooks/signature/ok`;
     const koUrl = `${baseUrl}/api/hooks/signature/ko`;
 
-    // Si el estado es REJECTED o no tiene signatureID, crear una nueva firma
-    // Esto sustituye la firma anterior con una nueva
-    if (organization.verificationStatus === 'REJECTED' || !organization.signatureID) {
-      const signatureResult = await icommunityService.createSignature(
-        organization.nombre,
-        okUrl,
-        koUrl
-      );
+    // Siempre crear una nueva firma, sustituyendo la anterior (si existe)
+    const signatureResult = await icommunityService.createSignature(
+      organization.nombre,
+      okUrl,
+      koUrl
+    );
 
-      // Actualizar organización con el nuevo signatureID y kycURL (sustituyendo el anterior)
-      await prisma.organization.update({
-        where: { id: organization.id },
-        data: {
-          signatureID: signatureResult.signature_id,
-          kycURL: signatureResult.url || null,
-          verificationStatus: signatureResult.signature_id ? 'WAITING' : 'NOT_VERIFIED',
-        },
-      });
-
-      return {
-        success: true,
+    // Actualizar organización con el nuevo signatureID y kycURL (sustituyendo el anterior)
+    await prisma.organization.update({
+      where: { id: organization.id },
+      data: {
+        signatureID: signatureResult.signature_id,
         kycURL: signatureResult.url || null,
-      };
-    }
+        verificationStatus: signatureResult.signature_id ? 'WAITING' : 'NOT_VERIFIED',
+      },
+    });
 
-    // Si el estado es WAITING o NOT_VERIFIED y ya tiene signatureID, usar retrySignature
-    try {
-      const retryResult = await icommunityService.retrySignature(organization.signatureID);
-      
-      // Actualizar kycURL si se obtuvo una nueva
-      if (retryResult.url) {
-        await prisma.organization.update({
-          where: { id: organization.id },
-          data: {
-            kycURL: retryResult.url,
-            verificationStatus: 'WAITING',
-          },
-        });
-      }
-
-      return {
-        success: true,
-        kycURL: retryResult.url || null,
-      };
-    } catch (retryError) {
-      console.error("Error retrying signature:", retryError);
-      // Si retry falla, devolver la URL existente si hay una
-      const org = await prisma.organization.findUnique({
-        where: { id: organization.id },
-        select: { kycURL: true },
-      });
-
-      return {
-        success: true,
-        kycURL: org?.kycURL || null,
-      };
-    }
+    return {
+      success: true,
+      kycURL: signatureResult.url || null,
+    };
   } catch (error) {
     console.error("Error retrying organization KYC:", error);
     return {

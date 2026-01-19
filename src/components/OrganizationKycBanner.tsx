@@ -64,31 +64,26 @@ export default function OrganizationKycBanner() {
   };
 
   const handleOpenKyc = async () => {
-    if (kycInfo.verificationStatus === 'REJECTED') {
-      // Si está rechazado, crear nueva firma
-      setRetrying(true);
-      setRetryError(null);
-      
-      try {
-        const result = await retryOrganizationKyc();
-        if (result.success && result.kycURL) {
-          // Recargar información del KYC para reflejar los cambios
-          const updatedResult = await getOrganizationKyc();
-          if (updatedResult.success && updatedResult.kycInfo) {
-            setKycInfo(updatedResult.kycInfo);
-          }
-          window.open(result.kycURL, '_blank', 'noopener,noreferrer');
-        } else {
-          setRetryError(result.error || 'Error al crear nueva firma');
+    // Siempre crear nueva firma, sin importar el estado actual
+    setRetrying(true);
+    setRetryError(null);
+    
+    try {
+      const result = await retryOrganizationKyc();
+      if (result.success && result.kycURL) {
+        // Recargar información del KYC para reflejar los cambios
+        const updatedResult = await getOrganizationKyc();
+        if (updatedResult.success && updatedResult.kycInfo) {
+          setKycInfo(updatedResult.kycInfo);
         }
-      } catch (error) {
-        setRetryError(error instanceof Error ? error.message : 'Error desconocido');
-      } finally {
-        setRetrying(false);
+        window.open(result.kycURL, '_blank', 'noopener,noreferrer');
+      } else {
+        setRetryError(result.error || 'Error al crear nueva firma');
       }
-    } else if (kycInfo.kycURL) {
-      // Si tiene URL, abrirla directamente
-      window.open(kycInfo.kycURL, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      setRetryError(error instanceof Error ? error.message : 'Error desconocido');
+    } finally {
+      setRetrying(false);
     }
   };
 
@@ -113,30 +108,24 @@ export default function OrganizationKycBanner() {
           {retryError}
         </Alert>
       )}
-      {(kycInfo.kycURL || kycInfo.verificationStatus === 'REJECTED') && (
-        <Button
-          variant={kycInfo.verificationStatus === 'REJECTED' ? 'danger' : 'primary'}
-          size="sm"
-          onClick={handleOpenKyc}
-          disabled={retrying}
-        >
-          {retrying ? (
-            <>
-              <Spinner size="sm" className="me-1" />
-              Creando nueva firma...
-            </>
-          ) : (
-            <>
-              <i className={`bi bi-${kycInfo.verificationStatus === 'REJECTED' ? 'arrow-clockwise' : 'box-arrow-up-right'} me-1`}></i>
-              {kycInfo.verificationStatus === 'REJECTED' 
-                ? 'Reintentar KYC' 
-                : kycInfo.verificationStatus === 'WAITING' 
-                ? 'Ver Proceso' 
-                : 'Iniciar KYC'}
-            </>
-          )}
-        </Button>
-      )}
+      <Button
+        variant={kycInfo.verificationStatus === 'REJECTED' ? 'danger' : 'outline-primary'}
+        size="sm"
+        onClick={handleOpenKyc}
+        disabled={retrying}
+      >
+        {retrying ? (
+          <>
+            <Spinner size="sm" className="me-1" />
+            Creando nueva firma...
+          </>
+        ) : (
+          <>
+            <i className="bi bi-arrow-clockwise me-1"></i>
+            Reintentar KYC
+          </>
+        )}
+      </Button>
     </Alert>
   );
 }
