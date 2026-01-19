@@ -24,7 +24,16 @@ export default function ProfilePageClient({ user }: { user: any }) {
       if (result.success) {
         if (result.kycURL) {
           setKycURL(result.kycURL);
+          // Si estaba rechazado, actualizar el estado local a WAITING
+          if (user?.Organization?.verificationStatus === 'REJECTED') {
+            user.Organization.verificationStatus = 'WAITING';
+            user.Organization.kycURL = result.kycURL;
+          }
           window.open(result.kycURL, '_blank', 'noopener,noreferrer');
+          // Recargar la página después de un breve delay para reflejar los cambios
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
         } else {
           setRetryError('No se pudo obtener una URL de verificación. Por favor, intenta más tarde.');
         }
@@ -38,8 +47,11 @@ export default function ProfilePageClient({ user }: { user: any }) {
     }
   };
 
-  const handleOpenKyc = () => {
-    if (kycURL) {
+  const handleOpenKyc = async () => {
+    // Si está rechazado, crear nueva firma antes de abrir
+    if (user?.Organization?.verificationStatus === 'REJECTED') {
+      await handleRetryKyc();
+    } else if (kycURL) {
       window.open(kycURL, '_blank', 'noopener,noreferrer');
     }
   };
@@ -190,34 +202,48 @@ export default function ProfilePageClient({ user }: { user: any }) {
                   </Alert>
 
                   <div className="d-flex gap-2 flex-wrap">
-                    {kycURL && (
+                    {(kycURL || user.Organization.verificationStatus === 'REJECTED') && (
                       <Button
-                        variant="primary"
+                        variant={user.Organization.verificationStatus === 'REJECTED' ? 'danger' : 'primary'}
                         onClick={handleOpenKyc}
+                        disabled={retrying}
                       >
-                        <i className="bi bi-box-arrow-up-right me-2"></i>
-                        {user.Organization.verificationStatus === 'WAITING' 
-                          ? 'Ver Proceso de Verificación' 
-                          : 'Abrir Proceso de Verificación'}
+                        {retrying ? (
+                          <>
+                            <Spinner size="sm" className="me-2" />
+                            Creando nueva firma...
+                          </>
+                        ) : (
+                          <>
+                            <i className={`bi bi-${user.Organization.verificationStatus === 'REJECTED' ? 'arrow-clockwise' : 'box-arrow-up-right'} me-2`}></i>
+                            {user.Organization.verificationStatus === 'REJECTED' 
+                              ? 'Reintentar KYC' 
+                              : user.Organization.verificationStatus === 'WAITING' 
+                              ? 'Ver Proceso de Verificación' 
+                              : 'Abrir Proceso de Verificación'}
+                          </>
+                        )}
                       </Button>
                     )}
-                    <Button
-                      variant={user.Organization.verificationStatus === 'REJECTED' ? 'danger' : 'outline-primary'}
-                      onClick={handleRetryKyc}
-                      disabled={retrying}
-                    >
-                      {retrying ? (
-                        <>
-                          <Spinner size="sm" className="me-2" />
-                          Reintentando...
-                        </>
-                      ) : (
-                        <>
-                          <i className="bi bi-arrow-clockwise me-2"></i>
-                          Reintentar KYC
-                        </>
-                      )}
-                    </Button>
+                    {user.Organization.verificationStatus !== 'REJECTED' && (
+                      <Button
+                        variant="outline-primary"
+                        onClick={handleRetryKyc}
+                        disabled={retrying}
+                      >
+                        {retrying ? (
+                          <>
+                            <Spinner size="sm" className="me-2" />
+                            Reintentando...
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-arrow-clockwise me-2"></i>
+                            Reintentar KYC
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </div>
 
                   {retryError && (

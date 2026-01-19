@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Alert, Button } from 'react-bootstrap';
+import { Alert, Button, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { getOrganizationKyc } from '@/actions/organizations/get-organization-kyc';
+import { retryOrganizationKyc } from '@/actions/organizations/retry-organization-kyc';
 
 export default function OrganizationKycBanner() {
   const [kycInfo, setKycInfo] = useState<{
@@ -13,6 +14,8 @@ export default function OrganizationKycBanner() {
     organizationName: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadKycInfo = async () => {
@@ -31,7 +34,7 @@ export default function OrganizationKycBanner() {
     loadKycInfo();
   }, []);
 
-  // Solo mostrar el banner si el KYC no está verificado
+  // Solo mostrar el banner si el KYC no est? verificado
   if (loading || !kycInfo || kycInfo.verificationStatus === 'VERIFIED') {
     return null;
   }
@@ -51,17 +54,40 @@ export default function OrganizationKycBanner() {
   const getMessage = () => {
     switch (kycInfo.verificationStatus) {
       case 'WAITING':
-        return `La verificación de identidad (KYC) de tu organización "${kycInfo.organizationName}" está pendiente de aprobación.`;
+        return `La verificaci?n de identidad (KYC) de tu organizaci?n "${kycInfo.organizationName}" est? pendiente de aprobaci?n.`;
       case 'REJECTED':
-        return `La verificación de identidad (KYC) de tu organización "${kycInfo.organizationName}" fue rechazada. Por favor, reintenta el proceso.`;
+        return `La verificaci?n de identidad (KYC) de tu organizaci?n "${kycInfo.organizationName}" fue rechazada. Por favor, reintenta el proceso.`;
       case 'NOT_VERIFIED':
       default:
-        return `Tu organización "${kycInfo.organizationName}" aún no ha completado la verificación de identidad (KYC).`;
+        return `Tu organizaci?n "${kycInfo.organizationName}" a?n no ha completado la verificaci?n de identidad (KYC).`;
     }
   };
 
-  const handleOpenKyc = () => {
-    if (kycInfo.kycURL) {
+  const handleOpenKyc = async () => {
+    if (kycInfo.verificationStatus === 'REJECTED') {
+      // Si está rechazado, crear nueva firma
+      setRetrying(true);
+      setRetryError(null);
+      
+      try {
+        const result = await retryOrganizationKyc();
+        if (result.success && result.kycURL) {
+          // Recargar información del KYC para reflejar los cambios
+          const updatedResult = await getOrganizationKyc();
+          if (updatedResult.success && updatedResult.kycInfo) {
+            setKycInfo(updatedResult.kycInfo);
+          }
+          window.open(result.kycURL, '_blank', 'noopener,noreferrer');
+        } else {
+          setRetryError(result.error || 'Error al crear nueva firma');
+        }
+      } catch (error) {
+        setRetryError(error instanceof Error ? error.message : 'Error desconocido');
+      } finally {
+        setRetrying(false);
+      }
+    } else if (kycInfo.kycURL) {
+      // Si tiene URL, abrirla directamente
       window.open(kycInfo.kycURL, '_blank', 'noopener,noreferrer');
     }
   };
@@ -72,24 +98,43 @@ export default function OrganizationKycBanner() {
         <i className={`bi bi-${kycInfo.verificationStatus === 'WAITING' ? 'clock' : kycInfo.verificationStatus === 'REJECTED' ? 'x-circle' : 'info-circle'}-fill me-2`}></i>
         <div>
           <Alert.Heading className="mb-1" style={{ fontSize: '1rem' }}>
-            Verificación de Identidad Pendiente
+            Verificaci?n de Identidad Pendiente
           </Alert.Heading>
           <div style={{ fontSize: '0.875rem' }}>
             {getMessage()}
             <span className="ms-1">
-              Necesitarás completar el KYC para crear items y estados certificados.
+              Necesitar?s completar el KYC para crear items y estados certificados.
             </span>
           </div>
         </div>
       </div>
-      {kycInfo.kycURL && (
+      {retryError && (
+        <Alert variant="danger" className="w-100 mb-2" style={{ fontSize: '0.875rem' }}>
+          {retryError}
+        </Alert>
+      )}
+      {(kycInfo.kycURL || kycInfo.verificationStatus === 'REJECTED') && (
         <Button
           variant={kycInfo.verificationStatus === 'REJECTED' ? 'danger' : 'primary'}
           size="sm"
           onClick={handleOpenKyc}
+          disabled={retrying}
         >
-          <i className="bi bi-box-arrow-up-right me-1"></i>
-          {kycInfo.verificationStatus === 'WAITING' ? 'Ver Proceso' : 'Iniciar KYC'}
+          {retrying ? (
+            <>
+              <Spinner size="sm" className="me-1" />
+              Creando nueva firma...
+            </>
+          ) : (
+            <>
+              <i className={`bi bi-${kycInfo.verificationStatus === 'REJECTED' ? 'arrow-clockwise' : 'box-arrow-up-right'} me-1`}></i>
+              {kycInfo.verificationStatus === 'REJECTED' 
+                ? 'Reintentar KYC' 
+                : kycInfo.verificationStatus === 'WAITING' 
+                ? 'Ver Proceso' 
+                : 'Iniciar KYC'}
+            </>
+          )}
         </Button>
       )}
     </Alert>

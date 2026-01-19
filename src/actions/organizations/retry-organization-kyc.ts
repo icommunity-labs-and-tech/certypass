@@ -34,6 +34,7 @@ export async function retryOrganizationKyc(): Promise<RetryOrganizationKycResult
             id: true,
             nombre: true,
             signatureID: true,
+            verificationStatus: true,
           },
         },
       },
@@ -48,23 +49,24 @@ export async function retryOrganizationKyc(): Promise<RetryOrganizationKycResult
 
     const organization = userWithOrg.Organization;
 
-    // Si no tiene signatureID, crear uno nuevo
-    if (!organization.signatureID) {
-      // Obtener la URL base de la aplicación para los webhooks
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL 
-        ? `https://${process.env.VERCEL_URL}` 
-        : process.env.APP_URL || 'http://localhost:3000';
-      
-      const okUrl = `${baseUrl}/api/hooks/signature/ok`;
-      const koUrl = `${baseUrl}/api/hooks/signature/ko`;
+    // Obtener la URL base de la aplicación para los webhooks
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : process.env.APP_URL || 'http://localhost:3000';
+    
+    const okUrl = `${baseUrl}/api/hooks/signature/ok`;
+    const koUrl = `${baseUrl}/api/hooks/signature/ko`;
 
+    // Si el estado es REJECTED o no tiene signatureID, crear una nueva firma
+    // Esto sustituye la firma anterior con una nueva
+    if (organization.verificationStatus === 'REJECTED' || !organization.signatureID) {
       const signatureResult = await icommunityService.createSignature(
         organization.nombre,
         okUrl,
         koUrl
       );
 
-      // Actualizar organización con el nuevo signatureID y kycURL
+      // Actualizar organización con el nuevo signatureID y kycURL (sustituyendo el anterior)
       await prisma.organization.update({
         where: { id: organization.id },
         data: {
@@ -80,7 +82,7 @@ export async function retryOrganizationKyc(): Promise<RetryOrganizationKycResult
       };
     }
 
-    // Si ya tiene signatureID, usar retrySignature para obtener nueva URL
+    // Si el estado es WAITING o NOT_VERIFIED y ya tiene signatureID, usar retrySignature
     try {
       const retryResult = await icommunityService.retrySignature(organization.signatureID);
       
