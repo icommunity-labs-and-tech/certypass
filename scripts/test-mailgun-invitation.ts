@@ -20,11 +20,13 @@ if (!process.env.MAILGUN_FROM_EMAIL) {
   process.env.MAILGUN_FROM_EMAIL = 'ibs@icommunity.io';
 }
 
-const TEST_EMAIL = 'pablocumpian@gmail.com';
+const TEST_EMAIL = 'pcumpian1@gmail.com';
 const TEST_NAME = 'Pablo Cumpian';
 const TEST_ORG = 'iCommunity';
 const TEST_TOKEN = 'test-token-' + Date.now();
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL 
+  ? `https://${process.env.VERCEL_URL}` 
+  : process.env.APP_URL || 'https://certypass.icommunitylabs.com';
 const ACTIVATION_URL = `${APP_URL}/auth/activate?token=${TEST_TOKEN}`;
 
 async function testInvitationEmail() {
@@ -46,6 +48,7 @@ async function testInvitationEmail() {
       appName: 'certypass',
       activationToken: TEST_TOKEN,
       activationUrl: ACTIVATION_URL,
+      appUrl: APP_URL,
     });
     console.log('✅ Email enviado exitosamente!');
     console.log(`📬 Revisa la bandeja de entrada de ${TEST_EMAIL}`);

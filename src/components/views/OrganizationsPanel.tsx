@@ -70,12 +70,6 @@ export default function OrganizationsPanel({
           `Administrador: ${result.admin?.email}\n` +
           `Se ha enviado automáticamente un email de invitación al administrador.`;
         
-        if (result.kycURL) {
-          successMessage += `\n\nKYC de Organización:\n` +
-            `Se ha generado el proceso KYC para la organización. ` +
-            `Completa la verificación en: ${result.kycURL}`;
-        }
-        
         setSuccess(successMessage);
         setFormData({
           organizationName: '',
@@ -143,13 +137,6 @@ export default function OrganizationsPanel({
                 <i className="bi bi-envelope-check me-2"></i>
                 <strong>Email enviado:</strong> Se ha enviado automáticamente un email de activación al administrador.
               </Alert>
-              {success.includes('KYC de Organización') && (
-                <Alert variant="info" className="mt-3 mb-0">
-                  <i className="bi bi-shield-check me-2"></i>
-                  <strong>KYC Generado:</strong> La organización tiene un proceso KYC pendiente. 
-                  Completa la verificación para poder crear evidencias certificadas.
-                </Alert>
-              )}
             </div>
           </div>
         </Alert>

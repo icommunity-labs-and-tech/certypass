@@ -111,6 +111,7 @@ export function createMailgunService(): MailgunService {
           organizationName: data.organizationName,
           appName: data.appName,
           activationUrl: data.activationUrl,
+          appUrl: data.appUrl,
         });
 
         const text = generateInvitationEmailText({

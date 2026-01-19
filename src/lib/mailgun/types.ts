@@ -9,4 +9,5 @@ export interface InvitationEmailData {
   appName: string; // Nombre de la aplicación (ej: "certypass")
   activationToken: string;
   activationUrl: string;
+  appUrl?: string; // URL base de la aplicación para recursos (logo, etc.)
 }

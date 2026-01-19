@@ -31,6 +31,7 @@ export async function sendInvitationEmail(params: SendInvitationEmailParams): Pr
     appName: 'certypass',
     activationToken,
     activationUrl,
+    appUrl: appUrl,
   });
 }
 
