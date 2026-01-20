@@ -19,7 +19,7 @@ async function verifyAdminJWT(token: string) {
     }
     
     return payload;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -37,7 +37,7 @@ async function verifyOperatorJWT(token: string) {
     }
     
     return payload;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

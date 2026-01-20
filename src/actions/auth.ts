@@ -14,7 +14,7 @@ export async function login({ email, password }: { email: string; password: stri
       throw new Error('Credenciales inválidas');
     }
     return { message: 'Logged in successfully' };
-  } catch (error) {
+  } catch {
     throw new Error('Credenciales inválidas');
   }
 }

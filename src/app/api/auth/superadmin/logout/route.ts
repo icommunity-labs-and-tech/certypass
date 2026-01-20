@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { superadminAuthConfig } from '@/lib/auth/superadmin/config';
 
 export async function POST() {

@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { JWTPayload, AuthResult } from '../shared/types';
-import { adminAuthConfig, ADMIN_REQUIRED_ROLE } from './config';
+import { adminAuthConfig } from './config';
 import { authenticateUser, validateUserRole, createAuthError } from '../shared/utils';
 
 /**

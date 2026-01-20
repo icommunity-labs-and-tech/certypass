@@ -52,7 +52,7 @@ export async function GET(_req: NextRequest, { params }: any) {
         'X-Checksum-SHA512-Base64': require('crypto').createHash('sha512').update(imageBuffer).digest('base64'),
       },
     });
-  } catch (_) {
+  } catch {
     return NextResponse.json({ error: 'Failed to process image' }, { status: 500 });
   }
 }

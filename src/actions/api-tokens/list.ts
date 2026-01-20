@@ -1,6 +1,5 @@
 'use server';
 
-import { ApiTokenService, type ApiTokenListResponse } from '@/domain/api-tokens/ApiTokenService';
 import { createApiTokenServiceImpl } from '@/domain/api-tokens/ApiTokenServiceImpl';
 import { apiTokenRepository } from '@/infrastructure/prisma/repositories/ApiTokenRepositoryPrisma';
 import { cookies } from 'next/headers';

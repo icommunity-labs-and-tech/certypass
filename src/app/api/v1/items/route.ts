@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { type ItemResponse } from '@/domain/items/ItemService';
 import { createItemServiceImpl } from '@/domain/items/ItemServiceImpl';
 import { createEvidenceServiceImpl } from '@/domain/evidence/EvidenceServiceImpl';
 import { itemRepository } from '@/infrastructure/prisma/repositories/ItemRepositoryPrisma';

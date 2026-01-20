@@ -66,7 +66,7 @@ export default function OrganizationsPanel({
       });
 
       if (result.success) {
-        let successMessage = `¡Organización "${result.organization?.nombre}" creada exitosamente!\n` +
+        const successMessage = `¡Organización "${result.organization?.nombre}" creada exitosamente!\n` +
           `Administrador: ${result.admin?.email}\n` +
           `Se ha enviado automáticamente un email de invitación al administrador.`;
         

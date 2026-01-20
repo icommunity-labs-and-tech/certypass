@@ -1,6 +1,6 @@
 'use server';
 
-import { ItemService, type CreateItemRequest, type ItemResponse } from '@/domain/items/ItemService';
+import type { CreateItemRequest } from '@/domain/items/ItemService';
 import { createItemServiceImpl } from '@/domain/items/ItemServiceImpl';
 import { createEvidenceServiceImpl } from '@/domain/evidence/EvidenceServiceImpl';
 import { icommunityService } from '@/infrastructure/icommunity/ICommunityServiceImpl';

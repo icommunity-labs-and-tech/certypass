@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { activateAccount } from '@/actions/organizations/activate-account';
+import { signAdminJWT } from '@/lib/auth/admin/jwt';
+import { adminAuthConfig } from '@/lib/auth/admin/config';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,11 +29,54 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    // Obtener el usuario completo para crear el JWT
+    const user = await prisma.user.findUnique({
+      where: { id: result.user!.id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        organizationId: true,
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Usuario no encontrado' },
+        { status: 400 }
+      );
+    }
+
+    // Crear JWT para autenticación automática
+    const jwtPayload = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      organizationId: user.organizationId!,
+      context: 'admin' as const,
+    };
+
+    const jwtToken = await signAdminJWT(jwtPayload);
+
+    // Crear respuesta con cookie de autenticación
+    const response = NextResponse.json({
       success: true,
       message: 'Cuenta activada exitosamente',
       user: result.user,
     });
+
+    // Establecer cookie de autenticación
+    response.cookies.set(adminAuthConfig.cookieName, jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: adminAuthConfig.sameSite,
+      path: adminAuthConfig.cookiePath,
+      maxAge: adminAuthConfig.sessionDuration,
+    });
+
+    return response;
   } catch (error) {
     console.error('Activation error:', error);
     return NextResponse.json(

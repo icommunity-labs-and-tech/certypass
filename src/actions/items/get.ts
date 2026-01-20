@@ -19,7 +19,7 @@ export async function getItem(id: string) {
   let categories: Array<{ id: string; name: string }> = [];
   try {
     categories = await itemRepository.getItemCategories(id, organizationId);
-  } catch (error) {
+  } catch {
     // Si hay error obteniendo categorías, continuar con array vacío
     // No lanzar error para no interrumpir la carga de la página
     categories = [];

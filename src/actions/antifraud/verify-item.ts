@@ -5,7 +5,6 @@ import { createEvidenceService } from '@/lib/services/evidence';
 import { icommunityService } from '@/infrastructure/icommunity/ICommunityServiceImpl';
 import { antifraudRepository } from '@/infrastructure/repositories/antifraud-repository';
 import { prisma } from '@/lib/prisma';
-import { ItemNotFoundError } from '@/domain/antifraud/errors';
 
 export interface VerifyItemResult {
   success: boolean;

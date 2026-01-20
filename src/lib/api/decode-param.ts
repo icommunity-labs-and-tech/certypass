@@ -30,7 +30,7 @@ export function decodeUrlParam(rawParam: string): string {
         } else {
           break;
         }
-      } catch (e) {
+      } catch {
         // If decoding fails at any point, stop and use the last valid value
         break;
       }

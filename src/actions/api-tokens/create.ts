@@ -1,13 +1,11 @@
 'use server';
 
-import { ApiTokenService, type ApiTokenResponse } from '@/domain/api-tokens/ApiTokenService';
 import { createApiTokenServiceImpl } from '@/domain/api-tokens/ApiTokenServiceImpl';
 import { apiTokenRepository } from '@/infrastructure/prisma/repositories/ApiTokenRepositoryPrisma';
 import { cookies } from 'next/headers';
 import { verifyAdminJWT } from '@/lib/auth/admin/jwt';
 import { adminAuthConfig } from '@/lib/auth/admin/config';
 import { prisma } from '@/lib/prisma';
-import { DbError } from '@/domain/api-tokens/ApiTokenRepository';
 
 export async function createApiToken(name: string, expiresAt?: Date | null) {
   try {

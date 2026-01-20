@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { JWTPayload, AuthResult } from '../shared/types';
-import { operatorAuthConfig, OPERATOR_REQUIRED_ROLE } from './config';
+import { operatorAuthConfig } from './config';
 import { authenticateUser, validateUserRole, createAuthError } from '../shared/utils';
 
 /**

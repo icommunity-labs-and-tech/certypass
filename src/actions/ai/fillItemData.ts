@@ -24,7 +24,7 @@ export async function fillItemData({ itemName, itemDescription, fields }: {
       }
     }
     return { success: true, data: valid };
-  } catch (error) {
+  } catch {
     // Fallback error mapping
     return { success: false, error: 'Error al procesar la solicitud con IA' };
   }

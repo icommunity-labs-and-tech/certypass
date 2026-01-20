@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifySuperAdminJWT } from '@/lib/auth/superadmin/jwt';
 import { superadminAuthConfig } from '@/lib/auth/superadmin/config';

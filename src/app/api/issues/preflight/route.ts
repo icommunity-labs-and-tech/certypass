@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       items,
       overLimit: total > LIMIT_BYTES,
     });
-  } catch (_) {
+  } catch {
     return NextResponse.json({ error: 'bad request' }, { status: 400 });
   }
 }

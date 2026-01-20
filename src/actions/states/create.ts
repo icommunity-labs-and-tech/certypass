@@ -1,6 +1,6 @@
 'use server';
 
-import { StateService, type CreateStateRequest, type StateResponse } from '@/domain/states/stateService';
+import type { CreateStateRequest } from '@/domain/states/stateService';
 import { createStateServiceImpl } from '@/domain/states/StateServiceImpl';
 import { createEvidenceServiceImpl } from '@/domain/evidence/EvidenceServiceImpl';
 import { icommunityService } from '@/infrastructure/icommunity/ICommunityServiceImpl';
