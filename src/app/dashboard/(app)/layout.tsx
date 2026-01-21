@@ -7,12 +7,15 @@ import PageBody from '@/components/Body';
 import { SidebarProvider, useSidebar } from '@/components/SidebarContext';
 import { AuthProvider } from '@/hooks/useAuthSeparated';
 import OrganizationKycBanner from '@/components/OrganizationKycBanner';
+import { TutorialProvider } from '@/lib/tutorial/TutorialProvider';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <SidebarProvider>
-        <Shell>{children}</Shell>
+        <TutorialProvider>
+          <Shell>{children}</Shell>
+        </TutorialProvider>
       </SidebarProvider>
     </AuthProvider>
   );

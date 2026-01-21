@@ -56,7 +56,7 @@ export default function Sidebar() {
   };
 
   return (
-    <Container fluid className="sidebar-wrap min-vh-100 p-3 d-flex flex-column">
+    <Container fluid className="sidebar-wrap min-vh-100 p-3 d-flex flex-column" data-tour="sidebar">
       <div className="px-2">
         <Navbar.Brand className="d-flex align-items-center mb-3">
           <Logo href="/dashboard" width={120} height={40} priority />
@@ -119,7 +119,7 @@ export default function Sidebar() {
         
         <hr className="opacity-75 border" />
         <div className="mb-2">
-          <small className="text-muted px-3">DESARROLLADOR</small>
+          <small className="text-muted px-3" data-tour="developer-section">DESARROLLADOR</small>
         </div>
         <Nav className="flex-column mb-3">
           {developerLinks.map(({ href, icon, label, external }) => (
@@ -155,7 +155,7 @@ export default function Sidebar() {
 
         <hr className="opacity-75 border" />
         <div className="mb-2">
-          <small className="text-muted px-3">APLICACIONES</small>
+          <small className="text-muted px-3" data-tour="applications-section">APLICACIONES</small>
         </div>
         <Nav className="flex-column">
           {appLinks.map(({ href, icon, label }) => (

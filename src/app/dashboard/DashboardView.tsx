@@ -8,6 +8,8 @@ import MonthlyActivityChart from '@/components/charts/MonthlyActivityChart';
 import CategoryDistributionChart from '@/components/charts/CategoryDistributionChart';
 import { BackupStatusByUserChart } from '@/components/charts/BackupStatusByUserChart';
 import { useAuthSeparated } from '@/hooks/useAuthSeparated';
+import { useTutorial } from '@/lib/tutorial/useTutorial';
+import { TOUR_IDS, sidebarTour } from '@/lib/tutorial/tutorialConfig';
 import type { DashboardKPIs as DashboardKPIsType, MonthlyActivity, CategoryDistribution, BackupStatus, BackupStatusByUser } from '@/types/dashboard';
 
 interface DashboardClientProps {
@@ -29,14 +31,11 @@ export default function DashboardClient({
 }: DashboardClientProps) {
   const { logout } = useAuthSeparated();
   
-  // Verification notification hook removed - not currently used
-  // const { showVerificationRequiredNotification, showVerificationErrorNotification } = useVerificationNotification();
-
-  // handleLogout removed - not currently used
-  // const handleLogout = async () => {
-  //   await logout();
-  //   // No necesitamos router.push porque logout ya maneja la redirección
-  // };
+  // Activar tour del sidebar automáticamente en primera visita
+  useTutorial(TOUR_IDS.SIDEBAR_TOUR, sidebarTour, {
+    autoStart: true,
+    delay: 2000, // Esperar 2 segundos para que todo se renderice
+  });
 
   return (
     <>
