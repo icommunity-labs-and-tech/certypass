@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyItemAntifalsificacion } from '@/actions/antifraud/verify-item';
 import { decodeUrlParam } from '@/lib/api/decode-param';
 
 export async function GET(
@@ -18,7 +19,7 @@ export async function GET(
 
     // Decode the code parameter in case it's URL-encoded
     const code = decodeUrlParam(rawCode);
-    console.log('[API] Looking for item with ID:', code);
+    console.log('[Verify API] Looking for item with ID:', code);
 
     // Buscar el item por ID (asumiendo que el código es el ID del item)
     const item = await prisma.item.findUnique({
@@ -61,10 +62,54 @@ export async function GET(
       );
     }
 
-    // No ejecutar verificación antifraude aquí - se hace en /api/customer/verify/[code]
-    // Solo retornar el estado actual
-    const isFirstVerification = !item.antifraudEvidenceId;
-    const antifraudEvidenceId = item.antifraudEvidenceId;
+    // Verificación antifalsificación automática - ESTE ES EL TRIGGER
+    const ipAddress = request.headers.get('x-forwarded-for') || 
+                      request.headers.get('x-real-ip') || 
+                      undefined;
+    const userAgent = request.headers.get('user-agent') || undefined;
+
+    // Si no está verificado, realizar verificación
+    let isFirstVerification = !item.antifraudEvidenceId;
+    let antifraudEvidenceId = item.antifraudEvidenceId;
+    
+    if (!item.antifraudEvidenceId) {
+      console.log('[Verify API] Item not verified, starting verification process');
+      try {
+        const verificationResult = await verifyItemAntifalsificacion(code, {
+          ipAddress,
+          userAgent,
+        });
+        
+        console.log('[Verify API] Verification result:', verificationResult);
+        
+        if (verificationResult.success && verificationResult.data) {
+          // Re-fetch item to get updated antifraudEvidenceId
+          const updatedItem = await prisma.item.findUnique({
+            where: { id: code },
+            select: { antifraudEvidenceId: true },
+          });
+          console.log('[Verify API] Updated item from DB:', updatedItem);
+          
+          if (updatedItem) {
+            antifraudEvidenceId = updatedItem.antifraudEvidenceId;
+            isFirstVerification = verificationResult.data.isFirstVerification;
+            console.log('[Verify API] Final values - antifraudEvidenceId:', antifraudEvidenceId, 'isFirstVerification:', isFirstVerification);
+          } else {
+            console.warn('[Verify API] Updated item not found after verification');
+          }
+        } else {
+          console.error('[Verify API] Verification failed:', verificationResult.error);
+        }
+      } catch (error) {
+        // Log error but don't fail the request
+        console.error('[Verify API] Exception in verification antifraude:', error);
+        if (error instanceof Error) {
+          console.error('[Verify API] Error stack:', error.stack);
+        }
+      }
+    } else {
+      console.log('[Verify API] Item already verified, antifraudEvidenceId:', item.antifraudEvidenceId);
+    }
 
     // Transformar los datos para el frontend
     const transformedItem = {

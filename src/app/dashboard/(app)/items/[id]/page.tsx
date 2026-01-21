@@ -12,6 +12,7 @@ import { Button } from 'react-bootstrap';
 import { useDeleteEntity } from '@/hooks/useDeleteEntity';
 import { getCascadeInfo } from '@/config/entityConfig';
 import ItemQrModal from '@/components/ItemQrModal';
+import ItemVerifyQrModal from '@/components/ItemVerifyQrModal';
 import ItemStatesTable from '@/components/views/ItemStatesTable';
 import { Row, Col } from 'react-bootstrap';
 import ImageDisplay from '@/components/ImageDisplay';
@@ -27,6 +28,7 @@ export default function ItemDetailPage() {
   const [states, setStates] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showQr, setShowQr] = useState(false);
+  const [showVerifyQr, setShowVerifyQr] = useState(false);
 
   // Usar el hook refactorizado
   const {
@@ -140,14 +142,24 @@ export default function ItemDetailPage() {
             <Button
               variant="outline-success"
               size="sm"
+              onClick={() => setShowVerifyQr(true)}
+              className="d-flex align-items-center gap-1"
+              disabled={!itemId}
+            >
+              <i className="bi bi-shield-check me-1"></i>
+              QR Verificación
+            </Button>
+            <Button
+              variant="outline-info"
+              size="sm"
               href={`/customer/item/${encodeURIComponent(itemId)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="d-flex align-items-center gap-1"
               disabled={!itemId}
             >
-              <i className="bi bi-shield-check me-1"></i>
-              Verificar
+              <i className="bi bi-eye me-1"></i>
+              Ver
             </Button>
             <Button
               variant="outline-danger"
@@ -197,6 +209,47 @@ export default function ItemDetailPage() {
         </Row>
 
         <Divider />
+
+        {/* Sección de verificación antifraude */}
+        {item?.antifraudEvidenceId && (
+          <>
+            <div className="mt-4 mb-3">
+              <div className="d-flex align-items-center mb-2">
+                <i className="bi bi-shield-check me-2 text-success"></i>
+                <h5 className="mb-0">Verificación Antifalsificación</h5>
+              </div>
+              <div className="alert alert-success mb-0" role="alert">
+                <div className="d-flex align-items-center justify-content-between">
+                  <div>
+                    <i className="bi bi-check-circle me-2"></i>
+                    <strong>Producto verificado</strong>
+                    {item.antifraudEvidenceId !== 'NO_SIGNATURE' && (
+                      <div className="mt-2">
+                        <small className="text-muted">
+                          ID de evidencia: <code>{item.antifraudEvidenceId}</code>
+                        </small>
+                      </div>
+                    )}
+                  </div>
+                  {item.antifraudEvidenceId && item.antifraudEvidenceId !== 'NO_SIGNATURE' && (
+                    <Button
+                      variant="outline-success"
+                      size="sm"
+                      href={`https://checker.icommunitylabs.com/lookup/${item.antifraudEvidenceId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="d-flex align-items-center gap-1"
+                    >
+                      <i className="bi bi-box-arrow-up-right me-1"></i>
+                      Ver evidencia
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+            <Divider />
+          </>
+        )}
 
         {/* Sección de categorías */}
         <CategoryInputField
@@ -279,6 +332,13 @@ export default function ItemDetailPage() {
       <ItemQrModal
         show={showQr}
         onHide={() => setShowQr(false)}
+        itemId={itemId}
+        itemName={item?.name}
+      />
+
+      <ItemVerifyQrModal
+        show={showVerifyQr}
+        onHide={() => setShowVerifyQr(false)}
         itemId={itemId}
         itemName={item?.name}
       />

@@ -11,3 +11,13 @@ export interface InvitationEmailData {
   activationUrl: string;
   appUrl?: string; // URL base de la aplicación para recursos (logo, etc.)
 }
+
+export interface VerificationEmailData {
+  recipientEmail: string;
+  recipientName?: string;
+  itemName: string;
+  itemId: string;
+  verificationUrl: string;
+  appName: string;
+  appUrl?: string;
+}
