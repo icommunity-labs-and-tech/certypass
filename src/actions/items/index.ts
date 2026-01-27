@@ -7,7 +7,7 @@ export * from './list';
 export * from './search';
 export * from './all';
 export * from './importFromCsv';
+export * from './validateCsv';
+export * from './executeCsvImport';
 export * from './addCategories';
 export * from './removeCategories';
-
-

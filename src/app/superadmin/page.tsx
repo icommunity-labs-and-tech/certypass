@@ -122,66 +122,6 @@ export default function SuperAdminDashboard() {
             style={{
               transition: 'all 0.3s ease',
               borderRadius: '16px',
-              border: '1px solid #e5e7eb'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px)';
-              e.currentTarget.style.boxShadow = '0 10px 25px rgba(34, 197, 94, 0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-            }}
-          >
-            <Card.Body className="text-center p-4">
-              <div 
-                className="mb-4"
-                style={{
-                  width: '80px',
-                  height: '80px',
-                  margin: '0 auto',
-                  borderRadius: '20px',
-                  background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <i className="bi bi-filetype-csv text-success" style={{ fontSize: '2.5rem' }}></i>
-              </div>
-              <Card.Title style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem', color: '#1f2937' }}>
-                Importaciones CSV
-              </Card.Title>
-              <Card.Text className="text-muted mb-4" style={{ minHeight: '48px' }}>
-                Gestiona las importaciones de productos desde archivos CSV
-              </Card.Text>
-              <Link href="/superadmin/imports" className="text-decoration-none">
-                <Button 
-                  variant="success" 
-                  className="w-100"
-                  style={{
-                    borderRadius: '10px',
-                    padding: '10px',
-                    fontWeight: 600,
-                    border: 'none',
-                    background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                    boxShadow: '0 4px 6px rgba(34, 197, 94, 0.2)'
-                  }}
-                >
-                  <i className="bi bi-filetype-csv me-2"></i>
-                  Gestionar Importaciones
-                </Button>
-              </Link>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        <Col md={6} lg={4}>
-          <Card 
-            className="h-100 shadow-sm border-0"
-            style={{
-              transition: 'all 0.3s ease',
-              borderRadius: '16px',
               border: '1px solid #e5e7eb',
               opacity: 0.7
             }}
