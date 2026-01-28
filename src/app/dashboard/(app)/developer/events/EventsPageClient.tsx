@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Button, Table, Modal, Badge, Form } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { listEvents } from '@/actions/events/list';
 import { listEventsByType } from '@/actions/events/listByType';
@@ -21,6 +22,8 @@ interface EventLog {
 }
 
 export default function EventsPageClient() {
+  const t = useTranslations('developer.events');
+  const tCommon = useTranslations('common.actions');
   const [events, setEvents] = useState<EventLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<EventLog | null>(null);
@@ -55,7 +58,8 @@ export default function EventsPageClient() {
   };
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleString('es-ES');
+    const locale = typeof window !== 'undefined' ? navigator.language : 'en-US';
+    return new Date(date).toLocaleString(locale);
   };
 
   const getEventBadgeVariant = (eventType: string) => {
@@ -86,9 +90,10 @@ export default function EventsPageClient() {
     let periodNum = 1;
     
     while (startDate <= now) {
+      const locale = typeof window !== 'undefined' ? navigator.language : 'en-US';
       const key = periodType === 'week' 
         ? `Sem ${periodNum}`
-        : startDate.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+        : startDate.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' });
       
       const endDate = periodType === 'week'
         ? new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000)
@@ -133,11 +138,10 @@ export default function EventsPageClient() {
   return (
     <>
       <Box>
-        <h6 className="mb-2">¿Qué son los eventos?</h6>
+        <h6 className="mb-2">{t('whatAreEvents')}</h6>
         <Divider />
         <p className="mb-0 text-muted">
-          Los eventos son registros automáticos de acciones importantes que ocurren en el sistema, como la creación de items o estados. 
-          Estos eventos se utilizan para notificar a sistemas externos mediante webhooks y para mantener un historial de actividad del sistema.
+          {t('eventsDescription')}
         </p>
       </Box>
 
@@ -145,7 +149,7 @@ export default function EventsPageClient() {
         <div className="table-toolbar">
           <div className="title-section">
             <i className="bi bi-calendar-event-fill"></i>
-            <h4>Eventos</h4>
+            <h4>{t('title')}</h4>
           </div>
           <div className="controls-section">
             <Form.Select
@@ -153,9 +157,9 @@ export default function EventsPageClient() {
               onChange={(e) => setFilterType(e.target.value)}
               style={{ width: 'auto' }}
             >
-              <option value="all">Todos</option>
-              <option value="item.created">Item Creado</option>
-              <option value="state.created">Estado Creado</option>
+              <option value="all">{t('filter.all')}</option>
+              <option value="item.created">{t('filter.itemCreated')}</option>
+              <option value="state.created">{t('filter.stateCreated')}</option>
             </Form.Select>
           </div>
         </div>
@@ -165,17 +169,17 @@ export default function EventsPageClient() {
         {events.length === 0 ? (
           <div className="text-center py-5">
             <i className="bi bi-calendar-event" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
-            <p className="mt-3 text-muted">No hay eventos registrados aún</p>
+            <p className="mt-3 text-muted">{t('noEvents')}</p>
           </div>
         ) : (
           <Table responsive striped className="custom-table">
             <thead>
               <tr>
-                <th>Tipo</th>
-                <th>Entidad</th>
-                <th>ID de Entidad</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
+                <th>{t('table.type')}</th>
+                <th>{t('table.entity')}</th>
+                <th>{t('table.entityId')}</th>
+                <th>{t('table.date')}</th>
+                <th>{t('table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -198,7 +202,7 @@ export default function EventsPageClient() {
                       onClick={() => handleViewDetails(event)}
                     >
                       <i className="bi bi-eye me-1"></i>
-                      Ver Detalles
+                      {t('viewDetails')}
                     </Button>
                   </td>
                 </tr>
@@ -213,7 +217,7 @@ export default function EventsPageClient() {
           <div className="table-toolbar">
             <div className="title-section">
               <i className="bi bi-graph-up"></i>
-              <h4>Evolución de Eventos</h4>
+              <h4>{t('evolution')}</h4>
             </div>
           </div>
           <Divider />
@@ -224,8 +228,11 @@ export default function EventsPageClient() {
               <YAxis {...axisProps} allowDecimals={false} />
               <Tooltip 
                 contentStyle={tooltipStyle}
-                formatter={(value: number) => [`${value} evento${value !== 1 ? 's' : ''}`, '']}
-                labelFormatter={(label) => `Período: ${label}`}
+                formatter={(value: number) => {
+                  const eventText = value !== 1 ? t('eventsPlural') : t('event');
+                  return [`${value} ${eventText}`, ''];
+                }}
+                labelFormatter={(label) => `${t('period')} ${label}`}
               />
               <Legend />
               {chartData.eventTypes.map((eventType, index) => {
@@ -254,13 +261,13 @@ export default function EventsPageClient() {
       {/* Details Modal */}
       <Modal show={showDetailsModal} onHide={() => { setShowDetailsModal(false); setSelectedEvent(null); }} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Detalles del Evento</Modal.Title>
+          <Modal.Title>{t('detailsModal.title')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedEvent && (
             <>
               <div className="mb-3">
-                <strong>Tipo de Evento:</strong>
+                <strong>{t('detailsModal.eventType')}</strong>
                 <div>
                   <Badge bg={getEventBadgeVariant(selectedEvent.eventType)}>
                     {selectedEvent.eventType}
@@ -268,19 +275,19 @@ export default function EventsPageClient() {
                 </div>
               </div>
               <div className="mb-3">
-                <strong>Tipo de Entidad:</strong>
+                <strong>{t('detailsModal.entityType')}</strong>
                 <div>{selectedEvent.entityType}</div>
               </div>
               <div className="mb-3">
-                <strong>ID de Entidad:</strong>
+                <strong>{t('detailsModal.entityId')}</strong>
                 <div><code>{selectedEvent.entityId}</code></div>
               </div>
               <div className="mb-3">
-                <strong>Fecha:</strong>
+                <strong>{t('detailsModal.date')}</strong>
                 <div>{formatDate(selectedEvent.createdAt)}</div>
               </div>
               <div className="mb-3">
-                <strong>Datos:</strong>
+                <strong>{t('detailsModal.data')}</strong>
                 <pre className="bg-light p-3 rounded" style={{ maxHeight: '400px', overflow: 'auto' }}>
                   <code>{JSON.stringify(selectedEvent.data, null, 2)}</code>
                 </pre>
@@ -290,7 +297,7 @@ export default function EventsPageClient() {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => { setShowDetailsModal(false); setSelectedEvent(null); }}>
-            Cerrar
+            {t('detailsModal.close')}
           </Button>
         </Modal.Footer>
       </Modal>

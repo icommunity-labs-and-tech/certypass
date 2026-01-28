@@ -10,8 +10,11 @@ import { Divider } from '@/components/Divider';
 import MultipleImageDisplay from '@/components/MultipleImageDisplay';
 import { getState } from '@/actions/states';
 import { getStatusType } from '@/actions/statusTypes';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function StateDetailPage() {
+  const t = useTranslations('states');
+  const locale = useLocale();
   const { id } = useParams();
   const stateId = id as string;
   const [stateData, setStateData] = useState<any>(null);
@@ -43,8 +46,8 @@ export default function StateDetailPage() {
   if (!stateData) {
     return (
       <Box>
-        <BoxTitle message="Estado" />
-        <p className="text-danger mb-0">No se encontró información del estado.</p>
+        <BoxTitle message={t('title')} />
+        <p className="text-danger mb-0">{t('notFound')}</p>
       </Box>
     );
   }
@@ -62,27 +65,27 @@ export default function StateDetailPage() {
         <div className="d-flex align-items-center justify-content-between mb-2">
           <div className="d-flex align-items-center">
             <i className="bi bi-flag me-2" />
-            <h4 className="mb-0">Estado: {stateData.title || stateId}</h4>
+            <h4 className="mb-0">{t('title')}: {stateData.title || stateId}</h4>
           </div>
         </div>
         <Divider />
         <div className="d-flex flex-wrap gap-3 align-items-center">
           <div>
-            <span className="text-muted d-block small">Tipo</span>
+            <span className="text-muted d-block small">{t('type')}</span>
             <Badge bg="info">{statusType?.name || '—'}</Badge>
           </div>
           <div>
-            <span className="text-muted d-block small">Fecha</span>
-            <span>{new Date(stateData.createdAt).toLocaleString()}</span>
+            <span className="text-muted d-block small">{t('date')}</span>
+            <span>{new Date(stateData.createdAt).toLocaleString(locale === 'en' ? 'en-US' : 'es-ES')}</span>
           </div>
           <div>
-            <span className="text-muted d-block small">Respaldado</span>
+            <span className="text-muted d-block small">{t('backed')}</span>
             <Badge bg={stateData.backed ? 'success' : 'secondary'}>
-              {stateData.backed ? 'Sí' : 'No'}
+              {stateData.backed ? t('yes') : t('no')}
             </Badge>
           </div>
           <div>
-            <span className="text-muted d-block small">Evidence ID</span>
+            <span className="text-muted d-block small">{t('evidenceId')}</span>
             <span>{stateData.evidenceID || '—'}</span>
           </div>
         </div>
@@ -90,7 +93,7 @@ export default function StateDetailPage() {
 
       {hasDescription && (
         <Box>
-          <h6 className="mb-2">Descripción</h6>
+          <h6 className="mb-2">{t('description')}</h6>
           <Divider />
           <p className="mb-0 text-muted" style={{ whiteSpace: 'pre-wrap' }}>
             {stateData.description}
@@ -100,13 +103,13 @@ export default function StateDetailPage() {
 
       {fieldsWithValue.length > 0 && (
         <Box>
-          <h6 className="mb-2">Campos</h6>
+          <h6 className="mb-2">{t('fields')}</h6>
           <Divider />
           <div className="row g-3">
             {fieldsWithValue.map((f, idx) => (
               <div key={idx} className="col-12 col-md-6">
                 <div className="d-flex justify-content-between border rounded p-2">
-                  <span className="text-muted">{f.label || f.name || 'Campo'}</span>
+                  <span className="text-muted">{f.label || f.name || t('field')}</span>
                   <span>{f.value || '—'}</span>
                 </div>
               </div>
@@ -117,7 +120,7 @@ export default function StateDetailPage() {
 
       {imageUrls.length > 0 && (
         <Box>
-          <h6 className="mb-2">Fotografías</h6>
+          <h6 className="mb-2">{t('photos')}</h6>
           <Divider />
           <div className="d-flex align-items-center" style={{ minHeight: '24px' }}>
             <MultipleImageDisplay imageUrls={imageUrls} alt="Estado" className="me-2" style={{ width: '180px' }} maxDisplay={6} />

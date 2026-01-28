@@ -1,11 +1,13 @@
 'use client';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useTranslations } from 'next-intl';
 import { withDashboardChart } from './withDashboardChart';
 import { colors, axisProps, gridProps, tooltipStyle } from './theme';
 import type { MonthlyActivity } from '@/types/dashboard';
 
 function InnerMonthlyActivityChart({ data }: { data: MonthlyActivity[] }) {
+  const t = useTranslations('dashboard.charts.monthlyActivity');
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -35,7 +37,7 @@ function InnerMonthlyActivityChart({ data }: { data: MonthlyActivity[] }) {
           dataKey="usersRegistered" 
           stroke={colors.blue} 
           strokeWidth={2}
-          name="Usuarios Registrados"
+          name={t('usersRegistered')}
           dot={{ fill: colors.blue, strokeWidth: 2, r: 4 }}
         />
         <Line 
@@ -43,7 +45,7 @@ function InnerMonthlyActivityChart({ data }: { data: MonthlyActivity[] }) {
           dataKey="itemsCreated" 
           stroke={colors.green} 
           strokeWidth={2}
-          name="Items Creados"
+          name={t('itemsCreated')}
           dot={{ fill: colors.green, strokeWidth: 2, r: 4 }}
         />
       </LineChart>
@@ -62,7 +64,5 @@ interface MonthlyActivityChartProps {
 }
 
 export default function MonthlyActivityChart({ data }: MonthlyActivityChartProps) {
-  return (
-    <WrappedMonthlyChart data={data || []} loading={false} error={null} />
-  );
+  return <WrappedMonthlyChart data={data} />;
 }

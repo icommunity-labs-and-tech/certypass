@@ -3,8 +3,10 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Alert, Button } from 'react-bootstrap';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function VerificationErrorPage() {
+  const t = useTranslations('auth.verification');
   // KYC is now at organization level, not user level
   // This page is kept for backward compatibility but functionality is removed
 
@@ -24,31 +26,29 @@ export default function VerificationErrorPage() {
                   <div className="mb-3">
                     <i className="fas fa-exclamation-triangle text-danger" style={{ fontSize: '4rem' }}></i>
                   </div>
-                  <h1 className="h3 text-danger mb-3">Error en Verificación</h1>
+                  <h1 className="h3 text-danger mb-3">{t('title')}</h1>
                   <p className="text-muted">
-                    No se pudo completar la verificación de tu identidad
+                    {t('subtitle')}
                   </p>
                 </div>
 
                 <Alert variant="danger" className="mb-4">
-                  <Alert.Heading>¿Qué pasó?</Alert.Heading>
+                  <Alert.Heading>{t('whatHappened')}</Alert.Heading>
                   <p className="mb-0">
-                    Hubo un problema durante el proceso de verificación de identidad. 
-                    Esto puede deberse a:
+                    {t('description')}
                   </p>
                   <ul className="mb-0 mt-2">
-                    <li>Documentos no legibles o borrosos</li>
-                    <li>Información incorrecta proporcionada</li>
-                    <li>Problemas técnicos temporales</li>
-                    <li>Documentos no válidos o expirados</li>
+                    <li>{t('reasons.documents')}</li>
+                    <li>{t('reasons.incorrectInfo')}</li>
+                    <li>{t('reasons.technicalIssues')}</li>
+                    <li>{t('reasons.invalidDocuments')}</li>
                   </ul>
                 </Alert>
 
                 <Alert variant="info" className="mb-4">
-                  <Alert.Heading>Nota Importante</Alert.Heading>
+                  <Alert.Heading>{t('importantNote')}</Alert.Heading>
                   <p className="mb-0">
-                    La verificación de identidad ahora se realiza a nivel de organización. 
-                    Contacta con el administrador de tu organización para completar el proceso KYC.
+                    {t('organizationLevel')}
                   </p>
                 </Alert>
 
@@ -60,13 +60,13 @@ export default function VerificationErrorPage() {
                     className="mb-3"
                   >
                     <i className="fas fa-envelope me-2"></i>
-                    Contactar Soporte
+                    {t('contactSupport')}
                   </Button>
 
                   <div className="text-center">
                     <Link href="/auth/login" className="text-decoration-none">
                       <i className="fas fa-arrow-left me-1"></i>
-                      Volver al Login
+                      {t('backToLogin')}
                     </Link>
                   </div>
                 </div>
@@ -75,7 +75,7 @@ export default function VerificationErrorPage() {
 
             <div className="text-center mt-4">
               <p className="text-muted small">
-                Si continúas teniendo problemas, por favor contacta a nuestro equipo de soporte técnico.
+                {t('continueProblems')}
               </p>
             </div>
           </Col>

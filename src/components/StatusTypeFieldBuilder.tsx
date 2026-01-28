@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button, Form, Card, Row, Col, Badge, Alert } from 'react-bootstrap';
 
 export interface StatusTypeFieldDefinition {
@@ -16,14 +17,15 @@ interface StatusTypeFieldBuilderProps {
   className?: string;
 }
 
-const FIELD_TYPES = [
-  { value: 'text', label: 'Texto' },
-  { value: 'number', label: 'Número' },
-  { value: 'email', label: 'Email' },
-  { value: 'date', label: 'Fecha' },
-  { value: 'select', label: 'Opciones' },
-  { value: 'image', label: 'Imagen' },
-  { value: 'geolocation', label: 'Geolocalización' },
+// Función helper para crear los tipos de campo con traducciones
+const createFieldTypes = (t: (key: string) => string) => [
+  { value: 'text', label: t('text') },
+  { value: 'number', label: t('number') },
+  { value: 'email', label: t('email') },
+  { value: 'date', label: t('date') },
+  { value: 'select', label: t('select') },
+  { value: 'image', label: t('image') },
+  { value: 'geolocation', label: t('geolocation') },
 ] as const;
 
 // Función para generar colores automáticamente para las opciones
@@ -48,6 +50,10 @@ export default function StatusTypeFieldBuilder({
   onChange,
   className = ''
 }: StatusTypeFieldBuilderProps) {
+  const t = useTranslations('fieldTypes');
+  const tCommon = useTranslations('common');
+  const tForms = useTranslations('forms');
+  const FIELD_TYPES = useMemo(() => createFieldTypes(t), [t]);
   const [localFields, setLocalFields] = useState<StatusTypeFieldDefinition[]>(fields);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
@@ -61,11 +67,12 @@ export default function StatusTypeFieldBuilder({
     
     fieldsToValidate.forEach((field, index) => {
       if (!field.name || field.name.trim() === '') {
-        errors.push(`El campo ${index + 1} debe tener un nombre`);
+        errors.push(tForms('fieldMustHaveNameWithNumber', { number: index + 1 }));
       }
       
       if (field.type === 'select' && (!field.options || field.options.length === 0)) {
-        errors.push(`El campo "${field.name || `Campo ${index + 1}`}" de tipo Opciones debe tener al menos una opción`);
+        const fieldName = field.name || tCommon('fieldName') + ` ${index + 1}`;
+        errors.push(tForms('selectMustHaveOptions', { name: fieldName }));
       }
     });
     
@@ -171,9 +178,9 @@ export default function StatusTypeFieldBuilder({
             <Card key={index} className="mb-3">
               <Card.Header className="d-flex justify-content-between align-items-center py-2">
                 <div className="d-flex align-items-center gap-2">
-                  <Badge bg="primary">Campo {index + 1}</Badge>
+                  <Badge bg="primary">{tCommon('fieldName')} {index + 1}</Badge>
                   {field.required && (
-                    <Badge bg="danger" className="small">Requerido</Badge>
+                    <Badge bg="danger" className="small">{tCommon('required')}</Badge>
                   )}
                 </div>
                 <Button
@@ -189,16 +196,16 @@ export default function StatusTypeFieldBuilder({
                 <Row>
                   <Col md={5}>
                     <Form.Group className="mb-3">
-                      <Form.Label>Nombre del campo</Form.Label>
+                      <Form.Label>{tCommon('fieldName')}</Form.Label>
                       <Form.Control
                         type="text"
                         value={field.name}
                         onChange={(e) => updateField(index, { name: e.target.value })}
-                        placeholder="ej: temperatura, presión, etc."
+                        placeholder={tCommon('fieldNamePlaceholder')}
                         size="sm"
                       />
                       <Form.Text className="text-muted">
-                        Nombre descriptivo del campo
+                        {tCommon('fieldNameHelp')}
                       </Form.Text>
                     </Form.Group>
                   </Col>
@@ -223,11 +230,11 @@ export default function StatusTypeFieldBuilder({
                   </Col>
                   <Col md={3}>
                     <Form.Group className="mb-3">
-                      <Form.Label>Campo requerido</Form.Label>
+                      <Form.Label>{tCommon('fieldRequired')}</Form.Label>
                       <div className="d-flex align-items-center h-100">
                         <Form.Check
                           type="checkbox"
-                          label="Requerido"
+                          label={tCommon('required')}
                           checked={field.required || false}
                           onChange={(e) => updateField(index, { required: e.target.checked })}
                         />

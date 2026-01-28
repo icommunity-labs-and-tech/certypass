@@ -3,6 +3,7 @@
 import React from 'react';
 import ImageDisplay from './ImageDisplay';
 import KeyValueList, { FieldSchema } from './KeyValueList';
+import { useTranslations } from 'next-intl';
 
 interface FieldDefinition {
   name: string;
@@ -22,6 +23,7 @@ export default function ItemSpecificFields({
   templateFields,
   className = ''
 }: ItemSpecificFieldsProps) {
+  const t = useTranslations('common');
   const generateLabel = (name: string): string => {
     return name
       .replace(/_/g, ' ')
@@ -46,7 +48,7 @@ export default function ItemSpecificFields({
         label,
         format: 'custom',
         customRender: (value: any) => {
-          if (!value) return <span className="text-muted fst-italic">Sin especificar</span>;
+          if (!value) return <span className="text-muted fst-italic">{t('unspecified')}</span>;
           return (
             <ImageDisplay
               imageUrl={value}

@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 import { changePassword } from '@/actions/users';
 
 export default function ChangePasswordForm() {
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [formData, setFormData] = useState({
@@ -82,7 +84,7 @@ export default function ChangePasswordForm() {
           minLength={6}
         />
         <Form.Text className="text-muted">
-          La contraseña debe tener al menos 6 caracteres
+          {tCommon('passwordMinLength')}
         </Form.Text>
       </Form.Group>
 

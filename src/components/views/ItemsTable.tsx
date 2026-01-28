@@ -5,7 +5,7 @@ import { FormTemplate } from '@/components/GenericTable';
 import LoadingOverlay from '@/components/Loading';
 import ItemImageColumn from '@/components/ItemImageColumn';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import ExportItemsBox from '@/components/ExportItemsBox';
 import { getItems, addItem, deleteItem, getItemDetails } from '@/actions/items';
 import { getCategories } from '@/actions/categories';
@@ -15,15 +15,15 @@ import { getCascadeInfo } from '@/config/entityConfig';
 import ItemsTableCustom from './ItemsTableCustom';
 import { Divider } from '@/components/Divider';
 import CategoryEditor from '@/components/CategoryEditor';
+import { useTranslations, useLocale } from 'next-intl';
  
 
-// Template básico para items (campos fijos)
-// Nota: Las categorías ahora se gestionan como tags en ItemCreationWizard, no como campo select
-const baseItemFormTemplate: FormTemplate = [
-  { name: 'customId', label: 'ID del Producto', type: 'text', placeholder: 'ID único del producto', required: true },
-  { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre del producto', required: true },
-  { name: 'description', label: 'Descripción', type: 'text', placeholder: 'Descripción del producto' },
-  { name: 'imageUrl', label: 'Imagen', type: 'image', placeholder: 'URL de la imagen' },
+// Función helper para crear el template base de items con traducciones
+const createBaseItemFormTemplate = (tForms: (key: string) => string): FormTemplate => [
+  { name: 'customId', label: tForms('labels.productId'), type: 'text', placeholder: tForms('labels.productId'), required: true },
+  { name: 'name', label: tForms('labels.name'), type: 'text', placeholder: tForms('labels.productName'), required: true },
+  { name: 'description', label: tForms('labels.description'), type: 'text', placeholder: tForms('labels.productDescription') },
+  { name: 'imageUrl', label: tForms('labels.image'), type: 'image', placeholder: tForms('labels.imageUrl') },
 ];
 
 interface ItemsTableProps {
@@ -36,13 +36,19 @@ interface ItemsTableProps {
 }
 
 export default function ItemsTable({ 
-  title = "Inventario de productos",
+  title,
   showBox = true,
   onItemSelect,
   customActions = [],
   customColumns = [],
   allowTemplateEditing = true
 }: ItemsTableProps) {
+  const t = useTranslations('tables');
+  const tModals = useTranslations('modals');
+  const tForms = useTranslations('forms');
+  const locale = useLocale();
+  const defaultTitle = title || t('items');
+  const baseItemFormTemplate = useMemo(() => createBaseItemFormTemplate(tForms), [tForms]);
   const [items, setItems] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,7 +76,7 @@ export default function ItemsTable({
       }
     },
     onError: (error) => {
-      alert('Error al eliminar el producto');
+      alert(t('deleteProductError'));
     },
   });
 
@@ -208,7 +214,7 @@ export default function ItemsTable({
     },
     {
       key: 'item-categories',
-      label: 'Categorías',
+      label: t('columns.categories'),
       enableSorting: false,
       render: (item: any) => {
         const handleCategoryUpdate = (updatedCategories: Array<{ id: string; name: string }>) => {
@@ -234,7 +240,7 @@ export default function ItemsTable({
     },
     {
       key: 'item-created',
-      label: 'Fecha de alta',
+      label: t('columns.creationDate'),
       enableSorting: true,
       sortingFn: (a: any, b: any) => {
         const dateA = new Date(a.original.createdAt);
@@ -243,7 +249,8 @@ export default function ItemsTable({
       },
       render: (item: any) => {
         const date = new Date(item.createdAt);
-        const formattedDate = date.toLocaleDateString('es-ES', {
+        const localeString = locale === 'en' ? 'en-US' : 'es-ES';
+        const formattedDate = date.toLocaleDateString(localeString, {
           year: 'numeric',
           month: '2-digit',
           day: '2-digit'
@@ -257,7 +264,7 @@ export default function ItemsTable({
     },
     {
       key: 'item-image',
-      label: 'Imagen',
+      label: t('columns.image'),
       enableSorting: false,
       render: (item: any) => {
         return <ItemImageColumn item={item} />;
@@ -265,21 +272,21 @@ export default function ItemsTable({
     },
     {
       key: 'item-actions',
-      label: 'Acciones',
+      label: t('columns.actions'),
       enableSorting: false,
       render: (item: any) => (
         <div className="btn-group btn-group-sm">
           <button
             className="btn btn-outline-primary btn-sm"
             onClick={() => router.push(`/dashboard/items/${item.id}`)}
-            title="Ver detalle"
+            title={t('columns.viewDetail')}
           >
             <i className="bi bi-eye"></i>
           </button>
           <button
             className="btn btn-outline-danger btn-sm"
             onClick={() => openDeleteModalWithDetails(item)}
-            title="Eliminar"
+            title={t('columns.delete')}
           >
             <i className="bi bi-trash"></i>
           </button>
@@ -304,7 +311,7 @@ export default function ItemsTable({
 
   const tableContent = (
     <ItemsTableCustom 
-      title={title}
+      title={defaultTitle}
       icon={"bi-list-columns"}
       initialData={filteredItems} 
       formTemplate={!isLoading && products.length > 0 ? getSelectedProductTemplate() : undefined}
@@ -315,15 +322,15 @@ export default function ItemsTable({
       actions={customActions}
       filterPlaceholder={
         filterType === 'name' 
-          ? "Buscar por nombre" 
+          ? t('searchByName')
           : filterType === 'id'
-          ? "Buscar por ID"
-          : "Buscar por categoría"
+          ? t('searchById')
+          : t('searchByCategory')
       }
       filterType={filterType}
       onFilterTypeChange={setFilterType}
       categories={products}
-      addButtonLabel="Añadir producto"
+      addButtonLabel={t('addProduct')}
       onCategoryChange={setSelectedProductId}
     />
   );
@@ -335,11 +342,10 @@ export default function ItemsTable({
     <>
       {showBox && (
         <Box>
-          <h6 className="mb-2">¿Qué es el inventario de productos?</h6>
+          <h6 className="mb-2">{t('whatIsInventory')}</h6>
           <Divider />
           <p className="mb-0 text-muted">
-            El inventario de productos es el catálogo central de productos o elementos que gestiona tu organización. 
-            Cada producto puede tener múltiples categorías, una imagen, campos personalizados según su tipo, y un historial de estados que registra su evolución a lo largo del tiempo.
+            {t('inventoryDescription')}
           </p>
         </Box>
       )}
@@ -354,8 +360,8 @@ export default function ItemsTable({
         show={showDeleteModal}
         onHide={closeDeleteModal}
         onConfirm={handleDelete}
-        title="Eliminar Producto"
-        message={`¿Estás seguro de que quieres eliminar el producto "${entityToDelete?.name}"?`}
+        title={t('deleteProduct')}
+        message={t('confirmDeleteProduct', { name: entityToDelete?.name || '' })}
         cascadeInfo={cascadeInfo}
         isLoading={isDeleting}
       />

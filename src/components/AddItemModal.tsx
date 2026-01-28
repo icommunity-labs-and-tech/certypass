@@ -12,6 +12,7 @@ import Alert from 'react-bootstrap/Alert';
 import ListGroup from 'react-bootstrap/ListGroup';
 import ItemCreationWizard from './ItemCreationWizard';
 import { checkEmailExists } from '@/actions/users';
+import { useTranslations } from 'next-intl';
 
 type AddItemModalProps = {
   show: boolean;
@@ -55,6 +56,10 @@ export default function AddItemModal({
   const [selectedCopyItemId, setSelectedCopyItemId] = useState<string>('');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const t = useTranslations('modals.addItem');
+  const tValidation = useTranslations('common.validation');
+  const tCommon = useTranslations('common.actions');
+  const tForms = useTranslations('forms');
 
   useEffect(() => {
     // Only for issue creation, estimate payload size and warn
@@ -96,7 +101,7 @@ export default function AddItemModal({
     // Validación básica de formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && !emailRegex.test(email)) {
-      setEmailError('El formato del email no es válido');
+      setEmailError(t('emailFormatInvalid'));
       return;
     }
 
@@ -109,7 +114,7 @@ export default function AddItemModal({
         try {
           const result = await checkEmailExists(email);
           if (result.exists) {
-            setEmailError('Ya existe un usuario con este email');
+            setEmailError(t('emailExists'));
           } else if (result.error) {
             setEmailError(result.error);
           } else {
@@ -117,7 +122,7 @@ export default function AddItemModal({
           }
         } catch (error) {
           console.error('Error checking email:', error);
-          setEmailError('Error al verificar el email');
+          setEmailError(t('emailCheckError'));
         } finally {
           setIsCheckingEmail(false);
         }
@@ -136,7 +141,7 @@ export default function AddItemModal({
       if (field.required) {
         const value = formState?.[field.name];
         if (!value || (typeof value === 'string' && value.trim() === '')) {
-          errors.push(`El campo "${field.label}" es obligatorio`);
+          errors.push(t('fieldRequired', { label: field.label }));
         }
       }
     });
@@ -147,7 +152,7 @@ export default function AddItemModal({
   // Función para generar el título del modal basado en el contexto
   const getModalTitle = () => {
     if (isIssueTemplate) {
-      return 'Nuevo Estado';
+      return t('newState');
     }
     
     // Detectar si es un formulario de usuario por los campos específicos
@@ -156,18 +161,18 @@ export default function AddItemModal({
     );
     
     if (isUserForm) {
-      return 'Añadir Usuario';
+      return t('addUser');
     }
     
     switch (uploadType) {
       case 'item':
-        return 'Añadir Producto';
+        return t('addProduct');
       case 'product':
-        return 'Añadir Categoría';
+        return t('addCategory');
       case 'issue':
-        return 'Nuevo Estado';
+        return tForms('addState');
       default:
-        return 'Añadir Elemento';
+        return t('addElement');
     }
   };
 
@@ -198,7 +203,7 @@ export default function AddItemModal({
       };
       await onSubmit(finalData);
     } catch (err: any) {
-      setError(err.message || 'Error al crear el elemento');
+      setError(err.message || t('addItem.createError'));
     }
   };
 
@@ -214,7 +219,7 @@ export default function AddItemModal({
       try {
         setIsLoadingCategoryItems(true);
         const res = await fetch(`/api/items/by-category?categoryId=${encodeURIComponent(categoryId)}`);
-        if (!res.ok) throw new Error('Error cargando productos de la categoría');
+        if (!res.ok) throw new Error(t('loadCategoryError'));
         const data = await res.json();
         setCategoryItems((data || []).map((i: any) => ({ id: i.id, name: i.name })));
         // Resetear selección al cambiar de categoría
@@ -231,7 +236,7 @@ export default function AddItemModal({
   const handleCopyFromItem = async (itemId: string) => {
     try {
       const res = await fetch(`/api/items/${encodeURIComponent(itemId)}`);
-      if (!res.ok) throw new Error('No se pudo cargar el producto seleccionado');
+      if (!res.ok) throw new Error(t('loadItemError'));
       const item = await res.json();
 
       // Preservar el customId que el usuario haya escrito
@@ -330,12 +335,12 @@ export default function AddItemModal({
                 }}
                 disabled={isLoadingCategoryItems}
               >
-                <option value="">{isLoadingCategoryItems ? 'Cargando productos…' : 'No copiar'}</option>
+                <option value="">{isLoadingCategoryItems ? t('loadingProducts') : t('dontCopy')}</option>
                 {categoryItems.map((it) => (
                   <option key={it.id} value={it.id}>{it.name || it.id}</option>
                 ))}
               </Form.Select>
-              <Form.Text className="text-muted">Se copiarán nombre, descripción, imagen y campos de template. Tu ID se mantiene.</Form.Text>
+              <Form.Text className="text-muted">{t('copyHelp')}</Form.Text>
             </div>
           )}
         </Form.Group>
@@ -358,7 +363,7 @@ export default function AddItemModal({
             }
           />
           <Form.Text className="text-muted">
-            El ID es obligatorio, debe ser único y se usará para generar el código QR.
+            {t('customIdHelp')}
           </Form.Text>
         </Form.Group>
       );
@@ -413,7 +418,7 @@ export default function AddItemModal({
           {isEmailField && isCheckingEmail && (
             <div className="position-absolute top-50 end-0 translate-middle-y me-2">
               <div className="spinner-border spinner-border-sm text-primary" role="status">
-                <span className="visually-hidden">Verificando...</span>
+                <span className="visually-hidden">{tValidation('checking')}</span>
               </div>
             </div>
           )}
@@ -424,7 +429,7 @@ export default function AddItemModal({
           )}
           {isEmailField && formState?.[field.name] && !emailError && !isCheckingEmail && (
             <Form.Control.Feedback type="valid">
-              Email disponible
+              {tValidation('emailAvailable')}
             </Form.Control.Feedback>
           )}
         </div>
@@ -469,18 +474,18 @@ export default function AddItemModal({
           {preflight?.overLimit && (
             <Alert variant="warning">
               <div className="mb-2">
-                El tamaño estimado de la evidencia supera el máximo de
+                {t('evidenceSizeExceeded')}
                 {' '}
                 <strong>{(preflight.limitBytes / (1024 * 1024)).toFixed(0)} MB</strong>.
               </div>
               <div className="mb-2">
-                Total estimado: <strong>{(preflight.totalBytes / (1024 * 1024)).toFixed(2)} MB</strong>
+                {t('totalEstimated')} <strong>{(preflight.totalBytes / (1024 * 1024)).toFixed(2)} MB</strong>
                 {' '}(
-                +{((preflight.totalBytes - preflight.limitBytes) / (1024 * 1024)).toFixed(2)} MB por encima)
+                +{((preflight.totalBytes - preflight.limitBytes) / (1024 * 1024)).toFixed(2)} MB {t('aboveLimit')})
               </div>
               {Array.isArray(formState?.imageUrls) && formState?.imageUrls.length > 0 && (
                 <>
-                  <div className="mb-1">Detalle de imágenes:</div>
+                  <div className="mb-1">{t('imageDetails')}</div>
                   <ListGroup className="mb-2">
                     {formState?.imageUrls?.map((u: string, idx: number) => {
                       const bytes = (preflight as any)?.items?.find((it: any) => it.url === u)?.bytes ?? 0;
@@ -525,16 +530,16 @@ export default function AddItemModal({
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>
-          Cancelar
+          {tCommon('cancel')}
         </Button>
         <Button 
           variant="primary" 
           onClick={handleSubmit}
           disabled={isCheckingEmail || !!emailError}
         >
-          {isCheckingEmail ? 'Verificando email...' : 
-           emailError ? 'Corrija los errores' : 
-           'Guardar'}
+          {isCheckingEmail ? t('checkingEmail') : 
+           emailError ? t('fixErrors') : 
+           tCommon('save')}
         </Button>
       </Modal.Footer>
     </Modal>

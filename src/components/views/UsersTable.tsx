@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Modal, Form, Badge, Alert } from 'react-bootstrap';
 import GenericTable from '@/components/GenericTable';
 import { getUsers, createUser, deleteUser, updateUser } from '@/actions/users';
-import { listColumnPresets } from '@/components/GenericTable/useUnifiedColumns';
+import { getListColumnPresets } from '@/components/GenericTable/useUnifiedColumns';
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
 import { useDeleteEntity } from '@/hooks/useDeleteEntity';
 import Box from '@/components/Box';
@@ -11,22 +13,23 @@ import type { FormTemplate } from '@/components/GenericTable';
 // import BoxTitle from '@/components/BoxTitle';
 import PasswordModal from '@/components/PasswordModal';
 import { Divider } from '@/components/Divider';
+import { useTranslations, useLocale } from 'next-intl';
 
-// Template para creación de usuarios (sin teléfono)
-const userFormTemplate: FormTemplate = [
-  { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre completo del usuario' },
-  { name: 'email', label: 'Email', type: 'text', placeholder: 'correo@ejemplo.com' },
+// Función helper para crear el template de usuarios con traducciones
+const createUserFormTemplate = (tForms: (key: string) => string): FormTemplate => [
+  { name: 'name', label: tForms('labels.name'), type: 'text', placeholder: tForms('labels.userName') },
+  { name: 'email', label: tForms('labels.email'), type: 'text', placeholder: tForms('labels.userEmail') },
   { 
     name: 'role', 
-    label: 'Rol', 
+    label: tForms('labels.role'), 
     type: 'select', 
-    placeholder: 'Seleccionar rol',
+    placeholder: tForms('labels.selectRole'),
     options: [
-      { value: 'USER', label: 'Operador' },
-      { value: 'ADMIN', label: 'Administrador' }
+      { value: 'USER', label: tForms('roles.operator') },
+      { value: 'ADMIN', label: tForms('roles.administrator') }
     ]
   },
-  { name: 'notes', label: 'Notas', type: 'text', placeholder: 'Notas adicionales (opcional)' },
+  { name: 'notes', label: tForms('labels.notes'), type: 'text', placeholder: tForms('labels.additionalNotes') },
 ];
 
 interface UsersTableProps {
@@ -39,13 +42,21 @@ interface UsersTableProps {
 }
 
 export default function UsersTable({ 
-  title = "Usuarios del Sistema", 
+  title, 
   showBox = true, 
   onUserSelect, 
   customActions = [], 
   customColumns = [],
   allowTemplateEditing = true 
 }: UsersTableProps) {
+  const t = useTranslations('tables');
+  const tModals = useTranslations('modals');
+  const tForms = useTranslations('forms');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
+  const defaultTitle = title || t('users');
+  const userFormTemplate = useMemo(() => createUserFormTemplate(tForms), [tForms]);
+  const listColumnPresets = useMemo(() => getListColumnPresets(t), [t]);
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -84,7 +95,7 @@ export default function UsersTable({
       }
     },
     onError: (error) => {
-      alert('Error al eliminar el usuario');
+      alert(t('deleteUserError'));
     },
   });
 
@@ -175,32 +186,33 @@ export default function UsersTable({
         case 'role':
           return (
             <span className={`badge ${value === 'ADMIN' ? 'bg-primary' : 'bg-info'}`}>
-              {value === 'ADMIN' ? 'Administrador' : 'Operador'}
+              {value === 'ADMIN' ? tForms('roles.administrator') : tForms('roles.operator')}
             </span>
           );
         case 'createdAt':
-          return new Date(value).toLocaleDateString('es-ES');
+          const localeString = locale === 'en' ? 'en-US' : 'es-ES';
+          return new Date(value).toLocaleDateString(localeString);
         case 'actions':
           return (
             <div className="btn-group btn-group-sm">
               <button
                 className="btn btn-outline-primary btn-sm"
                 onClick={() => router.push(`/dashboard/users/${row.id}`)}
-                title="Ver detalle"
+                title={t('columns.viewDetail')}
               >
                 <i className="bi bi-eye"></i>
               </button>
               <button
                 className="btn btn-outline-secondary btn-sm"
                 onClick={() => router.push(`/dashboard/users/${row.id}/edit`)}
-                title="Editar"
+                title={t('columns.edit')}
               >
                 <i className="bi bi-pencil"></i>
               </button>
               <button
                 className="btn btn-outline-danger btn-sm"
                 onClick={() => openDeleteModalWithUser(row)}
-                title="Eliminar"
+                title={t('columns.delete')}
               >
                 <i className="bi bi-trash"></i>
               </button>
@@ -215,19 +227,19 @@ export default function UsersTable({
   if (isLoading) {
     return showBox ? (
       <Box>
-        <div className="text-center py-4">
+          <div className="text-center py-4">
           <div className="spinner-border" role="status">
-            <span className="visually-hidden">Cargando...</span>
+            <span className="visually-hidden">{tCommon('loading')}</span>
           </div>
-          <p className="mt-2">Cargando usuarios...</p>
+          <p className="mt-2">{t('loadingUsers')}</p>
         </div>
       </Box>
     ) : (
       <div className="text-center py-4">
         <div className="spinner-border" role="status">
-          <span className="visually-hidden">Cargando...</span>
+          <span className="visually-hidden">{tCommon('loading')}</span>
         </div>
-        <p className="mt-2">Cargando usuarios...</p>
+        <p className="mt-2">{t('loadingUsers')}</p>
       </div>
     );
   }
@@ -242,15 +254,15 @@ export default function UsersTable({
 
       <GenericTable
         initialData={users}
-        title={title}
+        title={defaultTitle}
         icon="bi-people-fill"
         formTemplate={userFormTemplate}
         onAddSubmit={handleAddUser}
         onItemCreated={handleUserCreated}
         customColumns={customColumns.length > 0 ? customColumns : userColumns}
         allowTemplateEditing={false}
-        filterPlaceholder="Filtrar por usuario..."
-        addButtonLabel="Añadir usuario"
+        filterPlaceholder={t('filterUserPlaceholder')}
+        addButtonLabel={t('addUser')}
       />
 
       <DeleteConfirmationModal
@@ -261,8 +273,8 @@ export default function UsersTable({
             handleDelete();
           }
         }}
-        title="Eliminar Usuario"
-        message={`¿Estás seguro de que quieres eliminar el usuario "${entityToDelete?.name}"?`}
+        title={tModals('deleteUser')}
+        message={tModals('confirmDeleteUser', { name: entityToDelete?.name || '' })}
         isLoading={isDeleting}
       />
 
@@ -283,11 +295,10 @@ export default function UsersTable({
     <>
       {showBox && (
         <Box>
-          <h6 className="mb-2">¿Qué es la gestión de usuarios?</h6>
+          <h6 className="mb-2">{t('whatIsUserManagement')}</h6>
           <Divider />
           <p className="mb-0 text-muted">
-            La gestión de usuarios te permite administrar los usuarios del sistema, crear nuevos usuarios, asignar roles (Operador o Administrador) y gestionar sus permisos. 
-            Los usuarios pueden ser verificados mediante KYC y pueden tener diferentes niveles de acceso según su rol en la organización.
+            {t('usersDescription')}
           </p>
         </Box>
       )}

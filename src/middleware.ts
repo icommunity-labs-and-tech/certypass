@@ -1,9 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
+import { routing } from './i18n/routing';
 
 // Configuración hardcodeada para evitar problemas con process.env en Edge Runtime
 const ADMIN_JWT_SECRET = process.env.DASHBOARD_JWT_SECRET || process.env.JWT_SECRET || 'fallback-admin-secret';
 const OPERATOR_JWT_SECRET = process.env.OPERATOR_JWT_SECRET || process.env.JWT_SECRET || 'fallback-operator-secret';
+
+// Función para detectar el idioma preferido
+function getLocale(request: NextRequest): string {
+  // 1. Verificar cookie de preferencia guardada
+  const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value;
+  if (cookieLocale && routing.locales.includes(cookieLocale as any)) {
+    return cookieLocale;
+  }
+
+  // 2. Detectar desde Accept-Language header
+  const acceptLanguage = request.headers.get('accept-language');
+  if (acceptLanguage) {
+    // Parsear Accept-Language header (ej: "en-US,en;q=0.9,es;q=0.8")
+    const languages = acceptLanguage
+      .split(',')
+      .map(lang => {
+        const [locale, q = '1'] = lang.trim().split(';q=');
+        return { locale: locale.split('-')[0], quality: parseFloat(q) };
+      })
+      .sort((a, b) => b.quality - a.quality);
+
+    for (const { locale } of languages) {
+      if (routing.locales.includes(locale as any)) {
+        return locale;
+      }
+    }
+  }
+
+  // 3. Fallback al idioma por defecto
+  return routing.defaultLocale;
+}
 
 // Funciones simplificadas para el middleware (sin consultas a BD)
 async function verifyAdminJWT(token: string) {
@@ -45,6 +77,9 @@ async function verifyOperatorJWT(token: string) {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  // Detectar idioma
+  const locale = getLocale(request);
+
   // Rutas públicas que no requieren autenticación
   const publicRoutes = [
     '/auth/admin/login',
@@ -70,9 +105,36 @@ export async function middleware(request: NextRequest) {
     pathname === route || pathname.startsWith(route)
   );
 
+  // Crear respuesta base
+  let response: NextResponse;
+  
   if (isPublicRoute) {
-    return NextResponse.next();
+    response = NextResponse.next();
+  } else {
+    // Continuar con la lógica de autenticación existente
+    response = await handleAuth(request);
   }
+
+  // Establecer locale en cookie si no existe o es diferente
+  const currentLocale = request.cookies.get('NEXT_LOCALE')?.value;
+  if (currentLocale !== locale) {
+    response.cookies.set('NEXT_LOCALE', locale, {
+      httpOnly: false, // Necesario para que el cliente pueda leerlo
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 365, // 1 año
+      path: '/',
+    });
+  }
+
+  // Establecer header para que next-intl lo pueda leer
+  response.headers.set('x-next-intl-locale', locale);
+
+  return response;
+}
+
+async function handleAuth(request: NextRequest): Promise<NextResponse> {
+  const pathname = request.nextUrl.pathname;
 
   // Manejar la ruta raíz - redirigir al selector de aplicaciones
   if (pathname === '/') {

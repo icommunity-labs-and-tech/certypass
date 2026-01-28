@@ -12,6 +12,7 @@ import { PaginationControls } from '@/components/PaginationControls';
 import { Toolbar } from '@/components/GenericTable/Toolbar';
 import { getAllItems } from '@/actions/items';
 import { UnifiedScannerButton } from '@/components';
+import { useTranslations } from 'next-intl';
 import { usePagination } from '@/hooks/usePagination';
 import { useItemFilter } from '@/hooks/useItemFilter';
 import { OPERATOR_CONSTANTS, OPERATOR_MESSAGES, OPERATOR_BUTTONS } from '@/constants/operator';
@@ -21,6 +22,7 @@ import './operator.css';
 type Item = any;
 
 export default function OperatorPage() {
+  const t = useTranslations('operator');
   const { user, logout } = useAuthSeparated();
   const router = useRouter();
   const { clearAdminOperatorAccess } = useAdminOperatorAccess();
@@ -114,15 +116,15 @@ export default function OperatorPage() {
         <Col>
           <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div className="me-2">
-              <h1 className="h3 mb-0">Operador certypass</h1>
-              <p className="text-muted mb-0">Bienvenido, {user?.name}</p>
+              <h1 className="h3 mb-0">{t('title')}</h1>
+              <p className="text-muted mb-0">{t('welcome', { name: user?.name || '' })}</p>
             </div>
             <div className="d-flex gap-2 flex-wrap">
               <UnifiedScannerButton 
                 appContext="operator"
                 returnUrl="/operator"
                 variant="primary"
-                aria-label="Abrir escáner"
+                aria-label={t('openScanner')}
               >
                 {OPERATOR_BUTTONS.START_SCAN}
               </UnifiedScannerButton>
@@ -168,7 +170,7 @@ export default function OperatorPage() {
                              onActionClick={() => {}}
                              showAddButton={false}
                              onAddClick={() => {}}
-                             filterPlaceholder="Buscar..."
+                             filterPlaceholder={t('search')}
                              className="mb-0"
                            />
                          </div>

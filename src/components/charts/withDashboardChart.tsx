@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import { Spinner } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 
 interface DashboardChartProps {
   loading?: boolean;
@@ -17,12 +20,14 @@ export const withDashboardChart = <P extends object>(
   emptyIcon: string
 ) => {
   return function DashboardChartWrapper(props: P & DashboardChartProps) {
+    const t = useTranslations('dashboard');
+    
     if (props.loading) {
       return (
         <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
           <div className="text-center">
             <Spinner animation="border" variant="primary" />
-            <p className="mt-2">Cargando datos...</p>
+            <p className="mt-2">{t('loadingData')}</p>
           </div>
         </div>
       );

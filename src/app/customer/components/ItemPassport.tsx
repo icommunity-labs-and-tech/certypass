@@ -4,6 +4,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { ItemData } from '../types';
 import { EvidenceVerification } from './EvidenceVerification';
 import { AntifraudPanel } from './AntifraudPanel';
@@ -168,6 +169,7 @@ interface ItemPassportProps {
 }
 
 export function ItemPassport({ item, onBack }: ItemPassportProps) {
+  const t = useTranslations('common');
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'info' | 'history' | 'antifraud'>('info');
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -425,7 +427,7 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
               )}
             </h3>
             <p style={passportStyles.itemDescription}>
-              {item.description || 'Sin descripción'}
+              {item.description || t('noDescription')}
             </p>
             <div style={passportStyles.itemMeta}>
               <span>ID: {item.id}</span>

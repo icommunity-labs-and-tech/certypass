@@ -183,7 +183,7 @@ model Organization {
   plan              String             @default("basic")
   limites           Json?
   configuracion      Json?
-  signatureID        String?            @unique
+  signatureID        String?
   kycURL            String?
   verificationStatus VerificationStatus @default(NOT_VERIFIED)
   createdAt         DateTime           @default(now())

@@ -1,6 +1,7 @@
 'use client';
 
 import { Row, Col } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 import Box from '@/components/Box';
 import BoxTitle from '@/components/BoxTitle';
 import DashboardKPIs from '@/components/charts/DashboardKPIs';
@@ -29,6 +30,7 @@ export default function DashboardClient({
   backupStatus: _backupStatus, 
   backupStatusByUser 
 }: DashboardClientProps) {
+  const t = useTranslations('dashboard');
   const { logout } = useAuthSeparated();
   
   // Activar tour del sidebar automáticamente en primera visita
@@ -42,7 +44,7 @@ export default function DashboardClient({
       <Row className="mb-2">
         <Col md={12}>
           <Box>
-            <BoxTitle message="Métricas" />
+            <BoxTitle message={t('metrics')} />
             <DashboardKPIs kpis={kpis} />
           </Box>
         </Col>
@@ -51,13 +53,13 @@ export default function DashboardClient({
       <Row className="mb-2">
         <Col md={6}>
           <Box>
-            <BoxTitle message="Actividad Mensual de Estados" />
+            <BoxTitle message={t('monthlyActivityTitle')} />
             <MonthlyActivityChart data={monthlyActivity} />
           </Box>
         </Col>
         <Col md={6}>
           <Box>
-            <BoxTitle message="Distribución por Categorías" />
+            <BoxTitle message={t('categoryDistributionTitle')} />
             <CategoryDistributionChart data={categoryDistribution} />
           </Box>
         </Col>
@@ -66,7 +68,7 @@ export default function DashboardClient({
       <Row className="mb-4">
         <Col md={12}>
           <Box>
-            <BoxTitle message="Estado de Respaldos por Usuario" />
+            <BoxTitle message={t('backupStatusByUserTitle')} />
             <BackupStatusByUserChart data={backupStatusByUser} />
           </Box>
         </Col>

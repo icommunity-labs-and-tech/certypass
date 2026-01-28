@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Form, Card, Row, Col, Badge, Alert } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 
 export interface FieldDefinition {
   name: string;
@@ -18,15 +19,16 @@ interface DynamicFieldBuilderProps {
   onValidationChange?: (isValid: boolean, errors: string[]) => void;
 }
 
-const FIELD_TYPES = [
-  { value: 'text', label: 'Texto' },
-  { value: 'textarea', label: 'Textarea' },
-  { value: 'number', label: 'Número' },
-  { value: 'email', label: 'Email' },
-  { value: 'date', label: 'Fecha' },
-  { value: 'select', label: 'Opciones' },
-  { value: 'image', label: 'Imagen' },
-  { value: 'geolocation', label: 'Geolocalización' },
+// Función helper para crear los tipos de campo con traducciones
+const createFieldTypes = (t: (key: string) => string) => [
+  { value: 'text', label: t('text') },
+  { value: 'textarea', label: t('textarea') },
+  { value: 'number', label: t('number') },
+  { value: 'email', label: t('email') },
+  { value: 'date', label: t('date') },
+  { value: 'select', label: t('select') },
+  { value: 'image', label: t('image') },
+  { value: 'geolocation', label: t('geolocation') },
 ] as const;
 
 // Función para generar colores automáticamente para las opciones
@@ -55,6 +57,10 @@ export default function DynamicFieldBuilder({
   showValidationErrors = false,
   onValidationChange
 }: DynamicFieldBuilderProps) {
+  const t = useTranslations('fieldTypes');
+  const tCommon = useTranslations('common');
+  const tForms = useTranslations('forms');
+  const FIELD_TYPES = useMemo(() => createFieldTypes(t), [t]);
   const [localFields, setLocalFields] = useState<FieldDefinition[]>(fields);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
@@ -79,11 +85,12 @@ export default function DynamicFieldBuilder({
     
     fieldsToValidate.forEach((field, index) => {
       if (!field.name || field.name.trim() === '') {
-        errors.push(`El campo ${index + 1} debe tener un nombre`);
+        errors.push(tForms('fieldMustHaveNameWithNumber', { number: index + 1 }));
       }
       
       if (field.type === 'select' && (!field.options || field.options.length === 0)) {
-        errors.push(`El campo "${field.name || `Campo ${index + 1}`}" de tipo Opciones debe tener al menos una opción`);
+        const fieldName = field.name || tCommon('fieldName') + ` ${index + 1}`;
+        errors.push(tForms('selectMustHaveOptions', { name: fieldName }));
       }
     });
     
@@ -184,9 +191,9 @@ export default function DynamicFieldBuilder({
             <Card key={index} className="mb-3">
               <Card.Header className="d-flex justify-content-between align-items-center py-2">
                 <div className="d-flex align-items-center gap-2">
-                  <Badge bg="primary">Campo {index + 1}</Badge>
+                  <Badge bg="primary">{tCommon('fieldName')} {index + 1}</Badge>
                   {field.required && (
-                    <Badge bg="danger" className="small">Requerido</Badge>
+                    <Badge bg="danger" className="small">{tCommon('required')}</Badge>
                   )}
                 </div>
                 <Button
@@ -202,16 +209,16 @@ export default function DynamicFieldBuilder({
                 <Row>
                   <Col md={5}>
                     <Form.Group className="mb-3">
-                      <Form.Label>Nombre del campo</Form.Label>
+                      <Form.Label>{tCommon('fieldName')}</Form.Label>
                       <Form.Control
                         type="text"
                         value={field.name}
                         onChange={(e) => updateField(index, { name: e.target.value })}
-                        placeholder="ej: material producto"
+                        placeholder={tCommon('fieldNamePlaceholder')}
                         size="sm"
                       />
                       <Form.Text className="text-muted">
-                        Nombre descriptivo del campo
+                        {tCommon('fieldNameHelp')}
                       </Form.Text>
                     </Form.Group>
                   </Col>
@@ -236,11 +243,11 @@ export default function DynamicFieldBuilder({
                   </Col>
                   <Col md={3}>
                     <Form.Group className="mb-3">
-                      <Form.Label>Campo requerido</Form.Label>
+                      <Form.Label>{tCommon('fieldRequired')}</Form.Label>
                       <div className="d-flex align-items-center h-100">
                         <Form.Check
                           type="checkbox"
-                          label="Requerido"
+                          label={tCommon('required')}
                           checked={field.required || false}
                           onChange={(e) => updateField(index, { required: e.target.checked })}
                         />

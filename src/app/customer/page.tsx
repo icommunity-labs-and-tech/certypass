@@ -3,8 +3,10 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { UnifiedScannerButton } from '@/components';
+import { useTranslations } from 'next-intl';
 
 export default function CustomerPage() {
+  const t = useTranslations('customer');
   const router = useRouter();
 
   // Scanner functionality is now handled by the unified scanner page
@@ -28,8 +30,8 @@ export default function CustomerPage() {
                 <path d="M9 3h6v18H9z"/>
               </svg>
             </div>
-            <h2>Escanear Código</h2>
-            <p>Coloca el código QR del producto frente a la cámara</p>
+            <h2>{t('scanCode')}</h2>
+            <p>{t('scanDescription')}</p>
             
             <div className="scan-actions">
               <UnifiedScannerButton
@@ -38,13 +40,13 @@ export default function CustomerPage() {
                 variant="primary"
                 className="scan-button primary"
               >
-                Escanear con Cámara
+                {t('scanWithCamera')}
               </UnifiedScannerButton>
               
               <div className="manual-input">
                 <input
                   type="text"
-                  placeholder="O ingresa el código manualmente"
+                  placeholder={t('manualInput')}
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       handleManualInput(e.currentTarget.value);
@@ -58,7 +60,7 @@ export default function CustomerPage() {
                     if (input) handleManualInput(input.value);
                   }}
                 >
-                  Buscar
+                  {t('search')}
                 </button>
               </div>
             </div>
@@ -69,7 +71,7 @@ export default function CustomerPage() {
       </div>
 
       <div className="customer-footer">
-        <p>&copy; 2026 certypass - Pasaporte Digital</p>
+        <p>{t('copyright')}</p>
       </div>
     </div>
   );

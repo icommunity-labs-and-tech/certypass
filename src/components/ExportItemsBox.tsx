@@ -2,7 +2,7 @@
 
 import Box from '@/components/Box';
 import BoxHeader from '@/components/BoxHeader';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
@@ -13,20 +13,22 @@ import { executeCsvImport } from '@/actions/items/executeCsvImport';
 import ItemSelectionModal from '@/components/ItemSelectionModal';
 import FieldSelector, { type FieldKey } from '@/components/FieldSelector';
 import { MAX_CSV_FILE_SIZE, MAX_CSV_ROWS, formatMaxFileSize } from '@/actions/items/csvImportLimits';
-
-const AVAILABLE_FIELDS = [
-  { key: 'id' as FieldKey, label: 'ID' },
-  { key: 'name' as FieldKey, label: 'Nombre' },
-  { key: 'description' as FieldKey, label: 'Descripción' },
-  { key: 'categoryName' as FieldKey, label: 'Categoría' },
-  { key: 'createdAt' as FieldKey, label: 'Fecha de creación' },
-  { key: 'lastStateTitle' as FieldKey, label: 'Pasaporte: Último estado' },
-  { key: 'lastStateBacked' as FieldKey, label: 'Pasaporte: Último estado respaldado' },
-  { key: 'customerUrl' as FieldKey, label: 'URL pública' },
-  { key: 'passportJson' as FieldKey, label: 'Pasaporte digital completo (JSON)' },
-];
+import { useTranslations } from 'next-intl';
 
 export default function ExportItemsBox() {
+  const t = useTranslations('exports');
+  const tCommon = useTranslations('common.actions');
+  const availableFields = useMemo(() => [
+    { key: 'id' as FieldKey, label: t('fieldLabels.id') },
+    { key: 'name' as FieldKey, label: t('fieldLabels.name') },
+    { key: 'description' as FieldKey, label: t('fieldLabels.description') },
+    { key: 'categoryName' as FieldKey, label: t('fieldLabels.categoryName') },
+    { key: 'createdAt' as FieldKey, label: t('fieldLabels.createdAt') },
+    { key: 'lastStateTitle' as FieldKey, label: t('fieldLabels.lastStateTitle') },
+    { key: 'lastStateBacked' as FieldKey, label: t('fieldLabels.lastStateBacked') },
+    { key: 'customerUrl' as FieldKey, label: t('fieldLabels.customerUrl') },
+    { key: 'passportJson' as FieldKey, label: t('fieldLabels.passportJson') },
+  ], [t]);
   const [selectedFields, setSelectedFields] = useState<FieldKey[]>(['id', 'name', 'categoryName']);
   const [showCsvModal, setShowCsvModal] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
@@ -62,15 +64,15 @@ export default function ExportItemsBox() {
 
   return (
     <Box>
-      <BoxHeader title="Exportar/Importar productos" icon="bi-filetype-csv" />
+      <BoxHeader title={t('title')} icon="bi-filetype-csv" />
 
       <Form className="mb-3 px-1">
-        <h6 className="mb-1">Exportar productos a CSV</h6>
+        <h6 className="mb-1">{t('exportToCsv')}</h6>
         <p className="text-muted small mb-2">
-          Usa el botón <strong>Exportar CSV</strong> para seleccionar productos y campos a exportar. Este CSV puede
-          usarse tanto para análisis como para preparar futuras importaciones. El CSV de ejemplo para importación
-          suele usar al menos <code>id</code>, <code>name</code>, <code>description</code> y{' '}
-          <code>categoryName</code>.
+          {t('exportDescription', { 
+            button: t('exportCsv'), 
+            fields: '<code>id</code>, <code>name</code>, <code>description</code> y <code>categoryName</code>' 
+          })}
         </p>
         <Button
           variant="outline-primary"
@@ -78,16 +80,14 @@ export default function ExportItemsBox() {
           onClick={() => setShowCsvModal(true)}
         >
           <i className="bi bi-filetype-csv me-2" />
-          Exportar CSV
+          {t('exportCsv')}
         </Button>
 
         <hr className="my-4" />
 
-        <h6 className="mb-1">Exportar QRs de productos</h6>
+        <h6 className="mb-1">{t('exportQrs')}</h6>
         <p className="text-muted small mb-2">
-          Usa el botón <strong>Exportar QRs</strong> para seleccionar un conjunto de productos y descargar los códigos QR
-          en formato ZIP (imágenes PNG) o Excel (.xlsx con QR incrustado). Ideal para imprimir pegatinas, etiquetas
-          físicas o inventarios impresos.
+          {t('exportQrsDescription', { button: t('exportQrs') })}
         </p>
         <Button
           variant="outline-primary"
@@ -95,16 +95,17 @@ export default function ExportItemsBox() {
           onClick={() => setShowQrModal(true)}
         >
           <i className="bi bi-qr-code me-2" />
-          Exportar QRs
+          {t('exportQrs')}
         </Button>
 
         <hr className="my-4" />
 
-        <h6 className="mb-1">Importar productos desde CSV</h6>
+        <h6 className="mb-1">{t('importFromCsv')}</h6>
         <p className="text-muted small mb-2">
-          El botón <strong>Importar productos desde CSV</strong> permite subir un archivo CSV para importar productos.
-          Primero se validará el archivo y luego podrás ejecutar la importación si todo está correcto. El CSV debe contener al menos las
-          columnas: <code>id</code>, <code>name</code>, <code>description</code> y <code>categoryName</code>.
+          {t('importDescription', { 
+            button: t('importButton'), 
+            fields: '<code>id</code>, <code>name</code>, <code>description</code> y <code>categoryName</code>' 
+          })}
         </p>
         <Button
           variant="outline-secondary"
@@ -112,21 +113,21 @@ export default function ExportItemsBox() {
           onClick={() => setShowImportModal(true)}
         >
           <i className="bi bi-filetype-csv me-2" />
-          Importar items desde CSV
+          {t('importButton')}
         </Button>
       </Form>
 
       <ItemSelectionModal
         show={showCsvModal}
         onHide={() => setShowCsvModal(false)}
-        title="Seleccionar productos y campos para exportar CSV"
+        title={t('selectProductsAndFields')}
         footer={(selectedItemIds, items) => (
           <>
             <Button variant="secondary" onClick={() => setShowCsvModal(false)}>
-              Cancelar
+              {tCommon('cancel')}
             </Button>
             <DownloadZipButton
-              label="Exportar CSV"
+              label={t('exportCsv')}
               iconClassName="bi bi-filetype-csv me-2"
               variant="primary"
               getZip={() => getCsvFile(selectedItemIds, items)}
@@ -134,18 +135,18 @@ export default function ExportItemsBox() {
           </>
         )}
       >
-        <h6 className="mb-2">Seleccionar campos</h6>
+        <h6 className="mb-2">{t('selectFields')}</h6>
         <p className="text-muted small mb-3">
-          Selecciona los campos que quieres incluir en el CSV.
+          {t('selectFields')}
         </p>
         <FieldSelector
-          fields={AVAILABLE_FIELDS}
+          fields={availableFields}
           selected={selectedFields}
           onToggle={toggleField}
           idPrefix="csv-field"
         />
         <hr className="my-3" />
-        <h6 className="mb-2">Seleccionar productos</h6>
+        <h6 className="mb-2">{t('selectProducts')}</h6>
       </ItemSelectionModal>
 
       <ItemSelectionModal
@@ -303,12 +304,12 @@ export default function ExportItemsBox() {
                   
                   {validationResult.summary && (
                     <div className="mb-3">
-                      <h6>Resumen:</h6>
+                      <h6>{t('summary')}</h6>
                       <ul className="mb-0">
-                        <li>Total de filas: <strong>{validationResult.summary.totalRows}</strong></li>
-                        <li>Filas válidas: <strong>{validationResult.summary.validRows}</strong></li>
+                        <li>{t('totalRows', { count: validationResult.summary.totalRows })}</li>
+                        <li>{t('validRows', { count: validationResult.summary.validRows })}</li>
                         {validationResult.categoriesToCreate && validationResult.categoriesToCreate.length > 0 && (
-                          <li>Categorías a crear: <strong>{validationResult.categoriesToCreate.length}</strong></li>
+                          <li>{t('categoriesToCreateCount', { count: validationResult.categoriesToCreate.length })}</li>
                         )}
                       </ul>
                     </div>

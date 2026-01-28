@@ -2,12 +2,15 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { useTranslations } from 'next-intl';
 
 function ErrorPageContent() {
+  const t = useTranslations('customer.error');
+  const tCustomer = useTranslations('customer');
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const error = searchParams.get('error') || 'Error desconocido';
+  const error = searchParams.get('error') || t('unknownError');
   const code = searchParams.get('code') || '';
 
   const handleRetry = () => {
@@ -33,17 +36,17 @@ function ErrorPageContent() {
                 <path d="M15 9l-6 6M9 9l6 6"/>
               </svg>
             </div>
-            <h3>Error</h3>
+            <h3>{t('title')}</h3>
             <p>{error}</p>
             
             <div className="error-actions">
               <button className="retry-button" onClick={handleRetry}>
-                Volver al Scanner
+                {t('backToScanner')}
               </button>
               
               {code && (
                 <button className="manual-button" onClick={handleManualSearch}>
-                  Intentar con código: {code}
+                  {t('tryWithCode', { code })}
                 </button>
               )}
             </div>
@@ -51,13 +54,15 @@ function ErrorPageContent() {
         </div>
       </div>
       <div className="customer-footer">
-        <p>&copy; 2026 certypass - Pasaporte Digital</p>
+        <p>{tCustomer('copyright')}</p>
       </div>
     </div>
   );
 }
 
 export default function ErrorPage() {
+  const t = useTranslations('customer.error');
+  const tCustomer = useTranslations('customer');
   return (
     <Suspense fallback={
       <div className="customer-container">
@@ -69,13 +74,13 @@ export default function ErrorPage() {
                   <path d="M21 12a9 9 0 11-6.219-8.56"/>
                 </svg>
               </div>
-              <h2>Cargando...</h2>
-              <p>Preparando página de error</p>
+              <h2>{t('loading')}</h2>
+              <p>{t('preparingError')}</p>
             </div>
           </div>
         </div>
         <div className="customer-footer">
-          <p>&copy; 2026 certypass - Pasaporte Digital</p>
+          <p>{tCustomer('copyright')}</p>
         </div>
       </div>
     }>

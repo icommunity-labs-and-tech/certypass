@@ -4,17 +4,19 @@ import Box from '@/components/Box';
 import GenericTable, { FormTemplate, TableAction } from '@/components/GenericTable';
 import LoadingOverlay from '@/components/Loading';
 import { addStatusType, listStatusTypes, updateStatusType, deleteStatusType, getStatusType } from '@/actions/statusTypes';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
 import { useDeleteEntity } from '@/hooks/useDeleteEntity';
 import StatusTypeFieldBuilder, { StatusTypeFieldDefinition } from '@/components/StatusTypeFieldBuilder';
 import { Button, Modal, Form, Alert } from 'react-bootstrap';
 import { Divider } from '@/components/Divider';
+import { useTranslations, useLocale } from 'next-intl';
 
-const statusTypeFormTemplate: FormTemplate = [
-  { name: 'name', label: 'Nombre', type: 'text' as const, placeholder: 'Nombre del tipo de estado', required: true },
-  { name: 'description', label: 'Descripción', type: 'textarea' as const, placeholder: 'Descripción del tipo de estado', required: false },
+// Función helper para crear el template de status types con traducciones
+const createStatusTypeFormTemplate = (tForms: (key: string) => string): FormTemplate => [
+  { name: 'name', label: tForms('labels.name'), type: 'text' as const, placeholder: tForms('labels.statusTypeName'), required: true },
+  { name: 'description', label: tForms('labels.description'), type: 'textarea' as const, placeholder: tForms('labels.statusTypeDescription'), required: false },
 ];
 
 interface StatusTypesTableProps {
@@ -26,12 +28,17 @@ interface StatusTypesTableProps {
 }
 
 export default function StatusTypesTable({ 
-  title = "Tipos de estado",
+  title,
   showBox = true,
   onStatusTypeSelect,
   customActions = [],
   customColumns = [],
 }: StatusTypesTableProps) {
+  const t = useTranslations('tables');
+  const tForms = useTranslations('forms');
+  const locale = useLocale();
+  const defaultTitle = title || t('statusTypes');
+  const statusTypeFormTemplate = useMemo(() => createStatusTypeFormTemplate(tForms), [tForms]);
   const [statusTypes, setStatusTypes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -57,7 +64,7 @@ export default function StatusTypesTable({
       }
     },
     onError: (error) => {
-      alert('Error al eliminar el tipo de estado');
+      alert(t('deleteStatusTypeError'));
     },
   });
 
@@ -87,7 +94,7 @@ export default function StatusTypesTable({
       setEditError(null);
     } catch (err) {
       console.error('Error cargando StatusType:', err);
-      setEditError('Error al cargar el tipo de estado');
+      setEditError(t('loadStatusTypeError'));
     }
   };
 
@@ -108,21 +115,22 @@ export default function StatusTypesTable({
       setEditingStatusType(null);
       setEditFormData({ name: '', description: '', template: [] });
     } catch (err: any) {
-      setEditError(err.message || 'Error al actualizar el tipo de estado');
+      setEditError(err.message || t('updateStatusTypeError'));
     } finally {
       setIsSavingEdit(false);
     }
   };
 
+  const tCommon = useTranslations('common.actions');
   const statusTypeActions: TableAction[] = [
     {
-      label: 'Editar',
+      label: tCommon('edit'),
       onClick: handleEditStatusType,
       icon: 'bi-pencil',
       variant: 'outline-secondary'
     },
     {
-      label: 'Eliminar',
+      label: tCommon('delete'),
       onClick: (statusType: any) => openDeleteModal(statusType),
       icon: 'bi-trash',
       variant: 'outline-danger'
@@ -135,7 +143,7 @@ export default function StatusTypesTable({
   const tableContent = (
     <GenericTable
       initialData={statusTypes}
-      title={title}
+      title={defaultTitle}
       icon="bi-collection"
       formTemplate={statusTypeFormTemplate}
       onAddSubmit={async (formData: any) => {
@@ -161,30 +169,33 @@ export default function StatusTypesTable({
       customColumns={customColumns.length > 0 ? customColumns : [
         {
           key: 'name',
-          label: 'Nombre',
+          label: t('columnLabels.name'),
           render: (statusType: any) => (
             <div className="fw-medium text-primary">{statusType.name}</div>
           )
         },
         {
           key: 'description',
-          label: 'Descripción',
+          label: t('columnLabels.description'),
           render: (statusType: any) => (
             <div className="text-muted">{statusType.description || '-'}</div>
           )
         },
         {
           key: 'createdAt',
-          label: 'Fecha de Creación',
-          render: (statusType: any) => (
-            <span className="text-muted">
-              {new Date(statusType.createdAt).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-              })}
-            </span>
-          )
+          label: t('columnLabels.creationDate'),
+          render: (statusType: any) => {
+            const localeString = locale === 'en' ? 'en-US' : 'es-ES';
+            return (
+              <span className="text-muted">
+                {new Date(statusType.createdAt).toLocaleDateString(localeString, {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                })}
+              </span>
+            );
+          }
         }
       ]}
     />
@@ -194,12 +205,10 @@ export default function StatusTypesTable({
     <>
       {showBox && (
         <Box>
-          <h6 className="mb-2">¿Qué son los tipos de estado?</h6>
+          <h6 className="mb-2">{t('whatIsStatusTypes')}</h6>
           <Divider />
           <p className="mb-0 text-muted">
-            Los tipos de estado definen las plantillas y estructuras de datos para los diferentes estados que pueden tener los items. 
-            Cada tipo de estado puede tener campos personalizados que permiten capturar información específica, como inspecciones, reparaciones o verificaciones, 
-            y se utilizan para crear estados consistentes y estructurados en el sistema.
+            {t('statusTypesDescription')}
           </p>
         </Box>
       )}
@@ -216,15 +225,15 @@ export default function StatusTypesTable({
         show={showDeleteModal}
         onHide={closeDeleteModal}
         onConfirm={handleDelete}
-        title="Eliminar Tipo de Estado"
-        message={`¿Estás seguro de que quieres eliminar el tipo de estado "${entityToDelete?.name}"?`}
+        title={t('deleteStatusType')}
+        message={t('confirmDeleteStatusType', { name: entityToDelete?.name || '' })}
         isLoading={isDeleting}
       />
 
       {/* Modal para editar StatusType */}
       <Modal show={!!editingStatusType} onHide={() => setEditingStatusType(null)} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Editar Tipo de Estado</Modal.Title>
+          <Modal.Title>{t('editStatusType')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {editError && (
@@ -234,7 +243,7 @@ export default function StatusTypesTable({
           )}
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Nombre</Form.Label>
+              <Form.Label>{t('columnLabels.name')}</Form.Label>
               <Form.Control
                 type="text"
                 value={editFormData.name}
@@ -243,7 +252,7 @@ export default function StatusTypesTable({
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Descripción</Form.Label>
+              <Form.Label>{t('columnLabels.description')}</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
@@ -262,10 +271,10 @@ export default function StatusTypesTable({
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setEditingStatusType(null)}>
-            Cancelar
+            {tCommon('cancel')}
           </Button>
           <Button variant="primary" onClick={handleSaveEdit} disabled={isSavingEdit}>
-            {isSavingEdit ? 'Guardando...' : 'Guardar Cambios'}
+            {isSavingEdit ? tCommon('loading') : tCommon('save')}
           </Button>
         </Modal.Footer>
       </Modal>

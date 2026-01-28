@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React from 'react';
 import { formatValueWithSmartDateDetection } from '@/lib/format';
+import { useTranslations } from 'next-intl';
 
 interface Item {
   id: string;
@@ -22,13 +23,14 @@ export const ItemCard: React.FC<ItemCardProps> = React.memo(({
   onClick, 
   className = '' 
 }) => {
+  const t = useTranslations('common');
   const handleClick = () => onClick(item);
 
   const truncatedDescription = item.description 
     ? (item.description.length > 50 
         ? `${item.description.substring(0, 50)}...` 
         : item.description)
-    : 'Sin descripción';
+    : t('noDescription');
 
   const statesCount = item.states?.length || 0;
   const ariaLabel = `${item.name}. ${truncatedDescription}. Creado ${formatValueWithSmartDateDetection(item.createdAt, 'createdAt')}${statesCount > 0 ? `. ${statesCount} estado${statesCount !== 1 ? 's' : ''}` : ''}`;

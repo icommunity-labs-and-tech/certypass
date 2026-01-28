@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, Col, Row } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 import { KPI_CONFIG } from '@/config/dashboardConfig';
 import type { DashboardKPIs } from '@/types/dashboard';
 import '../Box.css';
@@ -46,36 +47,38 @@ interface DashboardKPIsProps {
 }
 
 export default function DashboardKPIs({ kpis }: DashboardKPIsProps) {
+  const t = useTranslations('dashboard.kpis');
+  
   return (
     <Row className="text-center">
       <KPICard
-        title={KPI_CONFIG.totalItems.title}
+        title={t('totalItems.title')}
         value={KPI_CONFIG.totalItems.getValue(kpis)}
-        subtitle={KPI_CONFIG.totalItems.subtitle}
+        subtitle={t('totalItems.subtitle')}
         color={KPI_CONFIG.totalItems.color}
         icon={KPI_CONFIG.totalItems.icon}
       />
       
       <KPICard
-        title={KPI_CONFIG.backupRate.title}
+        title={t('backupRate.title')}
         value={KPI_CONFIG.backupRate.getValue(kpis)}
-        subtitle={typeof KPI_CONFIG.backupRate.subtitle === 'function' ? KPI_CONFIG.backupRate.subtitle(kpis) : KPI_CONFIG.backupRate.subtitle}
+        subtitle={t('backupRate.subtitle', { backed: kpis.backedPassports, total: kpis.backedPassports + kpis.pendingPassports })}
         color={KPI_CONFIG.backupRate.color}
         icon={KPI_CONFIG.backupRate.icon}
       />
       
       <KPICard
-        title={KPI_CONFIG.operators.title}
+        title={t('operators.title')}
         value={KPI_CONFIG.operators.getValue(kpis)}
-        subtitle={KPI_CONFIG.operators.subtitle}
+        subtitle={t('operators.subtitle')}
         color={KPI_CONFIG.operators.color}
         icon={KPI_CONFIG.operators.icon}
       />
       
       <KPICard
-        title={KPI_CONFIG.activeUsers.title}
+        title={t('activeUsers.title')}
         value={KPI_CONFIG.activeUsers.getValue(kpis)}
-        subtitle={KPI_CONFIG.activeUsers.subtitle}
+        subtitle={t('activeUsers.subtitle')}
         color={KPI_CONFIG.activeUsers.color}
         icon={KPI_CONFIG.activeUsers.icon}
       />

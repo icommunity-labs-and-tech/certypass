@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Button, Modal, Form, Alert, Badge, Table } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { createApiToken } from '@/actions/api-tokens/create';
 import { listApiTokens } from '@/actions/api-tokens/list';
@@ -23,6 +24,8 @@ interface ApiToken {
 }
 
 export default function AuthPageClient() {
+  const t = useTranslations('developer.auth');
+  const tCommon = useTranslations('common.actions');
   const [tokens, setTokens] = useState<ApiToken[]>([]);
   const [loading, setLoading] = useState(true);
   const [apiCalls, setApiCalls] = useState<Record<string, Array<{ createdAt: Date; statusCode: number }>>>({});
@@ -44,12 +47,12 @@ export default function AuthPageClient() {
       if (result.success && result.data) {
         setTokens(result.data);
       } else {
-        const errorMsg = result.error || 'Error al cargar tokens';
+        const errorMsg = result.error || t('loadError');
         console.error('Error loading tokens:', errorMsg);
         setError(errorMsg);
       }
     } catch (err: any) {
-      const errorMsg = err?.message || 'Error al cargar tokens';
+      const errorMsg = err?.message || t('loadError');
       console.error('Exception loading tokens:', err);
       setError(errorMsg);
     } finally {
@@ -143,37 +146,38 @@ export default function AuthPageClient() {
         setNewTokenExpiresAt('');
         await loadTokens();
       } else {
-        setError(result.error || 'Error al crear token');
+        setError(result.error || t('createError'));
       }
     } catch (err) {
-      setError('Error al crear token');
+      setError(t('createError'));
     } finally {
       setCreating(false);
     }
   };
 
   const handleDelete = async (tokenId: string) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este token? Esta acción no se puede deshacer.')) {
+    if (!confirm(t('deleteConfirm'))) {
       return;
     }
 
     try {
       const result = await deleteApiToken(tokenId);
       if (result.success) {
-        setSuccess('Token eliminado correctamente');
+        setSuccess(t('deleteSuccess'));
         await loadTokens();
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Error al eliminar token');
+        setError(result.error || t('deleteError'));
       }
     } catch (err) {
-      setError('Error al eliminar token');
+      setError(t('deleteError'));
     }
   };
 
   const formatDate = (date: Date | null) => {
-    if (!date) return 'Nunca';
-    return new Date(date).toLocaleString('es-ES');
+    if (!date) return t('never');
+    const locale = typeof window !== 'undefined' ? navigator.language : 'en-US';
+    return new Date(date).toLocaleString(locale);
   };
 
   const isExpired = (expiresAt: Date | null) => {
@@ -213,9 +217,10 @@ export default function AuthPageClient() {
     let periodNum = 1;
     
     while (startDate <= now) {
+      const locale = typeof window !== 'undefined' ? navigator.language : 'en-US';
       const key = periodType === 'week' 
         ? `Sem ${periodNum}`
-        : startDate.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+        : startDate.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' });
       
       periods.push({ period: key, date: new Date(startDate) });
       
@@ -275,12 +280,10 @@ export default function AuthPageClient() {
   return (
     <>
       <Box>
-        <h6 className="mb-2">¿Qué son los tokens de API?</h6>
+        <h6 className="mb-2">{t('whatAreTokens')}</h6>
         <Divider />
         <p className="mb-0 text-muted">
-          Los tokens de API son credenciales de autenticación que permiten acceder de forma segura a los endpoints REST de la plataforma. 
-          Se utilizan como Bearer tokens en el header <code>Authorization</code> de las peticiones HTTP para autenticar y autorizar las llamadas a la API.
-          Cada token está asociado a tu organización y puede tener una fecha de expiración opcional.
+          {t('tokensDescription')}
         </p>
       </Box>
 
@@ -288,11 +291,11 @@ export default function AuthPageClient() {
         <div className="table-toolbar">
           <div className="title-section">
             <i className="bi bi-key-fill"></i>
-            <h4>Tokens de API</h4>
+            <h4>{t('title')}</h4>
           </div>
           <div className="controls-section">
             <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-              <span className="d-none d-md-inline">Crear Token</span>
+              <span className="d-none d-md-inline">{t('createToken')}</span>
               <span className="d-md-none">+</span>
           </Button>
           </div>
@@ -315,18 +318,18 @@ export default function AuthPageClient() {
         {tokens.length === 0 ? (
           <div className="text-center py-5">
             <i className="bi bi-key" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
-            <p className="mt-3 text-muted">No hay tokens creados aún</p>
+            <p className="mt-3 text-muted">{t('noTokens')}</p>
           </div>
         ) : (
           <Table responsive striped className="custom-table">
               <thead>
                 <tr>
-                  <th>Nombre</th>
-                  <th>Creado</th>
-                  <th>Último uso</th>
-                  <th>Expira</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
+                  <th>{t('table.name')}</th>
+                  <th>{t('table.created')}</th>
+                  <th>{t('table.lastUsed')}</th>
+                  <th>{t('table.expires')}</th>
+                  <th>{t('table.status')}</th>
+                  <th>{t('table.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -335,12 +338,12 @@ export default function AuthPageClient() {
                     <td>{token.name}</td>
                     <td>{formatDate(token.createdAt)}</td>
                     <td>{formatDate(token.lastUsedAt)}</td>
-                    <td>{token.expiresAt ? formatDate(token.expiresAt) : 'Nunca'}</td>
+                    <td>{token.expiresAt ? formatDate(token.expiresAt) : t('never')}</td>
                     <td>
                       {isExpired(token.expiresAt) ? (
-                        <Badge bg="danger">Expirado</Badge>
+                        <Badge bg="danger">{t('expired')}</Badge>
                       ) : (
-                        <Badge bg="success">Activo</Badge>
+                        <Badge bg="success">{t('active')}</Badge>
                       )}
                     </td>
                     <td>
@@ -348,7 +351,7 @@ export default function AuthPageClient() {
                           variant="outline-danger"
                           size="sm"
                           onClick={() => handleDelete(token.id)}
-                          title="Eliminar"
+                          title={t('delete')}
                         >
                           <i className="bi bi-trash"></i>
                         </Button>
@@ -365,7 +368,7 @@ export default function AuthPageClient() {
           <div className="table-toolbar">
             <div className="title-section">
               <i className="bi bi-graph-up"></i>
-              <h4>Evolución del Uso de Tokens</h4>
+              <h4>{t('usageEvolution')}</h4>
             </div>
           </div>
           <Divider />
@@ -382,9 +385,10 @@ export default function AuthPageClient() {
                 formatter={(value: number, name: string) => {
                   const tokenIndex = parseInt(name.replace('token_', ''));
                   const tokenName = chartData.tokenNames[tokenIndex]?.name || name;
-                  return [`${value} llamada${value !== 1 ? 's' : ''}`, tokenName];
+                  const callsText = value !== 1 ? t('callsPlural') : t('calls');
+                  return [`${value} ${callsText}`, tokenName];
                 }}
-                labelFormatter={(label) => `Período: ${label}`}
+                labelFormatter={(label) => `${t('period')} ${label}`}
               />
               <Legend 
                 formatter={(value) => {
@@ -419,41 +423,41 @@ export default function AuthPageClient() {
       {/* Create Token Modal */}
       <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Crear Nuevo Token</Modal.Title>
+          <Modal.Title>{t('createModal.title')}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleCreate}>
           <Modal.Body>
             <Form.Group className="mb-3">
-              <Form.Label>Nombre del Token</Form.Label>
+              <Form.Label>{t('createModal.nameLabel')}</Form.Label>
               <Form.Control
                 type="text"
                 value={newTokenName}
                 onChange={(e) => setNewTokenName(e.target.value)}
                 required
-                placeholder="Ej: Token de producción"
+                placeholder={t('createModal.namePlaceholder')}
               />
               <Form.Text className="text-muted">
-                Elige un nombre descriptivo para identificar este token
+                {t('createModal.nameHelp')}
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Fecha de Expiración (opcional)</Form.Label>
+              <Form.Label>{t('createModal.expiresLabel')}</Form.Label>
               <Form.Control
                 type="date"
                 value={newTokenExpiresAt}
                 onChange={(e) => setNewTokenExpiresAt(e.target.value)}
               />
               <Form.Text className="text-muted">
-                Si no se especifica, el token no expirará. La expiración será a las 00:00 del día indicado.
+                {t('createModal.expiresHelp')}
               </Form.Text>
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
-              Cancelar
+              {t('createModal.cancel')}
             </Button>
             <Button variant="primary" type="submit" disabled={creating}>
-              {creating ? 'Creando...' : 'Crear Token'}
+              {creating ? t('createModal.creating') : t('createModal.create')}
             </Button>
           </Modal.Footer>
         </Form>
@@ -462,14 +466,14 @@ export default function AuthPageClient() {
       {/* Show New Token Modal */}
       <Modal show={showTokenModal} onHide={() => setShowTokenModal(false)} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Token Creado</Modal.Title>
+          <Modal.Title>{t('tokenCreated.title')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Alert variant="warning">
-            <strong>¡Importante!</strong> Este token solo se mostrará una vez. Asegúrate de copiarlo y guardarlo en un lugar seguro.
+            <strong>{t('tokenCreated.important')}</strong> {t('tokenCreated.warning')}
           </Alert>
           <Form.Group className="mb-3">
-            <Form.Label>Tu Token de API</Form.Label>
+            <Form.Label>{t('tokenCreated.tokenLabel')}</Form.Label>
             <Form.Control
               type="text"
               value={newToken || ''}
@@ -483,15 +487,15 @@ export default function AuthPageClient() {
               className="mt-2"
               onClick={() => {
                 navigator.clipboard.writeText(newToken || '');
-                setSuccess('Token copiado al portapapeles');
+                setSuccess(t('copySuccess'));
               }}
             >
               <i className="bi bi-clipboard me-2"></i>
-              Copiar
+              {t('tokenCreated.copy')}
             </Button>
           </Form.Group>
           <div className="mt-3">
-            <h6>Ejemplo de uso:</h6>
+            <h6>{t('tokenCreated.exampleTitle')}</h6>
             <pre className="bg-light p-3 rounded">
               <code>
                 {`curl -X POST ${typeof window !== 'undefined' ? window.location.origin : 'https://tu-dominio.com'}/api/v1/items \\
@@ -504,7 +508,7 @@ export default function AuthPageClient() {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={() => setShowTokenModal(false)}>
-            Entendido
+            {t('tokenCreated.understood')}
           </Button>
         </Modal.Footer>
       </Modal>

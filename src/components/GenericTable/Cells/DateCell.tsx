@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { useLocale } from 'next-intl';
 
 interface DateCellProps {
   value: string | Date | null | undefined;
@@ -7,6 +10,9 @@ interface DateCellProps {
 }
 
 export default function DateCell({ value, format = 'date', className = '' }: DateCellProps) {
+  const locale = useLocale();
+  const localeString = locale === 'en' ? 'en-US' : 'es-ES';
+  
   if (!value) return <span className="text-muted">-</span>;
   
   const date = new Date(value);
@@ -14,7 +20,7 @@ export default function DateCell({ value, format = 'date', className = '' }: Dat
   if (format === 'datetime') {
     return (
       <span className={`text-muted ${className}`}>
-        {date.toLocaleDateString('es-ES', {
+        {date.toLocaleDateString(localeString, {
           year: 'numeric',
           month: 'short',
           day: 'numeric',
@@ -27,7 +33,7 @@ export default function DateCell({ value, format = 'date', className = '' }: Dat
   
   return (
     <span className={`text-muted ${className}`}>
-      {date.toLocaleDateString('es-ES', {
+      {date.toLocaleDateString(localeString, {
         year: 'numeric',
         month: 'short',
         day: 'numeric'

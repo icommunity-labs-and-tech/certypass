@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
@@ -30,6 +31,7 @@ export default function ItemSelectionTable({
   onSelectAll,
   onClearSelection,
 }: ItemSelectionTableProps) {
+  const t = useTranslations('common');
   return (
     <>
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -92,7 +94,7 @@ export default function ItemSelectionTable({
                 <td className="text-muted small">{it.id}</td>
                 <td className="text-truncate" style={{ maxWidth: 240 }}>
                   <span title={it.description || ''}>
-                    {it.description || <span className="text-muted">Sin descripción</span>}
+                    {it.description || <span className="text-muted">{t('noDescription')}</span>}
                   </span>
                 </td>
               </tr>

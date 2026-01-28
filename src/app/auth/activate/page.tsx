@@ -10,6 +10,7 @@ import { getOnboardingInfo } from '@/actions/organizations/get-onboarding-info';
 import WelcomeStep from '@/components/onboarding/WelcomeStep';
 import TutorialStep from '@/components/onboarding/TutorialStep';
 import KycStep from '@/components/onboarding/KycStep';
+import { useTranslations } from 'next-intl';
 
 // Estilos para el fondo animado
 const backgroundStyles = `
@@ -69,6 +70,8 @@ const backgroundStyles = `
 type OnboardingStep = 1 | 2 | 3 | 4 | 5;
 
 function ActivateAccountForm() {
+  const t = useTranslations('auth.activate');
+  const tCommon = useTranslations('common.actions');
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -157,7 +160,7 @@ function ActivateAccountForm() {
   useEffect(() => {
     const loadOnboardingInfo = async () => {
       if (!token) {
-        setError('Token de activación no válido');
+        setError(t('error.invalidToken'));
         setValidating(false);
         return;
       }
@@ -165,7 +168,7 @@ function ActivateAccountForm() {
       try {
         const result = await getOnboardingInfo(token);
         if (!result.success || !result.info) {
-          setError(result.error || 'Error al cargar información de activación');
+          setError(result.error || t('error.loadError'));
           setValidating(false);
           return;
         }
@@ -174,13 +177,13 @@ function ActivateAccountForm() {
 
         // Verificar token
         if (!info.tokenValid) {
-          setError('Token de activación inválido');
+          setError(t('error.invalidToken'));
           setValidating(false);
           return;
         }
 
         if (info.tokenExpired) {
-          setError('El token de activación ha expirado');
+          setError(t('error.expiredToken'));
           setValidating(false);
           return;
         }
@@ -229,7 +232,7 @@ function ActivateAccountForm() {
         }
       } catch (err) {
         console.error('Error loading onboarding info:', err);
-        setError('Error al cargar información de activación');
+        setError(t('error.loadError'));
       } finally {
         setValidating(false);
       }
@@ -237,19 +240,19 @@ function ActivateAccountForm() {
 
     loadOnboardingInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, router]);
+  }, [token, router, t]);
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError(t('password.errors.passwordsDontMatch'));
       return;
     }
 
     if (password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres');
+      setError(t('password.errors.minLength'));
       return;
     }
 
@@ -276,10 +279,10 @@ function ActivateAccountForm() {
           saveOnboardingState(3, true); // Guardar que completó paso 2 y va al paso 3 (tour)
           setCurrentStep(3); // Ir al paso del tour
         } else {
-          setError(data.error || 'Error al activar la cuenta');
+          setError(data.error || t('error.activationError'));
         }
       } catch {
-        setError('Error de conexión. Por favor, intenta nuevamente.');
+        setError(t('error.connectionError'));
       } finally {
         setLoading(false);
       }
@@ -317,10 +320,10 @@ function ActivateAccountForm() {
         }
         // Para primer admin, handleKycVerified maneja la activación y avance al paso 4
       } else {
-        setError(data.error || 'Error al activar la cuenta');
+        setError(data.error || t('error.activationError'));
       }
     } catch {
-      setError('Error de conexión. Por favor, intenta nuevamente.');
+      setError(t('error.connectionError'));
     } finally {
       setLoading(false);
     }
@@ -352,7 +355,7 @@ function ActivateAccountForm() {
 
     // Si la contraseña ya fue guardada, usarla; si no, el usuario ya debería haberla configurado
     if (!password && !passwordSaved) {
-      setError('Por favor, configura tu contraseña primero');
+      setError(t('password.errors.passwordRequired'));
       setLoading(false);
       // Redirigir al paso de contraseña
       setCurrentStep(2);
@@ -384,17 +387,17 @@ function ActivateAccountForm() {
           handleFinish();
         }, 2000);
       } else {
-        setError(data.error || 'Error al activar la cuenta');
+        setError(data.error || t('error.activationError'));
         setLoading(false);
         kycVerifiedCalledRef.current = false; // Reset para permitir reintento
       }
     } catch (err) {
       console.error('Error activating account:', err);
-      setError('Error de conexión. Por favor, intenta nuevamente.');
+      setError(t('error.connectionError'));
       setLoading(false);
       kycVerifiedCalledRef.current = false; // Reset para permitir reintento
     }
-  }, [token, password, passwordSaved, accountActivated, handleFinish]);
+  }, [token, password, passwordSaved, accountActivated, handleFinish, t]);
 
   const handleNext = () => {
     setError('');
@@ -511,7 +514,7 @@ function ActivateAccountForm() {
         <style dangerouslySetInnerHTML={{ __html: backgroundStyles }} />
         <div className="text-center" style={{ color: 'white' }}>
           <Spinner animation="border" variant="light" style={{ borderWidth: '3px' }} />
-          <p className="mt-3" style={{ fontSize: '1.1rem', fontWeight: 500 }}>Validando token...</p>
+          <p className="mt-3" style={{ fontSize: '1.1rem', fontWeight: 500 }}>{t('validatingToken')}</p>
         </div>
       </div>
     );
@@ -596,10 +599,10 @@ function ActivateAccountForm() {
           <Card.Body className="p-4">
             <div className="text-center mb-4">
               <i className="bi bi-x-circle-fill text-danger" style={{ fontSize: '3rem' }}></i>
-              <h3 className="mt-3 mb-2" style={{ color: '#1a1a1a', fontWeight: 600 }}>Error</h3>
+              <h3 className="mt-3 mb-2" style={{ color: '#1a1a1a', fontWeight: 600 }}>{t('error.title')}</h3>
             </div>
             <Alert variant="danger" className="border-0" style={{ borderRadius: '8px' }}>
-              {error || 'El link de activación no es válido o ha expirado.'}
+              {error || t('error.invalidTokenMessage')}
             </Alert>
             <Button 
               variant="primary" 
@@ -613,7 +616,7 @@ function ActivateAccountForm() {
                 fontWeight: 600
               }}
             >
-              Ir al Login
+              {t('error.goToLogin')}
             </Button>
           </Card.Body>
         </Card>
@@ -935,13 +938,13 @@ function ActivateAccountForm() {
             {/* Indicador de progreso */}
             <div className="mb-4">
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="small" style={{ color: '#666', fontWeight: 500 }}>Paso {currentStep} de 5</span>
+                <span className="small" style={{ color: '#666', fontWeight: 500 }}>{t('steps.step', { current: currentStep })}</span>
                 <span className="small" style={{ color: '#667eea', fontWeight: 600 }}>
-                  {currentStep === 1 && 'Bienvenida'}
-                  {currentStep === 2 && 'Contraseña'}
-                  {currentStep === 3 && 'Tour'}
-                  {currentStep === 4 && 'Verificación'}
-                  {currentStep === 5 && 'Completado'}
+                  {currentStep === 1 && t('steps.welcome')}
+                  {currentStep === 2 && t('steps.password')}
+                  {currentStep === 3 && t('steps.tour')}
+                  {currentStep === 4 && t('steps.verification')}
+                  {currentStep === 5 && t('steps.completed')}
                 </span>
               </div>
               <ProgressBar
@@ -995,15 +998,15 @@ function ActivateAccountForm() {
                       <i className="bi bi-lock-fill text-white" style={{ fontSize: '2.5rem' }}></i>
                     </div>
                   </div>
-                  <h3 className="mb-2" style={{ color: '#1a1a1a', fontWeight: 600 }}>Establecer Contraseña</h3>
+                  <h3 className="mb-2" style={{ color: '#1a1a1a', fontWeight: 600 }}>{t('password.title')}</h3>
                   <p style={{ color: '#666', fontSize: '1rem' }}>
-                    Crea una contraseña segura para proteger tu cuenta
+                    {t('password.subtitle')}
                   </p>
                   {passwordSaved && (
                     <Alert variant="info" className="mt-3">
                       <small>
                         <i className="bi bi-info-circle me-2"></i>
-                        Ya estableciste una contraseña anteriormente. Puedes cambiarla o continuar con la misma.
+                        {t('password.alreadySet')}
                       </small>
                     </Alert>
                   )}
@@ -1011,14 +1014,14 @@ function ActivateAccountForm() {
 
                 <Form onSubmit={handlePasswordSubmit}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Contraseña *</Form.Label>
+                    <Form.Label>{t('password.passwordLabel')}</Form.Label>
                     <div className="input-group">
                       <span className="input-group-text">
                         <i className="bi bi-lock"></i>
                       </span>
                       <Form.Control
                         type="password"
-                        placeholder="Mínimo 8 caracteres"
+                        placeholder={t('password.passwordPlaceholder')}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -1027,19 +1030,19 @@ function ActivateAccountForm() {
                       />
                     </div>
                     <Form.Text className="text-muted">
-                      Usa al menos 8 caracteres con letras, números y símbolos
+                      {t('password.passwordHelp')}
                     </Form.Text>
                   </Form.Group>
 
                   <Form.Group className="mb-4">
-                    <Form.Label>Confirmar Contraseña *</Form.Label>
+                    <Form.Label>{t('password.confirmPasswordLabel')}</Form.Label>
                     <div className="input-group">
                       <span className="input-group-text">
                         <i className="bi bi-lock-fill"></i>
                       </span>
                       <Form.Control
                         type="password"
-                        placeholder="Repite tu contraseña"
+                        placeholder={t('password.confirmPasswordPlaceholder')}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
@@ -1057,7 +1060,7 @@ function ActivateAccountForm() {
                       style={{ borderRadius: '6px', fontWeight: 500 }}
                     >
                       <i className="bi bi-arrow-left me-2"></i>
-                      Anterior
+                      {tCommon('previous')}
                     </Button>
                     <Button
                       type="submit"
@@ -1074,11 +1077,11 @@ function ActivateAccountForm() {
                       {loading ? (
                         <>
                           <Spinner size="sm" className="me-2" />
-                          Guardando...
+                          {t('password.saving')}
                         </>
                       ) : (
                         <>
-                          Continuar
+                          {t('password.continue')}
                           <i className="bi bi-arrow-right ms-2"></i>
                         </>
                       )}
@@ -1137,9 +1140,9 @@ function ActivateAccountForm() {
                 }}>
                   <i className="bi bi-check-circle-fill text-white" style={{ fontSize: '2.5rem' }}></i>
                 </div>
-                <h3 className="mb-2" style={{ color: '#1a1a1a', fontWeight: 600 }}>¡Todo listo!</h3>
+                <h3 className="mb-2" style={{ color: '#1a1a1a', fontWeight: 600 }}>{t('completed.title')}</h3>
                 <p style={{ color: '#666', fontSize: '0.95rem' }}>
-                  Redirigiendo al dashboard...
+                  {t('completed.redirecting')}
                 </p>
               </div>
             )}
@@ -1191,8 +1194,8 @@ function ActivateAccountForm() {
                 <i className="bi bi-person-check-fill text-white" style={{ fontSize: '2.5rem' }}></i>
               </div>
             </div>
-            <h2 className="mb-2" style={{ color: '#1a1a1a', fontWeight: 600 }}>Activar Cuenta</h2>
-            <p style={{ color: '#666', fontSize: '1rem' }}>Establece tu contraseña para activar tu cuenta</p>
+            <h2 className="mb-2" style={{ color: '#1a1a1a', fontWeight: 600 }}>{t('account.title')}</h2>
+            <p style={{ color: '#666', fontSize: '1rem' }}>{t('account.subtitle')}</p>
           </div>
 
           {error && (
@@ -1204,20 +1207,20 @@ function ActivateAccountForm() {
           <Alert variant="info" className="mb-4">
             <small>
               <i className="bi bi-info-circle me-2"></i>
-              Tu cuenta está pendiente de activación. Establece una contraseña segura para comenzar.
+              {t('account.pendingActivation')}
             </small>
           </Alert>
 
           <Form onSubmit={handlePasswordSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Contraseña *</Form.Label>
+              <Form.Label>{t('password.passwordLabel')}</Form.Label>
               <div className="input-group">
                 <span className="input-group-text">
                   <i className="bi bi-lock"></i>
                 </span>
                 <Form.Control
                   type="password"
-                  placeholder="Mínimo 8 caracteres"
+                  placeholder={t('password.passwordPlaceholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -1226,19 +1229,19 @@ function ActivateAccountForm() {
                 />
               </div>
               <Form.Text className="text-muted">
-                Usa al menos 8 caracteres con letras, números y símbolos
+                {t('password.passwordHelp')}
               </Form.Text>
             </Form.Group>
 
             <Form.Group className="mb-4">
-              <Form.Label>Confirmar Contraseña *</Form.Label>
+              <Form.Label>{t('password.confirmPasswordLabel')}</Form.Label>
               <div className="input-group">
                 <span className="input-group-text">
                   <i className="bi bi-lock-fill"></i>
                 </span>
                 <Form.Control
                   type="password"
-                  placeholder="Repite tu contraseña"
+                  placeholder={t('password.confirmPasswordPlaceholder')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -1265,12 +1268,12 @@ function ActivateAccountForm() {
               {loading ? (
                 <>
                   <Spinner size="sm" className="me-2" />
-                  Activando cuenta...
+                  {t('account.activating')}
                 </>
               ) : (
                 <>
                   <i className="bi bi-check-circle me-2"></i>
-                  Activar Cuenta
+                  {t('account.activate')}
                 </>
               )}
             </Button>
@@ -1280,9 +1283,9 @@ function ActivateAccountForm() {
 
           <div className="text-center">
             <small className="text-muted">
-              ¿Ya tienes cuenta activa?{' '}
+              {t('account.alreadyHaveAccount')}{' '}
               <a href="/auth/admin/login" className="text-primary">
-                Iniciar sesión
+                {t('account.login')}
               </a>
             </small>
           </div>

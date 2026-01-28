@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { Button, Alert } from 'react-bootstrap';
 import L from 'leaflet';
@@ -68,6 +69,7 @@ export default function GeolocationMap({
   readOnly = false,
   label,
 }: GeolocationMapProps) {
+  const tCommon = useTranslations('common');
   const [coords, setCoords] = useState<GeolocationCoordinates | null>(
     value || null
   );
@@ -211,7 +213,7 @@ export default function GeolocationMap({
 
       {required && !coords && !readOnly && (
         <div className="text-danger small mt-1">
-          Este campo es obligatorio. Por favor, selecciona una ubicación en el mapa o usa tu ubicación actual.
+          {tCommon('geolocationRequired')}
         </div>
       )}
 

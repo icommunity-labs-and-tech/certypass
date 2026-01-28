@@ -6,8 +6,11 @@ import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { useTranslations } from 'next-intl';
 
 function AuthErrorContent() {
+  const t = useTranslations('auth.error');
+  const tCommon = useTranslations('common.actions');
   const searchParams = useSearchParams();
   const router = useRouter();
   const error = searchParams.get('error');
@@ -16,34 +19,34 @@ function AuthErrorContent() {
     switch (error) {
       case 'AccessDenied':
         return {
-          title: 'Acceso Denegado',
-          message: 'No tienes permisos para acceder a esta página.',
-          description: 'Tu cuenta no tiene los privilegios necesarios para acceder al área solicitada.',
-          action: 'Volver al Dashboard',
+          title: t('accessDenied.title'),
+          message: t('accessDenied.message'),
+          description: t('accessDenied.description'),
+          action: t('accessDenied.action'),
           actionUrl: '/dashboard'
         };
       case 'Unauthorized':
         return {
-          title: 'No Autorizado',
-          message: 'Debes iniciar sesión para continuar.',
-          description: 'Tu sesión ha expirado o no has iniciado sesión.',
-          action: 'Iniciar Sesión',
+          title: t('unauthorized.title'),
+          message: t('unauthorized.message'),
+          description: t('unauthorized.description'),
+          action: t('unauthorized.action'),
           actionUrl: '/auth/login'
         };
       case 'Configuration':
         return {
-          title: 'Error de Configuración',
-          message: 'Hay un problema con la configuración del servidor.',
-          description: 'Contacta al administrador del sistema.',
-          action: 'Volver al Inicio',
+          title: t('configuration.title'),
+          message: t('configuration.message'),
+          description: t('configuration.description'),
+          action: t('configuration.action'),
           actionUrl: '/'
         };
       default:
         return {
-          title: 'Error de Autenticación',
-          message: 'Ocurrió un error inesperado.',
-          description: 'Intenta nuevamente o contacta al administrador.',
-          action: 'Iniciar Sesión',
+          title: t('default.title'),
+          message: t('default.message'),
+          description: t('default.description'),
+          action: t('default.action'),
           actionUrl: '/auth/login'
         };
     }
@@ -77,7 +80,7 @@ function AuthErrorContent() {
                   className="w-100"
                   onClick={() => router.back()}
                 >
-                  Volver Atrás
+                  {t('goBack')}
                 </Button>
               </div>
             </Card.Body>
@@ -129,6 +132,7 @@ function AuthErrorContent() {
 }
 
 export default function AuthErrorPage() {
+  const t = useTranslations('auth.error');
   return (
     <Suspense fallback={
       <Container fluid className="auth-error">
@@ -136,7 +140,7 @@ export default function AuthErrorPage() {
           <Col xs={12} sm={8} md={6} lg={4}>
             <div className="text-center">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Cargando...</span>
+                <span className="visually-hidden">{t('loading')}</span>
               </div>
             </div>
           </Col>

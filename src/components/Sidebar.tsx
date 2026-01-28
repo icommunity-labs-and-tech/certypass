@@ -9,18 +9,20 @@ import { useAuthSeparated } from '@/hooks/useAuthSeparated';
 import { Badge } from 'react-bootstrap';
 import Logo from './Logo';
 import './Sidebar.css';
+import { useTranslations } from 'next-intl';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { isDesktop, closeMobile } = useSidebar();
   const { user, loading } = useAuthSeparated();
+  const t = useTranslations('sidebar');
 
   const navLinks = [
-    { href: '/dashboard', icon: 'bi-house', label: 'Inicio' },
-    { href: '/dashboard/status-types', icon: 'bi-collection', label: 'Estados' },
-    { href: '/dashboard/items', icon: 'bi-list-columns', label: 'Productos' },
-    { href: '/dashboard/users', icon: 'bi-people', label: 'Usuarios' },
-    { href: '/dashboard/profile', icon: 'bi-person', label: 'Perfil' },
+    { href: '/dashboard', icon: 'bi-house', label: t('home') },
+    { href: '/dashboard/status-types', icon: 'bi-collection', label: t('statusTypes') },
+    { href: '/dashboard/items', icon: 'bi-list-columns', label: t('products') },
+    { href: '/dashboard/users', icon: 'bi-people', label: t('users') },
+    { href: '/dashboard/profile', icon: 'bi-person', label: t('profile') },
   ];
 
   // Links de gestión según rol
@@ -31,21 +33,21 @@ export default function Sidebar() {
     managementLinks.push({
       href: '/dashboard/organizations',
       icon: 'bi-building',
-      label: 'Organizaciones',
+      label: t('organizations'),
       badge: 'SUPER'
     });
   }
 
   const appLinks = [
-    { href: '/customer', icon: 'bi-person-badge', label: 'App Cliente' },
-    { href: '/operator?admin-access=true', icon: 'bi-tools', label: 'App Operador' },
+    { href: '/customer', icon: 'bi-person-badge', label: t('appCustomer') },
+    { href: '/operator?admin-access=true', icon: 'bi-tools', label: t('appOperator') },
   ];
 
   const developerLinks: Array<{ href: string; icon: string; label: string; external?: boolean }> = [
-    { href: '/dashboard/developer/events', icon: 'bi-calendar-event', label: 'Eventos', external: false },
-    { href: '/dashboard/developer/webhooks', icon: 'bi-box-arrow-up-right', label: 'Webhooks', external: false },
-    { href: '/dashboard/developer/auth', icon: 'bi-key', label: 'Auth', external: false },
-    { href: '/api/v1/docs', icon: 'bi-book', label: 'API Docs', external: true },
+    { href: '/dashboard/developer/events', icon: 'bi-calendar-event', label: t('events'), external: false },
+    { href: '/dashboard/developer/webhooks', icon: 'bi-box-arrow-up-right', label: t('webhooks'), external: false },
+    { href: '/dashboard/developer/auth', icon: 'bi-key', label: t('auth'), external: false },
+    { href: '/api/v1/docs', icon: 'bi-book', label: t('apiDocs'), external: true },
   ];
 
   const handleNavClick = () => {
@@ -84,7 +86,7 @@ export default function Sidebar() {
           <>
             <hr className="opacity-75 border" />
             <div className="mb-2">
-              <small className="text-muted px-3">GESTIÓN</small>
+              <small className="text-muted px-3">{t('management')}</small>
             </div>
             <Nav className="flex-column mb-3">
               {managementLinks.map(({ href, icon, label, badge }) => (
@@ -119,7 +121,7 @@ export default function Sidebar() {
         
         <hr className="opacity-75 border" />
         <div className="mb-2">
-          <small className="text-muted px-3" data-tour="developer-section">DESARROLLADOR</small>
+          <small className="text-muted px-3" data-tour="developer-section">{t('developer')}</small>
         </div>
         <Nav className="flex-column mb-3">
           {developerLinks.map(({ href, icon, label, external }) => (
@@ -155,7 +157,7 @@ export default function Sidebar() {
 
         <hr className="opacity-75 border" />
         <div className="mb-2">
-          <small className="text-muted px-3" data-tour="applications-section">APLICACIONES</small>
+          <small className="text-muted px-3" data-tour="applications-section">{t('applications')}</small>
         </div>
         <Nav className="flex-column">
           {appLinks.map(({ href, icon, label }) => (

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Modal, Button, Alert, Form } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 
 interface PasswordModalProps {
   show: boolean;
@@ -14,6 +15,7 @@ interface PasswordModalProps {
 }
 
 export default function PasswordModal({ show, onHide, user }: PasswordModalProps) {
+  const t = useTranslations('modals.password');
   const [copied, setCopied] = React.useState(false);
 
   const handleCopyPassword = async () => {
@@ -47,29 +49,29 @@ export default function PasswordModal({ show, onHide, user }: PasswordModalProps
       <Modal.Header closeButton>
         <Modal.Title>
           <i className="bi bi-person-check me-2"></i>
-          Usuario Creado Exitosamente
+          {t('title')}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Alert variant="success" className="mb-4">
           <Alert.Heading>
             <i className="bi bi-check-circle me-2"></i>
-            ¡Usuario creado correctamente!
+            {t('successMessage')}
           </Alert.Heading>
           <p className="mb-0">
-            Se ha creado el usuario <strong>{user.name}</strong> con el email <strong>{user.email}</strong>.
+            {t('userCreated', { name: user.name, email: user.email })}
           </p>
         </Alert>
 
         <div className="mb-4">
           <h6 className="mb-3">
             <i className="bi bi-key me-2"></i>
-            Credenciales de Acceso
+            {t('credentialsTitle')}
           </h6>
           
           <div className="row">
             <div className="col-md-6 mb-3">
-              <Form.Label className="fw-bold">Email:</Form.Label>
+              <Form.Label className="fw-bold">{t('email')}</Form.Label>
               <div className="input-group">
                 <Form.Control
                   type="text"
@@ -80,7 +82,7 @@ export default function PasswordModal({ show, onHide, user }: PasswordModalProps
                 <Button
                   variant="outline-secondary"
                   onClick={handleCopyEmail}
-                  title="Copiar email"
+                  title={t('copyEmail')}
                 >
                   <i className="bi bi-clipboard"></i>
                 </Button>
@@ -88,7 +90,7 @@ export default function PasswordModal({ show, onHide, user }: PasswordModalProps
             </div>
             
             <div className="col-md-6 mb-3">
-              <Form.Label className="fw-bold">Contraseña Temporal:</Form.Label>
+              <Form.Label className="fw-bold">{t('temporaryPassword')}</Form.Label>
               <div className="input-group">
                 <Form.Control
                   type="text"
@@ -99,7 +101,7 @@ export default function PasswordModal({ show, onHide, user }: PasswordModalProps
                 <Button
                   variant="outline-secondary"
                   onClick={handleCopyPassword}
-                  title="Copiar contraseña"
+                  title={t('copyPassword')}
                 >
                   <i className="bi bi-clipboard"></i>
                 </Button>
@@ -111,26 +113,26 @@ export default function PasswordModal({ show, onHide, user }: PasswordModalProps
         <Alert variant="warning">
           <Alert.Heading>
             <i className="bi bi-exclamation-triangle me-2"></i>
-            Importante
+            {t('important')}
           </Alert.Heading>
           <ul className="mb-0">
-            <li>Esta contraseña es <strong>temporal</strong> y debe cambiarse en el primer inicio de sesión</li>
-            <li>Comparte estas credenciales de forma <strong>segura</strong> con el usuario</li>
-            <li>El usuario podrá cambiar su contraseña desde su perfil una vez que inicie sesión</li>
+            <li>{t('temporaryWarning')}</li>
+            <li>{t('shareSecurely')}</li>
+            <li>{t('canChangePassword')}</li>
           </ul>
         </Alert>
 
         {copied && (
           <Alert variant="info" className="mt-3">
             <i className="bi bi-check-circle me-2"></i>
-            ¡Copiado al portapapeles!
+            {t('copied')}
           </Alert>
         )}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="primary" onClick={onHide}>
           <i className="bi bi-check me-2"></i>
-          Entendido
+          {t('understood')}
         </Button>
       </Modal.Footer>
     </Modal>

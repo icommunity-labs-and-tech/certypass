@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import type { FormTemplate } from './GenericTable';
 import WizardImageField from './WizardImageField';
 import ImageConfigSection from './ImageConfigSection';
@@ -42,6 +43,7 @@ export default function ItemCreationWizard({
   uploadType = 'item',
   onCategoryChange
 }: ItemCreationWizardProps) {
+  const t = useTranslations('common');
   const [currentStep, setCurrentStep] = useState<WizardStep>(1);
   const [error, setError] = useState<string | null>(null);
   const [categoryItems, setCategoryItems] = useState<Array<{ id: string; name: string }>>([]);
@@ -203,7 +205,7 @@ export default function ItemCreationWizard({
     if (validateStep(currentStep)) {
       setCurrentStep((prev) => Math.min(4, prev + 1) as WizardStep);
     } else {
-      setError('Por favor completa todos los campos requeridos antes de continuar');
+      setError(t('completeRequiredFields'));
     }
   };
 
@@ -216,7 +218,7 @@ export default function ItemCreationWizard({
     setError(null);
     
     if (!validateStep(4)) {
-      setError('Por favor completa todos los campos requeridos');
+      setError(t('completeRequiredFieldsError'));
       return;
     }
     
@@ -393,6 +395,7 @@ export default function ItemCreationWizard({
     );
   };
 
+  const tForms = useTranslations('forms');
   const renderBasicFieldsStep = () => {
     const basicFields = ['customId', 'name', 'description', 'imageUrl'];
     
@@ -445,7 +448,7 @@ export default function ItemCreationWizard({
               )}
               {field.name === 'customId' && (
                 <Form.Text className="text-muted">
-                  El ID es obligatorio, debe ser único y se usará para generar el código QR.
+                  {tForms('customIdHelp')}
                 </Form.Text>
               )}
             </Form.Group>

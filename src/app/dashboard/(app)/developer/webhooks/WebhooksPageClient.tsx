@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Button, Table, Modal, Form, Alert, Badge } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { listWebhooks } from '@/actions/webhooks/list';
 import { createWebhook } from '@/actions/webhooks/create';
@@ -29,6 +30,8 @@ interface Webhook {
 }
 
 export default function WebhooksPageClient() {
+  const t = useTranslations('developer.webhooks');
+  const tCommon = useTranslations('common.actions');
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -57,12 +60,12 @@ export default function WebhooksPageClient() {
       if (result.success && result.data) {
         setWebhooks(result.data);
       } else {
-        const errorMsg = result.error || 'Error al cargar webhooks';
+        const errorMsg = result.error || t('loadError');
         console.error('Error loading webhooks:', errorMsg);
         setError(errorMsg);
       }
     } catch (err: any) {
-      const errorMsg = err?.message || 'Error al cargar webhooks';
+      const errorMsg = err?.message || t('loadError');
       console.error('Exception loading webhooks:', err);
       setError(errorMsg);
     } finally {
@@ -85,7 +88,7 @@ export default function WebhooksPageClient() {
         try {
           headersObj = JSON.parse(formData.headers);
         } catch {
-          setError('Los headers deben ser un JSON válido');
+          setError(t('headersInvalid'));
           return;
         }
       }
@@ -100,16 +103,16 @@ export default function WebhooksPageClient() {
       });
 
       if (result.success) {
-        setSuccess('Webhook creado correctamente');
+        setSuccess(t('createSuccess'));
         setShowCreateModal(false);
         resetForm();
         await loadWebhooks();
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Error al crear webhook');
+        setError(result.error || t('createError'));
       }
     } catch (err) {
-      setError('Error al crear webhook');
+      setError(t('createError'));
     }
   };
 
@@ -139,7 +142,7 @@ export default function WebhooksPageClient() {
         try {
           headersObj = JSON.parse(formData.headers);
         } catch {
-          setError('Los headers deben ser un JSON válido');
+          setError(t('headersInvalid'));
           return;
         }
       }
@@ -154,36 +157,36 @@ export default function WebhooksPageClient() {
       });
 
       if (result.success) {
-        setSuccess('Webhook actualizado correctamente');
+        setSuccess(t('updateSuccess'));
         setShowEditModal(false);
         setEditingWebhook(null);
         resetForm();
         await loadWebhooks();
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Error al actualizar webhook');
+        setError(result.error || t('updateError'));
       }
     } catch (err) {
-      setError('Error al actualizar webhook');
+      setError(t('updateError'));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este webhook? Esta acción no se puede deshacer.')) {
+    if (!confirm(t('deleteConfirm'))) {
       return;
     }
 
     try {
       const result = await deleteWebhook(id);
       if (result.success) {
-        setSuccess('Webhook eliminado correctamente');
+        setSuccess(t('deleteSuccess'));
         await loadWebhooks();
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Error al eliminar webhook');
+        setError(result.error || t('deleteError'));
       }
     } catch (err) {
-      setError('Error al eliminar webhook');
+      setError(t('deleteError'));
     }
   };
 
@@ -191,14 +194,15 @@ export default function WebhooksPageClient() {
     try {
       const result = await toggleWebhookActive(id, !currentActive);
       if (result.success) {
-        setSuccess(`Webhook ${!currentActive ? 'activado' : 'desactivado'} correctamente`);
+        const status = !currentActive ? t('activated') : t('deactivated');
+        setSuccess(t('toggleSuccess', { status }));
         await loadWebhooks();
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Error al actualizar estado del webhook');
+        setError(result.error || t('toggleError'));
       }
     } catch (err) {
-      setError('Error al actualizar estado del webhook');
+      setError(t('toggleError'));
     }
   };
 
@@ -223,8 +227,9 @@ export default function WebhooksPageClient() {
   };
 
   const formatDate = (date: Date | null) => {
-    if (!date) return 'Nunca';
-    return new Date(date).toLocaleString('es-ES');
+    if (!date) return t('never');
+    const locale = typeof window !== 'undefined' ? navigator.language : 'en-US';
+    return new Date(date).toLocaleString(locale);
   };
 
   // Preparar datos para el gráfico de evolución de triggers de webhooks
@@ -249,9 +254,10 @@ export default function WebhooksPageClient() {
     let periodNum = 1;
     
     while (startDate <= now) {
+      const locale = typeof window !== 'undefined' ? navigator.language : 'en-US';
       const key = periodType === 'week' 
         ? `Sem ${periodNum}`
-        : startDate.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+        : startDate.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' });
       
       const endDate = periodType === 'week'
         ? new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000)
@@ -311,11 +317,10 @@ export default function WebhooksPageClient() {
   return (
     <>
       <Box>
-        <h6 className="mb-2">¿Qué son los webhooks?</h6>
+        <h6 className="mb-2">{t('whatAreWebhooks')}</h6>
         <Divider />
         <p className="mb-0 text-muted">
-          Los webhooks son URLs configuradas que reciben notificaciones automáticas cuando ocurren eventos en el sistema, como la creación de items o estados. 
-          Permiten integrar el sistema con servicios externos de forma reactiva, enviando datos en tiempo real cuando ocurren eventos específicos.
+          {t('webhooksDescription')}
         </p>
       </Box>
 
@@ -323,11 +328,11 @@ export default function WebhooksPageClient() {
         <div className="table-toolbar">
           <div className="title-section">
             <i className="bi bi-box-arrow-up-right-fill"></i>
-            <h4>Webhooks</h4>
+            <h4>{t('title')}</h4>
           </div>
           <div className="controls-section">
             <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-              <span className="d-none d-md-inline">Crear Webhook</span>
+              <span className="d-none d-md-inline">{t('createWebhook')}</span>
               <span className="d-md-none">+</span>
             </Button>
           </div>
@@ -350,19 +355,19 @@ export default function WebhooksPageClient() {
         {webhooks.length === 0 ? (
           <div className="text-center py-5">
             <i className="bi bi-box-arrow-up-right" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
-            <p className="mt-3 text-muted">No hay webhooks configurados aún</p>
+            <p className="mt-3 text-muted">{t('noWebhooks')}</p>
           </div>
         ) : (
           <Table responsive striped className="custom-table">
             <thead>
               <tr>
-                <th>Nombre</th>
-                <th>URL</th>
-                <th>Eventos</th>
-                <th>Estado</th>
-                <th>Última ejecución</th>
-                <th>Fallos</th>
-                <th>Acciones</th>
+                <th>{t('table.name')}</th>
+                <th>{t('table.url')}</th>
+                <th>{t('table.events')}</th>
+                <th>{t('table.status')}</th>
+                <th>{t('table.lastExecution')}</th>
+                <th>{t('table.failures')}</th>
+                <th>{t('table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -383,9 +388,9 @@ export default function WebhooksPageClient() {
                   </td>
                   <td>
                     {webhook.active ? (
-                      <Badge bg="success">Activo</Badge>
+                      <Badge bg="success">{t('active')}</Badge>
                     ) : (
-                      <Badge bg="secondary">Inactivo</Badge>
+                      <Badge bg="secondary">{t('inactive')}</Badge>
                     )}
                   </td>
                   <td>
@@ -393,11 +398,11 @@ export default function WebhooksPageClient() {
                       <div>
                         <div>{formatDate(webhook.lastTriggeredAt)}</div>
                         <small className={webhook.lastSuccessAt ? 'text-success' : 'text-danger'}>
-                          {webhook.lastSuccessAt ? '✓ Éxito' : '✗ Error'}
+                          {webhook.lastSuccessAt ? t('success') : t('error')}
                         </small>
                       </div>
                     ) : (
-                      'Nunca'
+                      t('never')
                     )}
                   </td>
                   <td>
@@ -444,7 +449,7 @@ export default function WebhooksPageClient() {
           <div className="table-toolbar">
             <div className="title-section">
               <i className="bi bi-graph-up"></i>
-              <h4>Evolución de Triggers</h4>
+              <h4>{t('triggersEvolution')}</h4>
             </div>
           </div>
           <Divider />
@@ -456,16 +461,16 @@ export default function WebhooksPageClient() {
                 {...axisProps} 
                 domain={[0, 1]}
                 ticks={[0, 1]}
-                tickFormatter={(value) => value === 1 ? 'Disparado' : 'No disparado'}
+                tickFormatter={(value) => value === 1 ? t('triggered') : t('notTriggered')}
               />
               <Tooltip 
                 contentStyle={tooltipStyle}
                 formatter={(value: number, name: string) => {
                   const webhookIndex = parseInt(name.replace('webhook_', ''));
                   const webhookName = chartData.webhookNames[webhookIndex]?.name || name;
-                  return [value === 1 ? 'Disparado' : 'No disparado', webhookName];
+                  return [value === 1 ? t('triggered') : t('notTriggered'), webhookName];
                 }}
-                labelFormatter={(label) => `Período: ${label}`}
+                labelFormatter={(label) => `${t('period')} ${label}`}
               />
               <Legend 
                 formatter={(value) => {
@@ -499,35 +504,35 @@ export default function WebhooksPageClient() {
       {/* Create Modal */}
       <Modal show={showCreateModal} onHide={() => { setShowCreateModal(false); resetForm(); }} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Crear Nuevo Webhook</Modal.Title>
+          <Modal.Title>{t('createModal.title')}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleCreate}>
           <Modal.Body>
             <Form.Group className="mb-3">
-              <Form.Label>Nombre</Form.Label>
+              <Form.Label>{t('createModal.nameLabel')}</Form.Label>
               <Form.Control
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 required
-                placeholder="Ej: Webhook de producción"
+                placeholder={t('createModal.namePlaceholder')}
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>URL</Form.Label>
+              <Form.Label>{t('createModal.urlLabel')}</Form.Label>
               <Form.Control
                 type="url"
                 value={formData.url}
                 onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
                 required
-                placeholder="https://tu-servidor.com/webhook"
+                placeholder={t('createModal.urlPlaceholder')}
               />
               <Form.Text className="text-muted">
-                URL donde se enviarán las notificaciones (debe comenzar con http:// o https://)
+                {t('createModal.urlHelp')}
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Eventos</Form.Label>
+              <Form.Label>{t('createModal.eventsLabel')}</Form.Label>
               <div>
                 {availableEvents.map(event => (
                   <Form.Check
@@ -541,48 +546,48 @@ export default function WebhooksPageClient() {
                 ))}
               </div>
               <Form.Text className="text-muted">
-                Selecciona los eventos a los que se suscribirá este webhook
+                {t('createModal.eventsHelp')}
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Secret (opcional)</Form.Label>
+              <Form.Label>{t('createModal.secretLabel')}</Form.Label>
               <Form.Control
                 type="text"
                 value={formData.secret}
                 onChange={(e) => setFormData(prev => ({ ...prev, secret: e.target.value }))}
-                placeholder="Secreto para verificar las peticiones"
+                placeholder={t('createModal.secretPlaceholder')}
               />
               <Form.Text className="text-muted">
-                Se usará para generar la firma HMAC-SHA256 en el header X-Webhook-Signature
+                {t('createModal.secretHelp')}
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Headers personalizados (JSON opcional)</Form.Label>
+              <Form.Label>{t('createModal.headersLabel')}</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
                 value={formData.headers}
                 onChange={(e) => setFormData(prev => ({ ...prev, headers: e.target.value }))}
-                placeholder='{"Authorization": "Bearer token", "X-Custom-Header": "value"}'
+                placeholder={t('createModal.headersPlaceholder')}
               />
               <Form.Text className="text-muted">
-                Headers adicionales a incluir en cada petición (formato JSON)
+                {t('createModal.headersHelp')}
               </Form.Text>
             </Form.Group>
             <Form.Check
               type="switch"
               id="create-active"
-              label="Activo"
+              label={t('createModal.activeLabel')}
               checked={formData.active}
               onChange={(e) => setFormData(prev => ({ ...prev, active: e.target.checked }))}
             />
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => { setShowCreateModal(false); resetForm(); }}>
-              Cancelar
+              {t('createModal.cancel')}
             </Button>
             <Button variant="primary" type="submit">
-              Crear Webhook
+              {t('createModal.create')}
             </Button>
           </Modal.Footer>
         </Form>
@@ -591,12 +596,12 @@ export default function WebhooksPageClient() {
       {/* Edit Modal */}
       <Modal show={showEditModal} onHide={() => { setShowEditModal(false); setEditingWebhook(null); resetForm(); }} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Editar Webhook</Modal.Title>
+          <Modal.Title>{t('editModal.title')}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleUpdate}>
           <Modal.Body>
             <Form.Group className="mb-3">
-              <Form.Label>Nombre</Form.Label>
+              <Form.Label>{t('editModal.nameLabel')}</Form.Label>
               <Form.Control
                 type="text"
                 value={formData.name}
@@ -605,7 +610,7 @@ export default function WebhooksPageClient() {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>URL</Form.Label>
+              <Form.Label>{t('editModal.urlLabel')}</Form.Label>
               <Form.Control
                 type="url"
                 value={formData.url}
@@ -614,7 +619,7 @@ export default function WebhooksPageClient() {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Eventos</Form.Label>
+              <Form.Label>{t('editModal.eventsLabel')}</Form.Label>
               <div>
                 {availableEvents.map(event => (
                   <Form.Check
@@ -629,19 +634,19 @@ export default function WebhooksPageClient() {
               </div>
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Secret (opcional)</Form.Label>
+              <Form.Label>{t('editModal.secretLabel')}</Form.Label>
               <Form.Control
                 type="text"
                 value={formData.secret}
                 onChange={(e) => setFormData(prev => ({ ...prev, secret: e.target.value }))}
-                placeholder="Dejar vacío para no cambiar"
+                placeholder={t('editModal.secretPlaceholder')}
               />
               <Form.Text className="text-muted">
-                Dejar vacío para mantener el secret actual
+                {t('editModal.secretHelp')}
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Headers personalizados (JSON opcional)</Form.Label>
+              <Form.Label>{t('editModal.headersLabel')}</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
@@ -652,17 +657,17 @@ export default function WebhooksPageClient() {
             <Form.Check
               type="switch"
               id="edit-active"
-              label="Activo"
+              label={t('editModal.activeLabel')}
               checked={formData.active}
               onChange={(e) => setFormData(prev => ({ ...prev, active: e.target.checked }))}
             />
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => { setShowEditModal(false); setEditingWebhook(null); resetForm(); }}>
-              Cancelar
+              {t('editModal.cancel')}
             </Button>
             <Button variant="primary" type="submit">
-              Guardar Cambios
+              {t('editModal.save')}
             </Button>
           </Modal.Footer>
         </Form>

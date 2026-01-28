@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { useLocale } from 'next-intl';
 import { StatusBadgeCell, DateCell, TextTruncateCell } from './GenericTable/Cells';
 
 export interface FieldSchema {
@@ -28,6 +31,8 @@ export default function KeyValueList({
   className = '', 
   showEmptyFields = false 
 }: KeyValueListProps) {
+  const locale = useLocale();
+  const localeString = locale === 'en' ? 'en-US' : 'es-ES';
   const visibleFields = schema.filter(field => !field.hidden);
   
   const renderValue = (field: FieldSchema, value: any) => {
@@ -47,7 +52,7 @@ export default function KeyValueList({
         
       case 'number':
         if (value === null || value === undefined) return '-';
-        return value.toLocaleString('es-ES');
+        return value.toLocaleString(localeString);
         
       case 'relation':
         if (!field.relationData || !field.relationKey || !field.relationDisplay) return value || '-';

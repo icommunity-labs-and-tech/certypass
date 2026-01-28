@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import Box from '@/components/Box';
 import BoxTitle from '@/components/BoxTitle';
 import LoadingOverlay from '@/components/Loading';
@@ -14,6 +15,7 @@ import { useDeleteEntity } from '@/hooks/useDeleteEntity';
 import GenericTable from '@/components/GenericTable';
 
 export default function StatusTypeDetailPage() {
+  const t = useTranslations('common');
   const { id } = useParams();
   const router = useRouter();
   const statusTypeId = id as string;
@@ -98,7 +100,7 @@ export default function StatusTypeDetailPage() {
           </div>
         </div>
         <Divider />
-        <p className="text-muted mb-0">{statusType?.description || 'Sin descripción'}</p>
+        <p className="text-muted mb-0">{statusType?.description || t('noDescription')}</p>
       </Box>
 
       {statusType.template && Array.isArray(statusType.template) && statusType.template.length > 0 && (

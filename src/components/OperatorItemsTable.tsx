@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Table } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 import { formatValueWithSmartDateDetection } from '@/lib/format';
 import ImageDisplay from './ImageDisplay';
 
@@ -25,6 +26,7 @@ export const OperatorItemsTable: React.FC<OperatorItemsTableProps> = ({
   onItemSelect, 
   className = '' 
 }) => {
+  const t = useTranslations('common');
   const handleRowClick = (item: Item) => {
     onItemSelect(item);
   };
@@ -48,7 +50,7 @@ export const OperatorItemsTable: React.FC<OperatorItemsTableProps> = ({
               ? (item.description.length > 100 
                   ? `${item.description.substring(0, 100)}...` 
                   : item.description)
-              : 'Sin descripción';
+              : t('noDescription');
 
             return (
               <tr 

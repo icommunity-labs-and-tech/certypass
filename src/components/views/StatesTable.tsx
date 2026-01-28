@@ -5,10 +5,11 @@ import GenericTable, { FormTemplate } from '@/components/GenericTable';
 import LoadingOverlay from '@/components/Loading';
 import { getStates } from '@/actions/states';
 import { getItems } from '@/actions/items';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { listColumnPresets } from '@/components/GenericTable/useUnifiedColumns';
+import { getListColumnPresets } from '@/components/GenericTable/useUnifiedColumns';
 import { Divider } from '@/components/Divider';
+import { useTranslations } from 'next-intl';
 
 interface StatesTableProps {
   title?: string;
@@ -19,18 +20,23 @@ interface StatesTableProps {
 }
 
 export default function StatesTable({ 
-  title = "Estados",
+  title,
   showBox = true,
   onStateSelect,
   customActions = [],
   customColumns = []
 }: StatesTableProps) {
+  const t = useTranslations('states');
+  const tTables = useTranslations('tables');
+  const tCommon = useTranslations('common.actions');
+  const defaultTitle = title || t('title');
   const [states, setStates] = useState<any[]>([]);
   const [items, setItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   // Generar columnas usando el preset de states
+  const listColumnPresets = useMemo(() => getListColumnPresets(tTables), [tTables]);
   const stateColumns = listColumnPresets.states.map(col => ({
     key: col.key,
     label: col.label,
@@ -67,14 +73,14 @@ export default function StatesTable({
               <button
                 className="btn btn-outline-primary btn-sm"
                 onClick={() => router.push(`/dashboard/states/${state.id}`)}
-                title="Ver detalle"
+                title={t('viewDetail')}
               >
                 <i className="bi bi-eye"></i>
               </button>
               <button
                 className="btn btn-outline-secondary btn-sm"
                 onClick={() => router.push(`/dashboard/states/${state.id}/edit`)}
-                title="Editar"
+                title={tCommon('edit')}
               >
                 <i className="bi bi-pencil"></i>
               </button>
@@ -107,7 +113,7 @@ export default function StatesTable({
 
   const defaultActions = [
     {
-      label: 'Ver detalle',
+      label: t('viewDetail'),
       onClick: (row: Record<string, any>) => {
         if (onStateSelect) {
           onStateSelect(row);
@@ -124,24 +130,23 @@ export default function StatesTable({
     <>
       {showBox && (
         <Box>
-          <h6 className="mb-2">¿Qué son los estados?</h6>
+          <h6 className="mb-2">{t('whatAreStates')}</h6>
           <Divider />
           <p className="mb-0 text-muted">
-            Los estados representan eventos o cambios importantes en el ciclo de vida de un item, como inspecciones, reparaciones, mantenimientos o verificaciones. 
-            Cada estado puede incluir imágenes, descripciones detalladas y datos personalizados según el tipo de estado, y puede ser respaldado como evidencia verificable.
+            {t('statesDescription')}
           </p>
         </Box>
       )}
 
       <GenericTable
       initialData={states}
-      title={title}
+      title={defaultTitle}
       icon="bi-flag"
       allowTemplateEditing={false}
       customColumns={customColumns.length > 0 ? customColumns : stateColumns}
       actions={[...defaultActions, ...customActions]}
-      filterPlaceholder="Filtrar por estado..."
-      addButtonLabel="Añadir estado"
+      filterPlaceholder={t('filterPlaceholder')}
+      addButtonLabel={t('addButton')}
     />
     </>
   );

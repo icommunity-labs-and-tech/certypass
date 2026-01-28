@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Form, Button, Alert, Spinner, Modal, Badge } from 'react-bootstrap';
 import { listStatusTypes } from '@/actions/statusTypes';
 import { createState } from '@/actions/states';
@@ -36,6 +37,8 @@ export default function AddStateForm({
   show = true, 
   onHide 
 }: AddStateFormProps) {
+  const tCommon = useTranslations('common');
+  const tForms = useTranslations('forms');
   const [statusTypes, setStatusTypes] = useState<StatusType[]>([]);
   const [selectedStatusType, setSelectedStatusType] = useState<StatusType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -92,13 +95,13 @@ export default function AddStateForm({
           const fieldValue = templateConfig[fieldName];
           
           if (field.type === 'geolocation' && (!fieldValue || !fieldValue.lat || !fieldValue.lng)) {
-            setError(`El campo "${field.label || fieldName}" es obligatorio`);
+            setError(tForms('fieldRequiredWithName', { field: field.label || fieldName }));
             setIsSubmitting(false);
             return;
           }
           
           if (field.type !== 'geolocation' && (!fieldValue || fieldValue === '')) {
-            setError(`El campo "${field.label || fieldName}" es obligatorio`);
+            setError(tForms('fieldRequiredWithName', { field: field.label || fieldName }));
             setIsSubmitting(false);
             return;
           }
@@ -276,7 +279,7 @@ export default function AddStateForm({
                           [fieldName]: e.target.value,
                         }));
                       }}
-                      placeholder={field.placeholder || `Ingresa ${fieldLabel.toLowerCase()}`}
+                      placeholder={field.placeholder || tCommon('enterField', { field: fieldLabel.toLowerCase() })}
                       required={field.required}
                       disabled={isSubmitting}
                       className="form-control-custom"
@@ -301,7 +304,7 @@ export default function AddStateForm({
                           [fieldName]: e.target.value ? parseFloat(e.target.value) : undefined,
                         }));
                       }}
-                      placeholder={field.placeholder || `Ingresa ${fieldLabel.toLowerCase()}`}
+                      placeholder={field.placeholder || tCommon('enterField', { field: fieldLabel.toLowerCase() })}
                       required={field.required}
                       disabled={isSubmitting}
                       className="form-control-custom"

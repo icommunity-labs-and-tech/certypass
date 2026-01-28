@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Form, Button, Alert, Card, Container, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { useTranslations } from 'next-intl';
 
 export default function SuperAdminLoginPage() {
+  const t = useTranslations('auth.login.superadmin');
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,10 +32,10 @@ export default function SuperAdminLoginPage() {
       if (data.success) {
         router.push('/superadmin');
       } else {
-        setError(data.error || 'Error al iniciar sesión');
+        setError(data.error || t('errors.loginError'));
       }
     } catch {
-      setError('Error de conexión');
+      setError(t('errors.connectionError'));
     } finally {
       setLoading(false);
     }
@@ -101,8 +103,8 @@ export default function SuperAdminLoginPage() {
             <div className="mb-3">
               <i className="bi bi-shield-lock-fill text-danger" style={{ fontSize: '3rem' }}></i>
             </div>
-            <h2 className="mb-2" style={{ fontWeight: 700 }}>certypass</h2>
-            <p className="text-muted">Panel de Super Administrador</p>
+            <h2 className="mb-2" style={{ fontWeight: 700 }}>{t('title')}</h2>
+            <p className="text-muted">{t('subtitle')}</p>
           </div>
 
           {error && (
@@ -113,14 +115,14 @@ export default function SuperAdminLoginPage() {
 
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
+              <Form.Label>{t('emailLabel')}</Form.Label>
               <div className="input-group">
                 <span className="input-group-text">
                   <i className="bi bi-envelope"></i>
                 </span>
                 <Form.Control
                   type="email"
-                  placeholder="superadmin@ejemplo.com"
+                  placeholder={t('emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -130,14 +132,14 @@ export default function SuperAdminLoginPage() {
             </Form.Group>
 
             <Form.Group className="mb-4">
-              <Form.Label>Contraseña</Form.Label>
+              <Form.Label>{t('passwordLabel')}</Form.Label>
               <div className="input-group">
                 <span className="input-group-text">
                   <i className="bi bi-lock"></i>
                 </span>
                 <Form.Control
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={t('passwordPlaceholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -162,12 +164,12 @@ export default function SuperAdminLoginPage() {
               {loading ? (
                 <>
                   <Spinner size="sm" className="me-2" />
-                  Accediendo...
+                  {t('accessing')}
                 </>
               ) : (
                 <>
                   <i className="bi bi-shield-check me-2"></i>
-                  Acceder
+                  {t('access')}
                 </>
               )}
             </Button>
@@ -178,7 +180,7 @@ export default function SuperAdminLoginPage() {
           <div className="text-center">
             <small className="text-muted">
               <i className="bi bi-info-circle me-1"></i>
-              Acceso exclusivo para Super Administradores
+              {t('exclusiveAccess')}
             </small>
           </div>
         </Card.Body>

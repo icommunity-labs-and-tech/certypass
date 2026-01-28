@@ -1,0 +1,721 @@
+{
+  "common": {
+    "actions": {
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "add": "Añadir",
+      "create": "Crear",
+      "search": "Buscar",
+      "filter": "Filtrar",
+      "close": "Cerrar",
+      "confirm": "Confirmar",
+      "back": "Volver",
+      "next": "Siguiente",
+      "previous": "Anterior",
+      "submit": "Enviar",
+      "loading": "Cargando...",
+      "noData": "No hay datos disponibles"
+    },
+    "validation": {
+      "required": "Este campo es obligatorio",
+      "invalid": "Valor inválido",
+      "emailInvalid": "Email inválido",
+      "emailAvailable": "Email disponible",
+      "checking": "Verificando...",
+      "minLength": "Debe tener al menos {min} caracteres",
+      "maxLength": "No puede tener más de {max} caracteres"
+    },
+    "messages": {
+      "success": "Operación exitosa",
+      "error": "Ha ocurrido un error",
+      "confirmDelete": "¿Estás seguro de que quieres eliminar esto?",
+      "deleteSuccess": "Eliminado correctamente",
+      "saveSuccess": "Guardado correctamente"
+    },
+    "unspecified": "Sin especificar",
+    "enterField": "Ingresa {field}",
+    "noDescription": "Sin descripción",
+    "fieldName": "Nombre del campo",
+    "fieldNamePlaceholder": "ej: temperatura, presión, etc.",
+    "fieldNameHelp": "Nombre descriptivo del campo",
+    "fieldRequired": "Campo requerido",
+    "required": "Requerido",
+    "completeRequiredFields": "Por favor completa todos los campos requeridos antes de continuar",
+    "completeRequiredFieldsError": "Por favor completa todos los campos requeridos",
+    "geolocationRequired": "Este campo es obligatorio. Por favor, selecciona una ubicación en el mapa o usa tu ubicación actual.",
+    "passwordMinLength": "La contraseña debe tener al menos 6 caracteres"
+  },
+  "sidebar": {
+    "home": "Inicio",
+    "statusTypes": "Estados",
+    "products": "Productos",
+    "users": "Usuarios",
+    "profile": "Perfil",
+    "organizations": "Organizaciones",
+    "management": "GESTIÓN",
+    "developer": "DESARROLLADOR",
+    "applications": "APLICACIONES",
+    "appCustomer": "App Cliente",
+    "appOperator": "App Operador",
+    "events": "Eventos",
+    "webhooks": "Webhooks",
+    "auth": "Auth",
+    "apiDocs": "API Docs"
+  },
+  "forms": {
+    "addItem": "Añadir producto",
+    "editItem": "Editar producto",
+    "addUser": "Añadir usuario",
+    "editUser": "Editar usuario",
+    "addState": "Añadir estado",
+    "editState": "Editar estado",
+    "selectOption": "Seleccionar...",
+    "selectStatusType": "Selecciona un tipo de estado",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Describe el estado actual del producto...",
+    "customId": "ID personalizado",
+    "customIdHelp": "El ID es obligatorio, debe ser único y se usará para generar el código QR.",
+    "generatedTitle": "Título generado",
+    "addField": "Agregar campo",
+    "categoryFields": "Campos específicos de la categoría",
+    "statusTypeFields": "Campos específicos del tipo de estado",
+    "validationErrors": "Errores de validación",
+    "fieldMustHaveName": "El campo {index} debe tener un nombre",
+    "fieldMustHaveNameWithNumber": "El campo {number} debe tener un nombre",
+    "selectMustHaveOptions": "El campo \"{name}\" de tipo Opciones debe tener al menos una opción",
+    "fieldRequiredWithName": "El campo \"{field}\" es obligatorio",
+    "labels": {
+      "name": "Nombre",
+      "email": "Email",
+      "role": "Rol",
+      "notes": "Notas",
+      "image": "Imagen",
+      "productId": "ID del Producto",
+      "productName": "Nombre del producto",
+      "productDescription": "Descripción del producto",
+      "imageUrl": "URL de la imagen",
+      "statusTypeName": "Nombre del tipo de estado",
+      "statusTypeDescription": "Descripción del tipo de estado",
+      "userName": "Nombre completo del usuario",
+      "userEmail": "correo@ejemplo.com",
+      "selectRole": "Seleccionar rol",
+      "additionalNotes": "Notas adicionales (opcional)"
+    },
+    "roles": {
+      "operator": "Operador",
+      "administrator": "Administrador"
+    }
+  },
+  "tables": {
+    "noData": "No hay datos disponibles",
+    "loading": "Cargando...",
+    "loadingUsers": "Cargando usuarios...",
+    "filterPlaceholder": "Filtrar...",
+    "filterUserPlaceholder": "Filtrar por usuario...",
+    "searchByName": "Buscar por nombre",
+    "searchById": "Buscar por ID",
+    "searchByCategory": "Buscar por categoría",
+    "addUser": "Añadir usuario",
+    "addProduct": "Añadir producto",
+    "addItem": "Añadir elemento",
+    "addCategory": "Añadir categoría",
+    "users": "Usuarios del Sistema",
+    "items": "Inventario de productos",
+    "statusTypes": "Tipos de estado",
+    "usersDescription": "La gestión de usuarios te permite administrar los usuarios del sistema, crear nuevos usuarios, asignar roles (Operador o Administrador) y gestionar sus permisos. Los usuarios pueden ser verificados mediante KYC y pueden tener diferentes niveles de acceso según su rol en la organización.",
+    "whatIsUserManagement": "¿Qué es la gestión de usuarios?",
+    "whatIsInventory": "¿Qué es el inventario de productos?",
+    "inventoryDescription": "El inventario de productos es el catálogo central de productos o elementos que gestiona tu organización. Cada producto puede tener múltiples categorías, una imagen, campos personalizados según su tipo, y un historial de estados que registra su evolución a lo largo del tiempo.",
+    "columns": {
+      "categories": "Categorías",
+      "creationDate": "Fecha de alta",
+      "image": "Imagen",
+      "actions": "Acciones",
+      "viewDetail": "Ver detalle",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "deleteProduct": "Eliminar Producto",
+    "confirmDeleteProduct": "¿Estás seguro de que quieres eliminar el producto \"{name}\"?",
+    "deleteUserError": "Error al eliminar el usuario",
+    "deleteProductError": "Error al eliminar el producto",
+    "deleteStatusType": "Eliminar Tipo de Estado",
+    "confirmDeleteStatusType": "¿Estás seguro de que quieres eliminar el tipo de estado \"{name}\"?",
+    "editStatusType": "Editar Tipo de Estado",
+    "statusTypesDescription": "Los tipos de estado definen las plantillas y estructuras de datos para los diferentes estados que pueden tener los items. Cada tipo de estado puede tener campos personalizados que permiten capturar información específica, como inspecciones, reparaciones o verificaciones, y se utilizan para crear estados consistentes y estructurados en el sistema.",
+    "whatIsStatusTypes": "¿Qué son los tipos de estado?",
+    "deleteStatusTypeError": "Error al eliminar el tipo de estado",
+    "loadStatusTypeError": "Error al cargar el tipo de estado",
+    "updateStatusTypeError": "Error al actualizar el tipo de estado",
+    "columnLabels": {
+      "itemName": "Nombre del Item",
+      "status": "Estado",
+      "category": "Categoría",
+      "image": "Imagen",
+      "passport": "Pasaporte",
+      "categoryName": "Nombre de la Categoría",
+      "items": "Items",
+      "actions": "Acciones",
+      "item": "Item",
+      "description": "Descripción",
+      "name": "Nombre",
+      "role": "Rol",
+      "created": "Creado",
+      "stateTitle": "Título del Estado",
+      "creationDate": "Fecha de Creación"
+    }
+  },
+  "modals": {
+    "confirmDelete": "Eliminar",
+    "deleteUser": "Eliminar Usuario",
+    "confirmDeleteUser": "¿Estás seguro de que quieres eliminar el usuario \"{name}\"?",
+    "deleting": "Eliminando...",
+    "cascadeWarning": "⚠️ Atención: Esta acción también eliminará:",
+    "password": {
+      "title": "Usuario Creado Exitosamente",
+      "credentialsTitle": "Credenciales de Acceso",
+      "successMessage": "¡Usuario creado correctamente!",
+      "userCreated": "Se ha creado el usuario {name} con el email {email}.",
+      "email": "Email:",
+      "temporaryPassword": "Contraseña Temporal:",
+      "copyEmail": "Copiar email",
+      "copyPassword": "Copiar contraseña",
+      "copied": "¡Copiado al portapapeles!",
+      "important": "Importante",
+      "temporaryWarning": "Esta contraseña es temporal y debe cambiarse en el primer inicio de sesión",
+      "shareSecurely": "Comparte estas credenciales de forma segura con el usuario",
+      "canChangePassword": "El usuario podrá cambiar su contraseña desde su perfil una vez que inicie sesión",
+      "understood": "Entendido"
+    },
+    "error": {
+      "title": "Error al crear estado",
+      "generic": "Ha ocurrido un error"
+    },
+    "addItem": {
+      "customIdHelp": "El ID es obligatorio, debe ser único y se usará para generar el código QR.",
+      "emailFormatInvalid": "El formato del email no es válido",
+      "checkingEmail": "Verificando email...",
+      "fixErrors": "Corrija los errores",
+      "addUser": "Añadir Usuario",
+      "addProduct": "Añadir Producto",
+      "addCategory": "Añadir Categoría",
+      "addElement": "Añadir Elemento",
+      "createError": "Error al crear el elemento",
+      "emailExists": "Ya existe un usuario con este email",
+      "emailCheckError": "Error al verificar el email",
+      "fieldRequired": "El campo \"{label}\" es obligatorio",
+      "loadCategoryError": "Error cargando productos de la categoría",
+      "loadItemError": "No se pudo cargar el producto seleccionado",
+      "newState": "Nuevo Estado",
+      "loadingProducts": "Cargando productos…",
+      "dontCopy": "No copiar",
+      "copyHelp": "Se copiarán nombre, descripción, imagen y campos de template. Tu ID se mantiene.",
+      "evidenceSizeExceeded": "El tamaño estimado de la evidencia supera el máximo de",
+      "totalEstimated": "Total estimado:",
+      "aboveLimit": "por encima",
+      "imageDetails": "Detalle de imágenes:"
+    }
+  },
+  "dates": {
+    "format": "dd MMM yyyy",
+    "formatWithTime": "dd MMM yyyy 'a las' HH:mm"
+  },
+  "accessibility": {
+    "skipToContent": "Saltar al contenido principal",
+    "openMenu": "Abrir menú",
+    "profile": "Perfil"
+  },
+  "breadcrumbs": {
+    "loading": "Cargando..."
+  },
+  "header": {
+    "openMenu": "Abrir menú"
+  },
+  "auth": {
+    "login": {
+      "admin": {
+        "title": "Dashboard Admin",
+        "subtitle": "Acceso exclusivo para administradores",
+        "emailLabel": "Email Administrativo",
+        "emailPlaceholder": "admin@empresa.com",
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "••••••••",
+        "accessing": "Accediendo...",
+        "access": "Acceder",
+        "operatorLink": "¿Eres operador?",
+        "accessHere": "Accede aquí",
+        "errors": {
+          "accessDenied": "No tienes permisos para acceder al dashboard",
+          "unauthorized": "Debes iniciar sesión como administrador para continuar",
+          "invalidCredentials": "Credenciales inválidas",
+          "loginError": "Error al iniciar sesión"
+        }
+      },
+      "operator": {
+        "title": "Operador",
+        "subtitle": "Acceso para operadores de campo",
+        "emailLabel": "Email",
+        "emailPlaceholder": "tu@email.com",
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "••••••••",
+        "accessing": "Accediendo...",
+        "access": "Acceder",
+        "adminLink": "¿Eres administrador?",
+        "accessHere": "Accede aquí",
+        "errors": {
+          "accessDenied": "No tienes permisos para acceder a la aplicación de operadores",
+          "unauthorized": "Debes iniciar sesión como operador para continuar",
+          "invalidCredentials": "Credenciales inválidas",
+          "loginError": "Error al iniciar sesión"
+        }
+      },
+      "superadmin": {
+        "title": "certypass",
+        "subtitle": "Panel de Super Administrador",
+        "emailLabel": "Email",
+        "emailPlaceholder": "superadmin@ejemplo.com",
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "••••••••",
+        "accessing": "Accediendo...",
+        "access": "Acceder",
+        "exclusiveAccess": "Acceso exclusivo para Super Administradores",
+        "errors": {
+          "loginError": "Error al iniciar sesión",
+          "connectionError": "Error de conexión"
+        }
+      },
+      "loading": "Cargando..."
+    },
+    "activate": {
+      "validatingToken": "Validando token...",
+      "error": {
+        "title": "Error",
+        "invalidToken": "Token de activación no válido",
+        "invalidTokenMessage": "El link de activación no es válido o ha expirado.",
+        "expiredToken": "El token de activación ha expirado",
+        "loadError": "Error al cargar información de activación",
+        "activationError": "Error al activar la cuenta",
+        "connectionError": "Error de conexión. Por favor, intenta nuevamente.",
+        "goToLogin": "Ir al Login"
+      },
+      "steps": {
+        "step": "Paso {current} de 5",
+        "welcome": "Bienvenida",
+        "password": "Contraseña",
+        "tour": "Tour",
+        "verification": "Verificación",
+        "completed": "Completado"
+      },
+      "password": {
+        "title": "Establecer Contraseña",
+        "subtitle": "Crea una contraseña segura para proteger tu cuenta",
+        "alreadySet": "Ya estableciste una contraseña anteriormente. Puedes cambiarla o continuar con la misma.",
+        "passwordLabel": "Contraseña *",
+        "passwordPlaceholder": "Mínimo 8 caracteres",
+        "passwordHelp": "Usa al menos 8 caracteres con letras, números y símbolos",
+        "confirmPasswordLabel": "Confirmar Contraseña *",
+        "confirmPasswordPlaceholder": "Repite tu contraseña",
+        "saving": "Guardando...",
+        "continue": "Continuar",
+        "errors": {
+          "passwordsDontMatch": "Las contraseñas no coinciden",
+          "minLength": "La contraseña debe tener al menos 8 caracteres",
+          "passwordRequired": "Por favor, configura tu contraseña primero"
+        }
+      },
+      "account": {
+        "title": "Activar Cuenta",
+        "subtitle": "Establece tu contraseña para activar tu cuenta",
+        "pendingActivation": "Tu cuenta está pendiente de activación. Establece una contraseña segura para comenzar.",
+        "activating": "Activando cuenta...",
+        "activate": "Activar Cuenta",
+        "alreadyHaveAccount": "¿Ya tienes cuenta activa?",
+        "login": "Iniciar sesión"
+      },
+      "completed": {
+        "title": "¡Todo listo!",
+        "redirecting": "Redirigiendo al dashboard..."
+      }
+    },
+    "error": {
+      "accessDenied": {
+        "title": "Acceso Denegado",
+        "message": "No tienes permisos para acceder a esta página.",
+        "description": "Tu cuenta no tiene los privilegios necesarios para acceder al área solicitada.",
+        "action": "Volver al Dashboard"
+      },
+      "unauthorized": {
+        "title": "No Autorizado",
+        "message": "Debes iniciar sesión para continuar.",
+        "description": "Tu sesión ha expirado o no has iniciado sesión.",
+        "action": "Iniciar Sesión"
+      },
+      "configuration": {
+        "title": "Error de Configuración",
+        "message": "Hay un problema con la configuración del servidor.",
+        "description": "Contacta al administrador del sistema.",
+        "action": "Volver al Inicio"
+      },
+      "default": {
+        "title": "Error de Autenticación",
+        "message": "Ocurrió un error inesperado.",
+        "description": "Intenta nuevamente o contacta al administrador.",
+        "action": "Iniciar Sesión"
+      },
+      "goBack": "Volver Atrás",
+      "loading": "Cargando..."
+    },
+    "verification": {
+      "title": "Error en Verificación",
+      "subtitle": "No se pudo completar la verificación de tu identidad",
+      "whatHappened": "¿Qué pasó?",
+      "description": "Hubo un problema durante el proceso de verificación de identidad. Esto puede deberse a:",
+      "reasons": {
+        "documents": "Documentos no legibles o borrosos",
+        "incorrectInfo": "Información incorrecta proporcionada",
+        "technicalIssues": "Problemas técnicos temporales",
+        "invalidDocuments": "Documentos no válidos o expirados"
+      },
+      "importantNote": "Nota Importante",
+      "organizationLevel": "La verificación de identidad ahora se realiza a nivel de organización. Contacta con el administrador de tu organización para completar el proceso KYC.",
+      "contactSupport": "Contactar Soporte",
+      "backToLogin": "Volver al Login",
+      "continueProblems": "Si continúas teniendo problemas, por favor contacta a nuestro equipo de soporte técnico."
+    }
+  },
+  "ai": {
+    "fillWithAI": "Rellenar con IA",
+    "consultingAI": "Consultando IA...",
+    "nameRequired": "Completa el nombre del item para usar IA",
+    "noFields": "No hay campos específicos para rellenar",
+    "nameRequiredError": "El nombre del item es requerido para usar la IA",
+    "processingError": "Error al procesar la solicitud",
+    "noDataFound": "La IA no pudo encontrar información específica para este item",
+    "noValidData": "No se recibieron datos válidos de la IA",
+    "connectionError": "Error al conectar con la IA",
+    "fieldsCompleted": "Se completaron {count} campos"
+  },
+  "customer": {
+    "scanCode": "Escanear Código",
+    "scanDescription": "Coloca el código QR del producto frente a la cámara",
+    "scanWithCamera": "Escanear con Cámara",
+    "manualInput": "O ingresa el código manualmente",
+    "search": "Buscar",
+    "copyright": "© 2026 certypass - Pasaporte Digital",
+    "loading": "Cargando...",
+    "loadingProduct": "Obteniendo información del producto",
+    "productNotFound": "Producto no encontrado",
+    "productNotFoundMessage": "No se pudo encontrar el producto solicitado",
+    "errorGettingProduct": "Error al obtener datos del producto",
+    "verificationInfo": "ℹ️ Información de Verificación",
+    "previouslyRegistered": "Este producto fue registrado previamente en nuestro sistema de verificación antifalsificación.",
+    "verificationFlow": "Flujo de verificación:",
+    "verificationFlowDescription": "El proceso de verificación antifalsificación comienza cuando alguien accede por primera vez a esta página del producto. En ese momento, el sistema crea una evidencia única en blockchain que garantiza la autenticidad del producto y registra que ha sido verificado. En accesos posteriores a esta misma página, el sistema detecta que el producto ya fue verificado anteriormente.",
+    "alreadyVerified": "En este caso, nuestro sistema detectó que este producto ya fue verificado en una ocasión anterior, lo que indica que alguien ya accedió a esta página del producto previamente y se registró la primera verificación.",
+    "viewEvidence": "Ver evidencia del primer registro",
+    "verificationWarning": "Si usted realizó el primer registro, puede ignorar este mensaje. Si no lo hizo, le recomendamos verificar la autenticidad del producto.",
+    "errorLoadingEvidence": "No se pudieron cargar los detalles de la evidencia",
+    "error": {
+      "title": "Error",
+      "unknownError": "Error desconocido",
+      "backToScanner": "Volver al Scanner",
+      "tryWithCode": "Intentar con código: {code}",
+      "loading": "Cargando...",
+      "preparingError": "Preparando página de error"
+    }
+  },
+  "operator": {
+    "title": "Operador certypass",
+    "welcome": "Bienvenido, {name}",
+    "openScanner": "Abrir escáner",
+    "verifyingAccess": "Verificando acceso...",
+    "productNotFound": "Producto no encontrado",
+    "loadingDetails": "Cargando detalles del producto",
+    "productDetails": "Detalles del Producto",
+    "addState": "Agregar Estado",
+    "loadingStates": "Cargando estados...",
+    "noStates": "No hay estados registrados para este producto.",
+    "search": "Buscar..."
+  },
+  "states": {
+    "title": "Estado",
+    "notFound": "No se encontró información del estado.",
+    "type": "Tipo",
+    "date": "Fecha",
+    "backed": "Respaldado",
+    "yes": "Sí",
+    "no": "No",
+    "evidenceId": "Evidence ID",
+    "description": "Descripción",
+    "fields": "Campos",
+    "field": "Campo",
+    "photos": "Fotografías",
+    "whatAreStates": "¿Qué son los estados?",
+    "statesDescription": "Los estados representan eventos o cambios importantes en el ciclo de vida de un item, como inspecciones, reparaciones, mantenimientos o verificaciones. Cada estado puede incluir imágenes, descripciones detalladas y datos personalizados según el tipo de estado, y puede ser respaldado como evidencia verificable.",
+    "filterPlaceholder": "Filtrar por estado...",
+    "addButton": "Añadir estado",
+    "viewDetail": "Ver detalle"
+  },
+  "categories": {
+    "title": "Categorías",
+    "deleteCategory": "Eliminar Categoría",
+    "confirmDeleteCategory": "¿Estás seguro de que quieres eliminar la categoría \"{name}\"?",
+    "deleteCategoryError": "Error al eliminar la categoría",
+    "nameRequired": "El nombre de la categoría es obligatorio",
+    "descriptionRequired": "La descripción de la categoría es obligatoria",
+    "filterPlaceholder": "Filtrar por categoría...",
+    "addButton": "Añadir categoría",
+    "viewDetail": "Ver detalle",
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+  "exports": {
+    "title": "Exportar/Importar productos",
+    "exportToCsv": "Exportar productos a CSV",
+    "exportDescription": "Usa el botón {button} para seleccionar productos y campos a exportar. Este CSV puede usarse tanto para análisis como para preparar futuras importaciones. El CSV de ejemplo para importación suele usar al menos {fields}.",
+    "exportCsv": "Exportar CSV",
+    "exportQrs": "Exportar QRs",
+    "exportQrsDescription": "Usa el botón {button} para seleccionar un conjunto de productos y descargar los códigos QR",
+    "selectProductsAndFields": "Seleccionar productos y campos para exportar CSV",
+    "selectFields": "Selecciona los campos que quieres incluir en el CSV.",
+    "categoriesToCreate": "Categorías a crear automáticamente",
+    "categoriesToCreateDescription": "Las siguientes categorías no existen en el sistema y se crearán automáticamente durante la importación:",
+    "categoriesToCreateCount": "Categorías a crear: {count}",
+    "importFromCsv": "Importar productos desde CSV",
+    "importDescription": "El botón {button} permite subir un archivo CSV para importar productos. Primero se validará el archivo y luego podrás ejecutar la importación si todo está correcto. El CSV debe contener al menos las columnas: {fields}.",
+    "importButton": "Importar items desde CSV",
+    "selectProducts": "Seleccionar productos",
+    "summary": "Resumen:",
+    "totalRows": "Total de filas: {count}",
+    "validRows": "Filas válidas: {count}",
+    "exportQrsTitle": "Exportar QRs de productos",
+    "exportQrsFullDescription": "Usa el botón {button} para seleccionar un conjunto de productos y descargar los códigos QR en formato ZIP (imágenes PNG) o Excel (.xlsx con QR incrustado). Ideal para imprimir pegatinas, etiquetas físicas o inventarios impresos.",
+    "fieldLabels": {
+      "id": "ID",
+      "name": "Nombre",
+      "description": "Descripción",
+      "categoryName": "Categoría",
+      "createdAt": "Fecha de creación",
+      "lastStateTitle": "Pasaporte: Último estado",
+      "lastStateBacked": "Pasaporte: Último estado respaldado",
+      "customerUrl": "URL pública",
+      "passportJson": "Pasaporte digital completo (JSON)"
+    }
+  },
+  "fieldTypes": {
+    "text": "Texto",
+    "textarea": "Textarea",
+    "number": "Número",
+    "email": "Email",
+    "date": "Fecha",
+    "select": "Opciones",
+    "image": "Imagen",
+    "geolocation": "Geolocalización"
+  },
+  "deleteConfirmation": {
+    "itemsMore": "y {count} item{plural} más",
+    "itemsCount": "{count} item{plural}",
+    "statesMore": "y {count} estado{plural} más",
+    "statesCount": "{count} estado{plural}",
+    "statusTypesMore": "y {count} tipo{plural} de estado más",
+    "statusTypesCount": "{count} tipo{plural} de estado"
+  },
+  "dashboard": {
+    "metrics": "Métricas",
+    "monthlyActivityTitle": "Actividad Mensual de Estados",
+    "categoryDistributionTitle": "Distribución por Categorías",
+    "backupStatusByUserTitle": "Estado de Respaldos por Usuario",
+    "loadingData": "Cargando datos...",
+    "charts": {
+      "monthlyActivity": {
+        "usersRegistered": "Usuarios Registrados",
+        "itemsCreated": "Items Creados",
+        "emptyMessage": "No hay datos de actividad disponibles"
+      },
+      "categoryDistribution": {
+        "items": "Items:",
+        "percentage": "Porcentaje:",
+        "emptyMessage": "No hay datos de categorías disponibles"
+      },
+      "backupStatusByUser": {
+        "totalStates": "Total Estados",
+        "backedStates": "Respaldados",
+        "pendingStates": "Pendientes",
+        "emptyMessage": "No hay datos de estados por usuario disponibles"
+      }
+    },
+    "kpis": {
+      "totalItems": {
+        "title": "Total Productos",
+        "subtitle": "Productos registrados"
+      },
+      "backupRate": {
+        "title": "Respaldados",
+        "subtitle": "{backed} de {total}"
+      },
+      "operators": {
+        "title": "Operadores",
+        "subtitle": "Operadores activos"
+      },
+      "activeUsers": {
+        "title": "Usuarios Activos",
+        "subtitle": "Últimos 30 días"
+      }
+    }
+  },
+  "developer": {
+    "auth": {
+      "whatAreTokens": "¿Qué son los tokens de API?",
+      "tokensDescription": "Los tokens de API son credenciales de autenticación que permiten acceder de forma segura a los endpoints REST de la plataforma. Se utilizan como Bearer tokens en el header Authorization de las peticiones HTTP para autenticar y autorizar las llamadas a la API. Cada token está asociado a tu organización y puede tener una fecha de expiración opcional.",
+      "title": "Tokens de API",
+      "createToken": "Crear Token",
+      "noTokens": "No hay tokens creados aún",
+      "table": {
+        "name": "Nombre",
+        "created": "Creado",
+        "lastUsed": "Último uso",
+        "expires": "Expira",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "never": "Nunca",
+      "expired": "Expirado",
+      "active": "Activo",
+      "delete": "Eliminar",
+      "usageEvolution": "Evolución del Uso de Tokens",
+      "calls": "llamada",
+      "callsPlural": "llamadas",
+      "period": "Período:",
+      "createModal": {
+        "title": "Crear Nuevo Token",
+        "nameLabel": "Nombre del Token",
+        "namePlaceholder": "Ej: Token de producción",
+        "nameHelp": "Elige un nombre descriptivo para identificar este token",
+        "expiresLabel": "Fecha de Expiración (opcional)",
+        "expiresHelp": "Si no se especifica, el token no expirará. La expiración será a las 00:00 del día indicado.",
+        "cancel": "Cancelar",
+        "creating": "Creando...",
+        "create": "Crear Token"
+      },
+      "tokenCreated": {
+        "title": "Token Creado",
+        "important": "¡Importante!",
+        "warning": "Este token solo se mostrará una vez. Asegúrate de copiarlo y guardarlo en un lugar seguro.",
+        "tokenLabel": "Tu Token de API",
+        "copy": "Copiar",
+        "exampleTitle": "Ejemplo de uso:",
+        "understood": "Entendido"
+      },
+      "deleteConfirm": "¿Estás seguro de que quieres eliminar este token? Esta acción no se puede deshacer.",
+      "deleteSuccess": "Token eliminado correctamente",
+      "loadError": "Error al cargar tokens",
+      "createError": "Error al crear token",
+      "deleteError": "Error al eliminar token",
+      "copySuccess": "Token copiado al portapapeles"
+    },
+    "webhooks": {
+      "whatAreWebhooks": "¿Qué son los webhooks?",
+      "webhooksDescription": "Los webhooks son URLs configuradas que reciben notificaciones automáticas cuando ocurren eventos en el sistema, como la creación de items o estados. Permiten integrar el sistema con servicios externos de forma reactiva, enviando datos en tiempo real cuando ocurren eventos específicos.",
+      "title": "Webhooks",
+      "createWebhook": "Crear Webhook",
+      "noWebhooks": "No hay webhooks configurados aún",
+      "table": {
+        "name": "Nombre",
+        "url": "URL",
+        "events": "Eventos",
+        "status": "Estado",
+        "lastExecution": "Última ejecución",
+        "failures": "Fallos",
+        "actions": "Acciones"
+      },
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "success": "✓ Éxito",
+      "error": "✗ Error",
+      "never": "Nunca",
+      "triggersEvolution": "Evolución de Triggers",
+      "triggered": "Disparado",
+      "notTriggered": "No disparado",
+      "period": "Período:",
+      "createModal": {
+        "title": "Crear Nuevo Webhook",
+        "nameLabel": "Nombre",
+        "namePlaceholder": "Ej: Webhook de producción",
+        "urlLabel": "URL",
+        "urlPlaceholder": "https://tu-servidor.com/webhook",
+        "urlHelp": "URL donde se enviarán las notificaciones (debe comenzar con http:// o https://)",
+        "eventsLabel": "Eventos",
+        "eventsHelp": "Selecciona los eventos a los que se suscribirá este webhook",
+        "secretLabel": "Secret (opcional)",
+        "secretPlaceholder": "Secreto para verificar las peticiones",
+        "secretHelp": "Se usará para generar la firma HMAC-SHA256 en el header X-Webhook-Signature",
+        "headersLabel": "Headers personalizados (JSON opcional)",
+        "headersPlaceholder": "{'Authorization': 'Bearer token', 'X-Custom-Header': 'value'}",
+        "headersHelp": "Headers adicionales a incluir en cada petición (formato JSON)",
+        "activeLabel": "Activo",
+        "cancel": "Cancelar",
+        "create": "Crear Webhook"
+      },
+      "editModal": {
+        "title": "Editar Webhook",
+        "nameLabel": "Nombre",
+        "urlLabel": "URL",
+        "eventsLabel": "Eventos",
+        "secretLabel": "Secret (opcional)",
+        "secretPlaceholder": "Dejar vacío para no cambiar",
+        "secretHelp": "Dejar vacío para mantener el secret actual",
+        "headersLabel": "Headers personalizados (JSON opcional)",
+        "activeLabel": "Activo",
+        "cancel": "Cancelar",
+        "save": "Guardar Cambios"
+      },
+      "deleteConfirm": "¿Estás seguro de que quieres eliminar este webhook? Esta acción no se puede deshacer.",
+      "createSuccess": "Webhook creado correctamente",
+      "updateSuccess": "Webhook actualizado correctamente",
+      "deleteSuccess": "Webhook eliminado correctamente",
+      "toggleSuccess": "Webhook {status} correctamente",
+      "activated": "activado",
+      "deactivated": "desactivado",
+      "loadError": "Error al cargar webhooks",
+      "createError": "Error al crear webhook",
+      "updateError": "Error al actualizar webhook",
+      "deleteError": "Error al eliminar webhook",
+      "toggleError": "Error al actualizar estado del webhook",
+      "headersInvalid": "Los headers deben ser un JSON válido"
+    },
+    "events": {
+      "whatAreEvents": "¿Qué son los eventos?",
+      "eventsDescription": "Los eventos son registros automáticos de acciones importantes que ocurren en el sistema, como la creación de items o estados. Estos eventos se utilizan para notificar a sistemas externos mediante webhooks y para mantener un historial de actividad del sistema.",
+      "title": "Eventos",
+      "filter": {
+        "all": "Todos",
+        "itemCreated": "Item Creado",
+        "stateCreated": "Estado Creado"
+      },
+      "noEvents": "No hay eventos registrados aún",
+      "table": {
+        "type": "Tipo",
+        "entity": "Entidad",
+        "entityId": "ID de Entidad",
+        "date": "Fecha",
+        "actions": "Acciones"
+      },
+      "viewDetails": "Ver Detalles",
+      "evolution": "Evolución de Eventos",
+      "event": "evento",
+      "eventsPlural": "eventos",
+      "period": "Período:",
+      "detailsModal": {
+        "title": "Detalles del Evento",
+        "eventType": "Tipo de Evento:",
+        "entityType": "Tipo de Entidad:",
+        "entityId": "ID de Entidad:",
+        "date": "Fecha:",
+        "data": "Datos:",
+        "close": "Cerrar"
+      }
+    }
+  }
+}

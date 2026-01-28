@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import { Modal, Button, Alert } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 
 interface CascadeInfo {
   statusTypesDeleted?: number;
@@ -29,6 +32,9 @@ export default function DeleteConfirmationModal({
   cascadeInfo,
   isLoading = false
 }: DeleteConfirmationModalProps) {
+  const t = useTranslations('modals');
+  const tCommon = useTranslations('common.actions');
+  const tDeleteConfirmation = useTranslations('deleteConfirmation');
   const hasCascade = cascadeInfo && Object.values(cascadeInfo).some(count => count && count > 0);
 
   const renderCascadeWarning = () => {
@@ -45,11 +51,13 @@ export default function DeleteConfirmationModal({
         
         let text = displayNames.join(', ');
         if (remaining > 0) {
-          text += ` y ${remaining} tipo${remaining !== 1 ? 's' : ''} de estado más`;
+          const plural = remaining !== 1 ? 's' : '';
+          text += ` ${tDeleteConfirmation('statusTypesMore', { count: remaining, plural })}`;
         }
         cascadeItems.push(text);
       } else {
-        cascadeItems.push(`${cascadeInfo.statusTypesDeleted} tipo${cascadeInfo.statusTypesDeleted !== 1 ? 's' : ''} de estado`);
+        const plural = cascadeInfo.statusTypesDeleted !== 1 ? 's' : '';
+        cascadeItems.push(tDeleteConfirmation('statusTypesCount', { count: cascadeInfo.statusTypesDeleted, plural }));
       }
     }
     
@@ -61,11 +69,13 @@ export default function DeleteConfirmationModal({
         
         let text = displayNames.join(', ');
         if (remaining > 0) {
-          text += ` y ${remaining} item${remaining !== 1 ? 's' : ''} más`;
+          const plural = remaining !== 1 ? 's' : '';
+          text += ` ${tDeleteConfirmation('itemsMore', { count: remaining, plural })}`;
         }
         cascadeItems.push(text);
       } else {
-        cascadeItems.push(`${cascadeInfo.itemsDeleted} item${cascadeInfo.itemsDeleted !== 1 ? 's' : ''}`);
+        const plural = cascadeInfo.itemsDeleted !== 1 ? 's' : '';
+        cascadeItems.push(tDeleteConfirmation('itemsCount', { count: cascadeInfo.itemsDeleted, plural }));
       }
     }
     
@@ -77,17 +87,19 @@ export default function DeleteConfirmationModal({
         
         let text = displayNames.join(', ');
         if (remaining > 0) {
-          text += ` y ${remaining} estado${remaining !== 1 ? 's' : ''} más`;
+          const plural = remaining !== 1 ? 's' : '';
+          text += ` ${tDeleteConfirmation('statesMore', { count: remaining, plural })}`;
         }
         cascadeItems.push(text);
       } else {
-        cascadeItems.push(`${cascadeInfo.statesDeleted} estado${cascadeInfo.statesDeleted !== 1 ? 's' : ''}`);
+        const plural = cascadeInfo.statesDeleted !== 1 ? 's' : '';
+        cascadeItems.push(tDeleteConfirmation('statesCount', { count: cascadeInfo.statesDeleted, plural }));
       }
     }
 
     return (
       <Alert variant="warning" className="mt-3">
-        <strong>⚠️ Atención:</strong> Esta acción también eliminará:
+        <strong>{t('cascadeWarning')}</strong>
         <ul className="mb-0 mt-2">
           {cascadeItems.map((item, index) => (
             <li key={index}>{item}</li>
@@ -108,7 +120,7 @@ export default function DeleteConfirmationModal({
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide} disabled={isLoading}>
-          Cancelar
+          {tCommon('cancel')}
         </Button>
         <Button 
           variant="danger" 
@@ -118,10 +130,10 @@ export default function DeleteConfirmationModal({
           {isLoading ? (
             <>
               <span className="spinner-border spinner-border-sm me-2" />
-              Eliminando...
+              {t('deleting')}
             </>
           ) : (
-            'Eliminar'
+            t('confirmDelete')
           )}
         </Button>
       </Modal.Footer>

@@ -5,16 +5,18 @@ import GenericTable, { FormTemplate } from '@/components/GenericTable';
 import LoadingOverlay from '@/components/Loading';
 import DynamicFieldBuilder from '@/components/DynamicFieldBuilder';
 import { addCategory, getCategories, deleteCategory, getCategoryDetails } from '@/actions/categories';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { listColumnPresets } from '@/components/GenericTable/useUnifiedColumns';
+import { getListColumnPresets } from '@/components/GenericTable/useUnifiedColumns';
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
 import { useDeleteEntity } from '@/hooks/useDeleteEntity';
 import { getCascadeInfo } from '@/config/entityConfig';
+import { useTranslations } from 'next-intl';
 
-const categoryFormTemplate: FormTemplate = [
-  { name: 'name', label: 'Nombre', type: 'text' as const, placeholder: 'Nombre de la categoría', required: true },
-  { name: 'description', label: 'Descripción', type: 'text' as const, placeholder: 'Descripción de la categoría', required: true },
+// Función helper para crear el template de categorías con traducciones
+const createCategoryFormTemplate = (tForms: (key: string) => string): FormTemplate => [
+  { name: 'name', label: tForms('labels.name'), type: 'text' as const, placeholder: tForms('labels.name'), required: true },
+  { name: 'description', label: tForms('labels.description'), type: 'text' as const, placeholder: tForms('labels.description'), required: true },
 ];
 
 interface CategoriesTableProps {
@@ -27,13 +29,20 @@ interface CategoriesTableProps {
 }
 
 export default function CategoriesTable({ 
-  title = "Categorías",
+  title,
   showBox = true,
   onCategorySelect,
   customActions = [],
   customColumns = [],
   allowTemplateEditing = true 
 }: CategoriesTableProps) {
+  const t = useTranslations('categories');
+  const tForms = useTranslations('forms');
+  const tTables = useTranslations('tables');
+  const tCommon = useTranslations('common.actions');
+  const defaultTitle = title || t('title');
+  const categoryFormTemplate = useMemo(() => createCategoryFormTemplate(tForms), [tForms]);
+  const listColumnPresets = useMemo(() => getListColumnPresets(tTables), [tTables]);
   const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -56,7 +65,7 @@ export default function CategoriesTable({
       }
     },
     onError: (error) => {
-      alert('Error al eliminar la categoría');
+      alert(t('deleteCategoryError'));
     },
   });
 
@@ -137,21 +146,21 @@ export default function CategoriesTable({
               <button
                 className="btn btn-outline-primary btn-sm"
                 onClick={() => router.push(`/dashboard/categories/${category.id}`)}
-                title="Ver detalle"
+                title={t('viewDetail')}
               >
                 <i className="bi bi-eye"></i>
               </button>
               <button
                 className="btn btn-outline-secondary btn-sm"
                 onClick={() => router.push(`/dashboard/categories/${category.id}/edit`)}
-                title="Editar"
+                title={t('edit')}
               >
                 <i className="bi bi-pencil"></i>
               </button>
               <button
                 className="btn btn-outline-danger btn-sm"
                 onClick={() => openDeleteModalWithDetails(category)}
-                title="Eliminar"
+                title={t('delete')}
               >
                 <i className="bi bi-trash"></i>
               </button>
@@ -171,11 +180,11 @@ export default function CategoriesTable({
     const errors: string[] = [];
     
     if (!formData.name || formData.name.trim() === '') {
-      errors.push('El nombre de la categoría es obligatorio');
+      errors.push(t('nameRequired'));
     }
     
     if (!formData.description || formData.description.trim() === '') {
-      errors.push('La descripción de la categoría es obligatoria');
+      errors.push(t('descriptionRequired'));
     }
     
     if (errors.length > 0) {
@@ -190,15 +199,15 @@ export default function CategoriesTable({
   const tableContent = (
     <GenericTable
       initialData={categories}
-      title={title}
+      title={defaultTitle}
       icon="bi-tags"
       formTemplate={categoryFormTemplate}
       onAddSubmit={handleAddCategory}
       allowTemplateEditing={allowTemplateEditing}
       customColumns={customColumns.length > 0 ? customColumns : categoryColumns}
       actions={[...defaultActions, ...customActions]}
-      filterPlaceholder="Filtrar por categoría..."
-      addButtonLabel="Añadir categoría"
+      filterPlaceholder={t('filterPlaceholder')}
+      addButtonLabel={t('addButton')}
       customFormContent={({ formState, setFormState }) => (
         <DynamicFieldBuilder
           fields={formState.itemTemplate || []}
@@ -221,8 +230,8 @@ export default function CategoriesTable({
         show={showDeleteModal}
         onHide={closeDeleteModal}
         onConfirm={handleDelete}
-        title="Eliminar Categoría"
-        message={`¿Estás seguro de que quieres eliminar la categoría "${entityToDelete?.name}"?`}
+        title={t('deleteCategory')}
+        message={t('confirmDeleteCategory', { name: entityToDelete?.name || '' })}
         cascadeInfo={cascadeInfo}
         isLoading={isDeleting}
       />

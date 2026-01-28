@@ -5,8 +5,11 @@ import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap'
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthSeparated, AuthProvider } from '@/hooks/useAuthSeparated';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 function OperatorLoginContent() {
+  const t = useTranslations('auth.login.operator');
+  const tCommon = useTranslations('common.actions');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +29,11 @@ function OperatorLoginContent() {
   useEffect(() => {
     const errorParam = searchParams.get('error');
     if (errorParam === 'AccessDenied') {
-      setError('No tienes permisos para acceder a la aplicación de operadores');
+      setError(t('errors.accessDenied'));
     } else if (errorParam === 'Unauthorized') {
-      setError('Debes iniciar sesión como operador para continuar');
+      setError(t('errors.unauthorized'));
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,10 +47,10 @@ function OperatorLoginContent() {
         setError(null);
         router.push('/operator');
       } else {
-        setError(result.error || 'Credenciales inválidas');
+        setError(result.error || t('errors.invalidCredentials'));
       }
     } catch {
-      setError('Error al iniciar sesión');
+      setError(t('errors.loginError'));
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +63,7 @@ function OperatorLoginContent() {
           <Col xs={12} sm={10} md={8} lg={6} xl={4}>
             <div className="text-center">
               <div className="spinner-border text-success" role="status">
-                <span className="visually-hidden">Cargando...</span>
+                <span className="visually-hidden">{tCommon('loading')}</span>
               </div>
             </div>
           </Col>
@@ -109,19 +112,19 @@ function OperatorLoginContent() {
                   <i className="bi bi-phone display-4 text-success"></i>
                 </div>
                 <h2 className="h4 mb-2 text-success fw-bold">
-                  Operador
+                  {t('title')}
                 </h2>
-                <p className="text-muted mb-0">Acceso para operadores de campo</p>
+                <p className="text-muted mb-0">{t('subtitle')}</p>
               </div>
 
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
-                  <Form.Label className="fw-medium">Email</Form.Label>
+                  <Form.Label className="fw-medium">{t('emailLabel')}</Form.Label>
                   <Form.Control
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tu@email.com"
+                    placeholder={t('emailPlaceholder')}
                     required
                     disabled={isLoading}
                     className="border-2"
@@ -129,12 +132,12 @@ function OperatorLoginContent() {
                 </Form.Group>
 
                 <Form.Group className="mb-4">
-                  <Form.Label className="fw-medium">Contraseña</Form.Label>
+                  <Form.Label className="fw-medium">{t('passwordLabel')}</Form.Label>
                   <Form.Control
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder={t('passwordPlaceholder')}
                     required
                     disabled={isLoading}
                     className="border-2"
@@ -164,12 +167,12 @@ function OperatorLoginContent() {
                   {isLoading ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                      Accediendo...
+                      {t('accessing')}
                     </>
                   ) : (
                     <>
                       <i className="bi bi-box-arrow-in-right me-2"></i>
-                      Acceder
+                      {t('access')}
                     </>
                   )}
                 </Button>
@@ -177,7 +180,7 @@ function OperatorLoginContent() {
 
               <div className="text-center">
                 <small className="text-muted">
-                  ¿Eres administrador? <Link href="/auth/admin/login" className="text-decoration-none">Accede aquí</Link>
+                  {t('adminLink')} <Link href="/auth/admin/login" className="text-decoration-none">{t('accessHere')}</Link>
                 </small>
               </div>
             </Card.Body>
@@ -190,6 +193,7 @@ function OperatorLoginContent() {
 }
 
 export default function OperatorLoginPage() {
+  const tCommon = useTranslations('common.actions');
   return (
     <AuthProvider>
       <Suspense fallback={
@@ -198,7 +202,7 @@ export default function OperatorLoginPage() {
             <Col xs={12} sm={10} md={8} lg={6} xl={4}>
               <div className="text-center">
                 <div className="spinner-border text-success" role="status">
-                  <span className="visually-hidden">Cargando...</span>
+                  <span className="visually-hidden">{tCommon('loading')}</span>
                 </div>
               </div>
             </Col>

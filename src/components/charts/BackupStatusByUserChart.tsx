@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useTranslations } from 'next-intl';
 import { withDashboardChart } from './withDashboardChart';
 import { DASHBOARD_THEME } from '@/config/dashboardConfig';
 import type { BackupStatusByUser } from '@/types/dashboard';
@@ -9,6 +12,7 @@ interface InnerBackupStatusByUserChartProps {
 }
 
 const InnerBackupStatusByUserChart: React.FC<InnerBackupStatusByUserChartProps> = ({ data }) => {
+  const t = useTranslations('dashboard.charts.backupStatusByUser');
   const colors = DASHBOARD_THEME.colors;
 
   return (
@@ -32,14 +36,14 @@ const InnerBackupStatusByUserChart: React.FC<InnerBackupStatusByUserChartProps> 
           }}
           formatter={(value: number, name: string) => [
             value, 
-            name === 'totalStates' ? 'Total Estados' : 
-            name === 'backedStates' ? 'Respaldados' : 'Pendientes'
+            name === 'totalStates' ? t('totalStates') : 
+            name === 'backedStates' ? t('backedStates') : t('pendingStates')
           ]}
         />
         <Legend 
           formatter={(value: string) => 
-            value === 'totalStates' ? 'Total Estados' : 
-            value === 'backedStates' ? 'Respaldados' : 'Pendientes'
+            value === 'totalStates' ? t('totalStates') : 
+            value === 'backedStates' ? t('backedStates') : t('pendingStates')
           }
         />
         <Bar 
@@ -65,18 +69,21 @@ const InnerBackupStatusByUserChart: React.FC<InnerBackupStatusByUserChartProps> 
   );
 };
 
-const WrappedBackupStatusByUserInner = withDashboardChart(
-  InnerBackupStatusByUserChart,
-  'No hay datos de estados por usuario disponibles',
-  '📊'
-);
+// Wrapper component that provides translations
+function BackupStatusByUserChartWrapper({ data }: { data: BackupStatusByUser[] }) {
+  const t = useTranslations('dashboard.charts.backupStatusByUser');
+  const WrappedChart = withDashboardChart(
+    InnerBackupStatusByUserChart,
+    t('emptyMessage'),
+    '📊'
+  );
+  return <WrappedChart data={data || []} loading={false} error={null} />;
+}
 
 interface BackupStatusByUserChartProps {
   data: BackupStatusByUser[];
 }
 
 export const BackupStatusByUserChart: React.FC<BackupStatusByUserChartProps> = ({ data }) => {
-  return (
-    <WrappedBackupStatusByUserInner data={data || []} loading={false} error={null} />
-  );
+  return <BackupStatusByUserChartWrapper data={data} />;
 };

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import type { ItemData } from '../types';
 
 interface AntifraudPanelProps {
@@ -17,6 +18,7 @@ interface EvidenceDetails {
 }
 
 export function AntifraudPanel({ item }: AntifraudPanelProps) {
+  const t = useTranslations('customer');
   const [evidenceDetails, setEvidenceDetails] = useState<EvidenceDetails>({ loading: false });
 
   const getIbsUrl = (evidenceId: string) => {
@@ -56,7 +58,7 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
         console.error('[AntifraudPanel] Error fetching evidence details:', error);
         setEvidenceDetails({
           loading: false,
-          error: error instanceof Error ? error.message : 'No se pudieron cargar los detalles de la evidencia',
+          error: error instanceof Error ? error.message : t('errorLoadingEvidence'),
         });
       }
     };
@@ -322,7 +324,7 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '1rem', height: '1rem' }}>
                   <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
                 </svg>
-                Ver evidencia registrada
+                {t('viewEvidence')}
               </a>
             )}
             {renderEvidenceDetails()}
@@ -343,7 +345,7 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
               marginBottom: '1rem',
             }}
           >
-            ℹ️ Información de Verificación
+            {t('verificationInfo')}
           </h5>
           <div
             style={{
@@ -355,17 +357,13 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
             }}
           >
             <p style={{ margin: '0 0 1rem 0' }}>
-              Este producto fue registrado previamente en nuestro sistema de verificación antifalsificación.
+              {t('previouslyRegistered')}
             </p>
             <p style={{ margin: '0 0 1rem 0' }}>
-              <strong>Flujo de verificación:</strong> El proceso de verificación antifalsificación comienza cuando alguien 
-              accede por primera vez a esta página del producto. En ese momento, el sistema crea una evidencia única en 
-              blockchain que garantiza la autenticidad del producto y registra que ha sido verificado. En accesos posteriores 
-              a esta misma página, el sistema detecta que el producto ya fue verificado anteriormente.
+              <strong>{t('verificationFlow')}</strong> {t('verificationFlowDescription')}
             </p>
             <p style={{ margin: '0' }}>
-              En este caso, nuestro sistema detectó que este producto ya fue verificado en una ocasión anterior, 
-              lo que indica que alguien ya accedió a esta página del producto previamente y se registró la primera verificación.
+              {t('alreadyVerified')}
             </p>
           </div>
           {item.antifraudEvidenceId && item.antifraudEvidenceId !== 'NO_SIGNATURE' && (
@@ -386,12 +384,12 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '1rem', height: '1rem' }}>
                 <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
               </svg>
-              Ver evidencia del primer registro
+              {t('viewEvidence')}
             </a>
           )}
           {renderEvidenceDetails()}
           <div style={passportStyles.warningText}>
-            Si usted realizó el primer registro, puede ignorar este mensaje. Si no lo hizo, le recomendamos verificar la autenticidad del producto.
+            {t('verificationWarning')}
           </div>
         </div>
       </div>

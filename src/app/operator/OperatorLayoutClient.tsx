@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 interface JWTPayload {
   id: string;
@@ -16,6 +17,7 @@ interface OperatorLayoutClientProps {
 }
 
 export default function OperatorLayoutClient({ user, children }: OperatorLayoutClientProps) {
+  const t = useTranslations('operator');
   const router = useRouter();
   const searchParams = useSearchParams();
   const [hasAccess, setHasAccess] = useState(false);
@@ -57,7 +59,7 @@ export default function OperatorLayoutClient({ user, children }: OperatorLayoutC
     return (
       <div className="operator-layout d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Verificando acceso...</span>
+          <span className="visually-hidden">{t('verifyingAccess')}</span>
         </div>
       </div>
     );

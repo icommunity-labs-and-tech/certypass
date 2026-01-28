@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button, Alert, Spinner } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 
 interface AIFillButtonProps {
   itemName: string;
@@ -18,13 +19,14 @@ export default function AIFillButton({
   onDataFilled,
   className = ''
 }: AIFillButtonProps) {
+  const t = useTranslations('ai');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   const handleAIFill = async () => {
     if (!itemName.trim()) {
-      setError('El nombre del item es requerido para usar la IA');
+      setError(t('nameRequiredError'));
       return;
     }
 
@@ -48,7 +50,7 @@ export default function AIFillButton({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Error al procesar la solicitud');
+        throw new Error(result.error || t('processingError'));
       }
 
       if (result.success && result.data) {
@@ -62,16 +64,16 @@ export default function AIFillButton({
 
         if (Object.keys(validData).length > 0) {
           onDataFilled(validData);
-          setSuccess(result.message || `Se completaron ${Object.keys(validData).length} campos`);
+          setSuccess(result.message || t('fieldsCompleted', { count: Object.keys(validData).length }));
         } else {
-          setError('La IA no pudo encontrar información específica para este item');
+          setError(t('noDataFound'));
         }
       } else {
-        throw new Error('No se recibieron datos válidos de la IA');
+        throw new Error(t('noValidData'));
       }
     } catch (err) {
       console.error('AI Fill Error:', err);
-      setError(err instanceof Error ? err.message : 'Error al conectar con la IA');
+      setError(err instanceof Error ? err.message : t('connectionError'));
     } finally {
       setIsLoading(false);
     }
@@ -90,19 +92,19 @@ export default function AIFillButton({
         {isLoading ? (
           <>
             <Spinner animation="border" size="sm" />
-            Consultando IA...
+            {t('consultingAI')}
           </>
         ) : (
           <>
             <i className="bi bi-robot"></i>
-            Rellenar con IA
+            {t('fillWithAI')}
           </>
         )}
       </Button>
 
       {!canUseAI && (
         <small className="text-muted d-block mt-1">
-          {!itemName.trim() ? 'Completa el nombre del item para usar IA' : 'No hay campos específicos para rellenar'}
+          {!itemName.trim() ? t('nameRequired') : t('noFields')}
         </small>
       )}
 

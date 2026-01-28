@@ -1,19 +1,22 @@
 'use client';
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { useTranslations } from 'next-intl';
 import { withDashboardChart } from './withDashboardChart';
 import { colors, tooltipStyle } from './theme';
 import type { CategoryDistribution } from '@/types/dashboard';
 
 function InnerCategoryDistributionChart({ data }: { data: CategoryDistribution[] }) {
+  const t = useTranslations('dashboard.charts.categoryDistribution');
+  
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const d = payload[0];
       return (
         <div style={tooltipStyle}>
           <p className="mb-1"><strong>{d.name}</strong></p>
-          <p style={{ color: d.color }}>Items: {d.value}</p>
-          <p style={{ color: d.color }}>Porcentaje: {d.payload.percentage.toFixed(1)}%</p>
+          <p style={{ color: d.color }}>{t('items')} {d.value}</p>
+          <p style={{ color: d.color }}>{t('percentage')} {d.payload.percentage.toFixed(1)}%</p>
         </div>
       );
     }
@@ -67,18 +70,21 @@ function InnerCategoryDistributionChart({ data }: { data: CategoryDistribution[]
   );
 }
 
-const WrappedCategoryChart = withDashboardChart(
-  InnerCategoryDistributionChart,
-  'No hay datos de categorías disponibles',
-  'bi-pie-chart'
-);
+// Wrapper component that provides translations
+function CategoryDistributionChartWrapper({ data }: { data: CategoryDistribution[] }) {
+  const t = useTranslations('dashboard.charts.categoryDistribution');
+  const WrappedChart = withDashboardChart(
+    InnerCategoryDistributionChart,
+    t('emptyMessage'),
+    'bi-pie-chart'
+  );
+  return <WrappedChart data={data || []} loading={false} error={null} />;
+}
 
 interface CategoryDistributionChartProps {
   data: CategoryDistribution[];
 }
 
 export default function CategoryDistributionChart({ data }: CategoryDistributionChartProps) {
-  return (
-    <WrappedCategoryChart data={data || []} loading={false} error={null} />
-  );
+  return <CategoryDistributionChartWrapper data={data} />;
 }
