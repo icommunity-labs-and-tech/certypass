@@ -20,6 +20,15 @@ interface EvidenceDetails {
 export function AntifraudPanel({ item }: AntifraudPanelProps) {
   const t = useTranslations('customer');
   const [evidenceDetails, setEvidenceDetails] = useState<EvidenceDetails>({ loading: false });
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  // Detectar layout móvil
+  useEffect(() => {
+    const check = () => setIsMobile(typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const getIbsUrl = (evidenceId: string) => {
     return `https://checker.icommunitylabs.com/lookup/${evidenceId}`;
@@ -194,6 +203,14 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
       padding: '0.75rem 0',
       borderBottom: '1px solid #f1f5f9',
     },
+    evidenceDetailsItemMobile: {
+      display: 'flex',
+      flexDirection: 'column' as const,
+      alignItems: 'flex-start',
+      gap: '0.5rem',
+      padding: '0.75rem 0',
+      borderBottom: '1px solid #f1f5f9',
+    },
     evidenceDetailsItemLast: {
       borderBottom: 'none',
     },
@@ -249,7 +266,7 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
       <div style={passportStyles.evidenceDetails}>
         <div style={passportStyles.infoGrid}>
           {evidenceDetails.verificationDate && (
-            <div style={passportStyles.evidenceDetailsItem}>
+            <div style={isMobile ? passportStyles.evidenceDetailsItemMobile : passportStyles.evidenceDetailsItem}>
               <span style={passportStyles.evidenceDetailsLabel}>Fecha de registro:</span>
               <span style={passportStyles.evidenceDetailsValue}>
                 {formatDate(evidenceDetails.verificationDate)}
@@ -257,7 +274,10 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
             </div>
           )}
           {evidenceDetails.evidenceDate && (
-            <div style={{ ...passportStyles.evidenceDetailsItem, ...passportStyles.evidenceDetailsItemLast }}>
+            <div style={{ 
+              ...(isMobile ? passportStyles.evidenceDetailsItemMobile : passportStyles.evidenceDetailsItem), 
+              ...passportStyles.evidenceDetailsItemLast 
+            }}>
               <span style={passportStyles.evidenceDetailsLabel}>Fecha de la evidencia:</span>
               <span style={passportStyles.evidenceDetailsValue}>
                 {formatDate(evidenceDetails.evidenceDate)}
