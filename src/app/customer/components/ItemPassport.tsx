@@ -221,14 +221,34 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
         <div style={passportStyles.infoSection}>
           <h4 style={passportStyles.infoSectionTitle}>Especificaciones</h4>
           <div style={passportStyles.infoGrid}>
-            {Object.entries(item.templateFields).map(([key, value]: [string, any]) => (
-              <div key={key} style={isMobile ? passportStyles.infoItemMobile : passportStyles.infoItem}>
-                <span style={passportStyles.label}>{key}:</span>
-                <span style={passportStyles.value}>
-                  {String(value)}
-                </span>
-              </div>
-            ))}
+            {Object.entries(item.templateFields).map(([key, value]: [string, any]) => {
+              // Check if value is a geolocation object
+              const isGeolocation = value && 
+                typeof value === 'object' && 
+                !Array.isArray(value) &&
+                'lat' in value && 
+                'lng' in value &&
+                typeof value.lat === 'number' &&
+                typeof value.lng === 'number';
+
+              return (
+                <div key={key} style={isMobile ? passportStyles.infoItemMobile : passportStyles.infoItem}>
+                  <span style={passportStyles.label}>{key}:</span>
+                  <span style={passportStyles.value}>
+                    {isGeolocation ? (
+                      <div style={{ marginTop: '0.5rem' }}>
+                        <GeolocationMap 
+                          value={{ lat: value.lat, lng: value.lng }} 
+                          readOnly={true} 
+                        />
+                      </div>
+                    ) : (
+                      String(value)
+                    )}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
