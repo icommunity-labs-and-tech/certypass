@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ItemPassport } from '../../components/ItemPassport';
-import { AntifraudModal } from '@/components/customer/AntifraudModal';
 import { ItemData } from '../../types';
 import { useTranslations } from 'next-intl';
 
@@ -14,7 +13,6 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [itemId, setItemId] = useState<string>('');
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const getParams = async () => {
@@ -46,16 +44,11 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
         
         setItemData(data);
         
-        // Show modal if first verification (only if evidence was just created)
-        if (data.isFirstVerification && data.antifraudEvidenceId) {
-          console.log('[Frontend] Showing first verification modal');
-          setShowModal(true);
-        } else if (data.isFirstVerification && !data.antifraudEvidenceId) {
-          console.log('[Frontend] First verification but no evidence ID (NO_SIGNATURE case)');
-          setShowModal(true);
-        } else {
-          console.log('[Frontend] Not first verification, modal will not show');
-        }
+        // NO mostrar el modal de antifalsificación aquí porque esta ruta (/customer/item/[id])
+        // NO ejecuta la verificación antifalsificación. Solo la ruta /customer/verify/[id]
+        // ejecuta la verificación y debe mostrar el modal.
+        // El modal solo se muestra cuando se accede a través de /customer/verify/[id]
+        console.log('[Frontend] This is the normal item view - no antifraud verification modal');
       } catch (err) {
         setError(err instanceof Error ? err.message : t('errorGettingProduct'));
         setItemData(null);
@@ -156,13 +149,7 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
         </div>
       </div>
       
-      {/* Show modal for first verification */}
-      {showModal && itemData && (
-        <AntifraudModal
-          isFirstVerification={itemData.isFirstVerification}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+      {/* NO mostrar modal de antifalsificación aquí - esta ruta no ejecuta verificación */}
       
       <div className="customer-footer">
         <p>{t('copyright')}</p>
