@@ -161,7 +161,7 @@ export default function ItemDetailPage() {
               disabled={!itemId}
             >
               <i className="bi bi-eye me-1"></i>
-              Ver
+              Passport
             </Button>
             <Button
               variant="outline-danger"
