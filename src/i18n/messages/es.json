@@ -88,6 +88,7 @@
     "fieldRequiredWithName": "El campo \"{field}\" es obligatorio",
     "labels": {
       "name": "Nombre",
+      "description": "Descripción",
       "email": "Email",
       "role": "Rol",
       "notes": "Notas",
@@ -201,6 +202,7 @@
       "addUser": "Añadir Usuario",
       "addProduct": "Añadir Producto",
       "addCategory": "Añadir Categoría",
+      "addStatusType": "Añadir Tipo de estado",
       "addElement": "Añadir Elemento",
       "createError": "Error al crear el elemento",
       "emailExists": "Ya existe un usuario con este email",

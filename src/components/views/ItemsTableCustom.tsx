@@ -139,10 +139,26 @@ export default function ItemsTableCustom<TFormData = Record<string, unknown>>({
   const handleSubmit = async (combinedData: Record<string, any>, templateFields?: FormTemplate) => {
     try {
       const result = await onAddSubmit?.(combinedData as TFormData, templateFields);
-      if (onItemCreated && result) {
-        onItemCreated(result, combinedData);
+      
+      if (result) {
+        // Actualizar la lista de datos con el nuevo item
+        const updatedData = [result, ...data];
+        setData(updatedData);
+        
+        // Calcular la página donde debería aparecer el nuevo item
+        const indexInFiltered = updatedData.findIndex((row) => row.id === result.id);
+        const targetPage = Math.floor(indexInFiltered / pageSize);
+        setPageIndex(targetPage);
+        
+        // Marcar el item como recién añadido para resaltarlo
+        setLastAddedId(result.id);
+        
+        // Llamar al callback si existe
+        if (onItemCreated) {
+          onItemCreated(result, combinedData);
+        }
       }
-      setLastAddedId(result?.id || 'new-item');
+      
       setShowModal(false);
       setFormState({});
       return result;

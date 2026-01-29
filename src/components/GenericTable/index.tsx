@@ -31,6 +31,7 @@ export default function GenericTable<TFormData = Record<string, unknown>>({
   isIssueTemplate = false,
   filterPlaceholder,
   addButtonLabel,
+  modalTitle,
 }: GenericTableProps<TFormData>) {
   const [data, setData] = useState(initialData);
   // Mantener sincronizado el estado interno cuando cambie initialData (por ejemplo, tras borrar)
@@ -184,6 +185,7 @@ export default function GenericTable<TFormData = Record<string, unknown>>({
           }
           isIssueTemplate={isIssueTemplate}
           uploadType={uploadType}
+          modalTitle={modalTitle}
         />
       )}
     </>

@@ -23,8 +23,8 @@ export function createStatusTypeServiceImpl(deps: {
       try {
         const organizationId = data.organizationId || await requireOrganizationId();
         
-        if (!data.name || !data.description) {
-          throw new StatusTypeInputError(!data.name ? 'name' : 'description', 'Nombre y descripción son obligatorios');
+        if (!data.name) {
+          throw new StatusTypeInputError('name', 'El nombre es obligatorio');
         }
 
         const isDup = await repo.findDuplicateInOrganization(data.name.trim(), organizationId);
@@ -34,7 +34,7 @@ export function createStatusTypeServiceImpl(deps: {
 
         const created = await repo.create({ 
           name: data.name.trim(), 
-          description: data.description.trim(), 
+          description: (data.description || '').trim(), 
           template: data.template || [], 
           organizationId 
         });

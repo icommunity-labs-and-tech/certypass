@@ -66,6 +66,7 @@ export type GenericTableProps<TFormData = Record<string, unknown>> = {
   // Props para personalizar textos del toolbar
   filterPlaceholder?: string;
   addButtonLabel?: string;
+  modalTitle?: string;
 };
 
 

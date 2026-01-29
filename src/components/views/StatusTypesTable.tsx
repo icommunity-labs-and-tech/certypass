@@ -36,6 +36,7 @@ export default function StatusTypesTable({
 }: StatusTypesTableProps) {
   const t = useTranslations('tables');
   const tForms = useTranslations('forms');
+  const tModals = useTranslations('modals.addItem');
   const locale = useLocale();
   const defaultTitle = title || t('statusTypes');
   const statusTypeFormTemplate = useMemo(() => createStatusTypeFormTemplate(tForms), [tForms]);
@@ -153,6 +154,7 @@ export default function StatusTypesTable({
         return created;
       }}
       allowTemplateEditing={false}
+      modalTitle={tModals('addStatusType')}
       customFormContent={({ formState, setFormState }) => {
         const template = formState.template || [];
         return (

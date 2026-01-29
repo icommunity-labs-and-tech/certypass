@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Form, Card, Row, Col, Badge, Alert } from 'react-bootstrap';
 
@@ -15,6 +15,12 @@ interface StatusTypeFieldBuilderProps {
   fields: StatusTypeFieldDefinition[];
   onChange: (fields: StatusTypeFieldDefinition[]) => void;
   className?: string;
+  onValidationChange?: (isValid: boolean, errors: string[]) => void;
+}
+
+export interface StatusTypeFieldBuilderRef {
+  validateAll: () => boolean;
+  getErrors: () => string[];
 }
 
 // Función helper para crear los tipos de campo con traducciones
@@ -45,51 +51,98 @@ const getOptionColor = (index: number): string => {
   return colors[index % colors.length];
 };
 
-export default function StatusTypeFieldBuilder({
+const StatusTypeFieldBuilder = forwardRef<StatusTypeFieldBuilderRef, StatusTypeFieldBuilderProps>(({
   fields,
   onChange,
-  className = ''
-}: StatusTypeFieldBuilderProps) {
+  className = '',
+  onValidationChange
+}, ref) => {
   const t = useTranslations('fieldTypes');
   const tCommon = useTranslations('common');
   const tForms = useTranslations('forms');
   const FIELD_TYPES = useMemo(() => createFieldTypes(t), [t]);
   const [localFields, setLocalFields] = useState<StatusTypeFieldDefinition[]>(fields);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  // Rastrear qué campos han sido interactuados por el usuario
+  const [touchedFields, setTouchedFields] = useState<Set<number>>(new Set());
+  // Flag para indicar si se debe validar todo (al intentar enviar)
+  const [validateAll, setValidateAll] = useState(false);
 
   useEffect(() => {
     setLocalFields(fields);
   }, [fields]);
 
+  // Exponer métodos al componente padre mediante ref
+  useImperativeHandle(ref, () => ({
+    validateAll: () => {
+      // Marcar todos los campos como touched y validar
+      const allTouched = new Set(localFields.map((_, index) => index));
+      setTouchedFields(allTouched);
+      setValidateAll(true);
+      const errors = validateFields(localFields, allTouched, true);
+      setValidationErrors(errors);
+      if (onValidationChange) {
+        onValidationChange(errors.length === 0, errors);
+      }
+      return errors.length === 0;
+    },
+    getErrors: () => {
+      return validateFields(localFields, touchedFields, validateAll);
+    }
+  }));
+
+  // Notificar al padre sobre cambios en la validación
+  useEffect(() => {
+    if (onValidationChange) {
+      const errors = validateFields(localFields, touchedFields, validateAll);
+      onValidationChange(errors.length === 0, errors);
+    }
+  }, [localFields, touchedFields, validateAll, onValidationChange]);
+
   // Función para validar los campos
-  const validateFields = (fieldsToValidate: StatusTypeFieldDefinition[]): string[] => {
+  const validateFields = (
+    fieldsToValidate: StatusTypeFieldDefinition[], 
+    touchedSet: Set<number> = new Set(),
+    validateAllFields: boolean = false
+  ): string[] => {
     const errors: string[] = [];
     
     fieldsToValidate.forEach((field, index) => {
-      if (!field.name || field.name.trim() === '') {
-        errors.push(tForms('fieldMustHaveNameWithNumber', { number: index + 1 }));
-      }
+      // Solo validar si el campo ha sido touched o si se debe validar todo
+      const shouldValidate = validateAllFields || touchedSet.has(index);
       
-      if (field.type === 'select' && (!field.options || field.options.length === 0)) {
-        const fieldName = field.name || tCommon('fieldName') + ` ${index + 1}`;
-        errors.push(tForms('selectMustHaveOptions', { name: fieldName }));
+      if (shouldValidate) {
+        if (!field.name || field.name.trim() === '') {
+          errors.push(tForms('fieldMustHaveNameWithNumber', { number: index + 1 }));
+        }
+        
+        if (field.type === 'select' && (!field.options || field.options.length === 0)) {
+          const fieldName = field.name || tCommon('fieldName') + ` ${index + 1}`;
+          errors.push(tForms('selectMustHaveOptions', { name: fieldName }));
+        }
       }
     });
     
     return errors;
   };
 
-  const updateFieldsWithValidation = (newFields: StatusTypeFieldDefinition[]) => {
+  const updateFieldsWithValidation = (newFields: StatusTypeFieldDefinition[], markTouched?: number) => {
     setLocalFields(newFields);
     
-    // Validar y actualizar errores
-    const errors = validateFields(newFields);
+    // Actualizar touchedFields si se especifica un índice
+    let updatedTouched = touchedFields;
+    if (markTouched !== undefined) {
+      updatedTouched = new Set(touchedFields);
+      updatedTouched.add(markTouched);
+      setTouchedFields(updatedTouched);
+    }
+    
+    // Validar solo campos touched o todos si validateAll está activo
+    const errors = validateFields(newFields, updatedTouched, validateAll);
     setValidationErrors(errors);
     
-    // Solo llamar onChange si no hay errores
-    if (errors.length === 0) {
-      onChange(newFields);
-    }
+    // Siempre llamar onChange para permitir la edición continua
+    onChange(newFields);
   };
 
   const addField = () => {
@@ -100,7 +153,11 @@ export default function StatusTypeFieldBuilder({
     };
     
     const updatedFields = [...localFields, newField];
-    updateFieldsWithValidation(updatedFields);
+    // No marcar como touched al añadir, solo actualizar campos
+    setLocalFields(updatedFields);
+    onChange(updatedFields);
+    // Limpiar errores al añadir un nuevo campo
+    setValidationErrors([]);
   };
 
   const removeField = (index: number) => {
@@ -112,7 +169,20 @@ export default function StatusTypeFieldBuilder({
     const updatedFields = localFields.map((f, i) => 
       i === index ? { ...f, ...field } : f
     );
-    updateFieldsWithValidation(updatedFields);
+    // Marcar como touched cuando el usuario modifica el campo
+    updateFieldsWithValidation(updatedFields, index);
+  };
+
+  // Marcar campo como touched cuando pierde el foco
+  const handleFieldBlur = (index: number) => {
+    if (!touchedFields.has(index)) {
+      const updatedTouched = new Set(touchedFields);
+      updatedTouched.add(index);
+      setTouchedFields(updatedTouched);
+      // Validar después de marcar como touched
+      const errors = validateFields(localFields, updatedTouched, validateAll);
+      setValidationErrors(errors);
+    }
   };
 
   const addOption = (fieldIndex: number, value?: string) => {
@@ -201,6 +271,7 @@ export default function StatusTypeFieldBuilder({
                         type="text"
                         value={field.name}
                         onChange={(e) => updateField(index, { name: e.target.value })}
+                        onBlur={() => handleFieldBlur(index)}
                         placeholder={tCommon('fieldNamePlaceholder')}
                         size="sm"
                       />
@@ -333,5 +404,9 @@ export default function StatusTypeFieldBuilder({
       )}
     </div>
   );
-}
+});
+
+StatusTypeFieldBuilder.displayName = 'StatusTypeFieldBuilder';
+
+export default StatusTypeFieldBuilder;
 

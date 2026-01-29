@@ -88,6 +88,7 @@
     "fieldRequiredWithName": "The field \"{field}\" is required",
     "labels": {
       "name": "Name",
+      "description": "Description",
       "email": "Email",
       "role": "Role",
       "notes": "Notes",
@@ -201,6 +202,7 @@
       "addUser": "Add User",
       "addProduct": "Add Product",
       "addCategory": "Add Category",
+      "addStatusType": "Add Status Type",
       "addElement": "Add Element",
       "createError": "Error creating element",
       "emailExists": "A user with this email already exists",

@@ -309,13 +309,19 @@ export default function ItemsTable({
     return await addItem(formData, categoryTemplate);
   };
 
+  const handleItemCreated = (newItem: any) => {
+    // Actualizar la lista local de items con el nuevo producto
+    setItems(prev => [newItem, ...prev]);
+  };
+
   const tableContent = (
     <ItemsTableCustom 
       title={defaultTitle}
       icon={"bi-list-columns"}
       initialData={filteredItems} 
-      formTemplate={!isLoading && products.length > 0 ? getSelectedProductTemplate() : undefined}
+      formTemplate={!isLoading ? getSelectedProductTemplate() : undefined}
       onAddSubmit={handleAddItem}
+      onItemCreated={handleItemCreated}
       uploadType="item"
       allowTemplateEditing={false}
       customColumns={[...defaultColumns, ...customColumns]}

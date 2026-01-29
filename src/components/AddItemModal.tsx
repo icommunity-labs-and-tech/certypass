@@ -28,6 +28,7 @@ type AddItemModalProps = {
   uploadType?: 'product' | 'item' | 'issue';
   onCategoryChange?: (categoryId: string | null) => void;
   useWizard?: boolean; // Nueva prop para activar el wizard
+  modalTitle?: string; // Título personalizado para el modal
 };
 
 export default function AddItemModal({
@@ -43,7 +44,8 @@ export default function AddItemModal({
   isIssueTemplate = false,
   uploadType = 'product',
   onCategoryChange,
-  useWizard = false
+  useWizard = false,
+  modalTitle
 }: AddItemModalProps) {
   const [imageConfig, setImageConfig] = useState({
     allowMultipleImages: false,
@@ -151,6 +153,11 @@ export default function AddItemModal({
 
   // Función para generar el título del modal basado en el contexto
   const getModalTitle = () => {
+    // Si se proporciona un título personalizado, usarlo
+    if (modalTitle) {
+      return modalTitle;
+    }
+    
     if (isIssueTemplate) {
       return t('newState');
     }
@@ -190,6 +197,24 @@ export default function AddItemModal({
     if (validationErrors.length > 0) {
       setError(validationErrors.join(', '));
       return;
+    }
+    
+    // Validar campos del template (para StatusTypeFieldBuilder)
+    if (formState?.template && Array.isArray(formState.template)) {
+      const templateErrors: string[] = [];
+      formState.template.forEach((field: any, index: number) => {
+        if (!field.name || field.name.trim() === '') {
+          templateErrors.push(tForms('fieldMustHaveNameWithNumber', { number: index + 1 }));
+        }
+        if (field.type === 'select' && (!field.options || field.options.length === 0)) {
+          const fieldName = field.name || tForms('fieldName') + ` ${index + 1}`;
+          templateErrors.push(tForms('selectMustHaveOptions', { name: fieldName }));
+        }
+      });
+      if (templateErrors.length > 0) {
+        setError(templateErrors.join(', '));
+        return;
+      }
     }
     
     try {

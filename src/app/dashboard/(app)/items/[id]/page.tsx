@@ -19,6 +19,7 @@ import ImageDisplay from '@/components/ImageDisplay';
 import ItemSpecificFields from '@/components/ItemSpecificFields';
 import ItemStatesMap from '@/components/ItemStatesMapClient';
 import CategoryInputField from '@/components/CategoryInputField';
+import AddStateForm from '@/components/AddStateForm';
 
 export default function ItemDetailPage() {
   const { id } = useParams();
@@ -29,6 +30,7 @@ export default function ItemDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showQr, setShowQr] = useState(false);
   const [showVerifyQr, setShowVerifyQr] = useState(false);
+  const [showAddStateModal, setShowAddStateModal] = useState(false);
 
   // Usar el hook refactorizado
   const {
@@ -272,7 +274,15 @@ export default function ItemDetailPage() {
             <i className="bi bi-flag me-2" />
             <h5 className="mb-0">Estados del Producto</h5>
           </div>
-          
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setShowAddStateModal(true)}
+            className="d-flex align-items-center gap-1"
+          >
+            <i className="bi bi-plus-circle me-1"></i>
+            Añadir Estado
+          </Button>
         </div>
         <Divider />
         <ItemStatesTable states={states as any} />
@@ -343,7 +353,35 @@ export default function ItemDetailPage() {
         itemName={item?.name}
       />
 
-      
+      {/* Modal para añadir estado */}
+      {item && (
+        <AddStateForm
+          item={item}
+          itemId={itemId}
+          show={showAddStateModal}
+          onHide={() => setShowAddStateModal(false)}
+          onSuccess={async () => {
+            setShowAddStateModal(false);
+            // Recargar los estados después de crear uno nuevo
+            try {
+              const statesData = await getStatesByItem(itemId);
+              setStates(statesData);
+            } catch (err) {
+              console.error('Error recargando estados:', err);
+            }
+          }}
+          onStateCreated={async (newState) => {
+            // También actualizar cuando se crea el estado
+            setShowAddStateModal(false);
+            try {
+              const statesData = await getStatesByItem(itemId);
+              setStates(statesData);
+            } catch (err) {
+              console.error('Error recargando estados:', err);
+            }
+          }}
+        />
+      )}
     </>
   );
 }

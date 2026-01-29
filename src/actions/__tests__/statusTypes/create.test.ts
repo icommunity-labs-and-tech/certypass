@@ -44,7 +44,7 @@ describe('statusTypes/create', () => {
   });
 
   it('should handle validation errors', async () => {
-    mockCreateStatusType.mockRejectedValue(new Error('Nombre y descripción son obligatorios'));
+    mockCreateStatusType.mockRejectedValue(new Error('El nombre es obligatorio'));
 
     await expect(
       mockCreateStatusType({
@@ -53,7 +53,27 @@ describe('statusTypes/create', () => {
         categoryId: 'category-123',
         color: '#FF5733',
       })
-    ).rejects.toThrow('Nombre y descripción son obligatorios');
+    ).rejects.toThrow('El nombre es obligatorio');
+  });
+
+  it('should create statusType without description', async () => {
+    const statusTypeData = createStatusTypeFixture();
+    mockCreateStatusType.mockResolvedValue(statusTypeData);
+
+    const result = await mockCreateStatusType({
+      name: 'New Status Type',
+      description: undefined,
+      categoryId: 'category-123',
+      color: '#FF5733',
+    });
+
+    expect(result).toEqual(statusTypeData);
+    expect(mockCreateStatusType).toHaveBeenCalledWith({
+      name: 'New Status Type',
+      description: undefined,
+      categoryId: 'category-123',
+      color: '#FF5733',
+    });
   });
 
   it('should handle missing category', async () => {

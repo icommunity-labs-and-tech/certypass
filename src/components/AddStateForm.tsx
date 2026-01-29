@@ -233,11 +233,7 @@ export default function AddStateForm({
           }
           
           return (
-            <div className="template-fields mb-4">
-              <h6 className="template-fields-title mb-3">
-                <span className="label-icon">📋</span>
-                Campos específicos
-              </h6>
+            <>
               {templateArray.map((field: any, index: number) => {
                 const fieldName = field.name || `field_${index}`;
                 const fieldLabel = field.label || generateFieldLabel(fieldName);
@@ -369,7 +365,7 @@ export default function AddStateForm({
 
                 return null;
               })}
-            </div>
+            </>
           );
         })()}
 
@@ -439,18 +435,6 @@ export default function AddStateForm({
           box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
 
-        .template-fields {
-          background: rgba(102, 126, 234, 0.05);
-          border: 1px solid rgba(102, 126, 234, 0.1);
-          border-radius: 12px;
-          padding: 1.5rem;
-        }
-
-        .template-fields-title {
-          color: #667eea;
-          font-weight: 600;
-          margin-bottom: 1rem;
-        }
 
         .form-actions {
           display: flex;
@@ -491,10 +475,6 @@ export default function AddStateForm({
 
           .submit-btn {
             width: 100%;
-          }
-
-          .template-fields {
-            padding: 1rem;
           }
         }
       `}</style>

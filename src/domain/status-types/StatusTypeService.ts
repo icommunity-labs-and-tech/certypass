@@ -3,7 +3,7 @@ import type { StatusTypeRepository } from './StatusTypeRepository';
 
 export interface CreateStatusTypeRequest {
   name: string;
-  description: string;
+  description?: string;
   organizationId: string;
   template?: any;
 }
