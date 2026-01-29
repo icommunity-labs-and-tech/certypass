@@ -80,7 +80,10 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         if (tourId && !isMarkingCompletedRef.current) {
           markTourCompleted(tourId);
         }
-        // Driver.js destruirá automáticamente el tour cuando se llama a onCloseClick
+        // Cerrar el tour explícitamente
+        if (driverInstance.isActive()) {
+          driverInstance.destroy();
+        }
       },
       onNextClick: (element, step, opts) => {
         // Verificar si es el último paso
