@@ -40,6 +40,17 @@ export default function KeyValueList({
       return field.customRender(value, data);
     }
     
+    // Handle geolocation objects that might be passed as value
+    if (value && typeof value === 'object' && 'lat' in value && 'lng' in value && field.format !== 'custom') {
+      // If it's a geolocation object but format is not custom, render coordinates as text
+      return (
+        <span className="text-muted">
+          <i className="bi bi-geo-alt me-1"></i>
+          Lat: {value.lat.toFixed(6)}, Lng: {value.lng.toFixed(6)}
+        </span>
+      );
+    }
+    
     switch (field.format) {
       case 'status':
         return <StatusBadgeCell value={value} />;
@@ -63,7 +74,18 @@ export default function KeyValueList({
         
       case 'text':
       default:
-        return <TextTruncateCell value={value} maxLength={field.maxLength || 60} />;
+        // Check if value is an object that shouldn't be rendered directly
+        if (value && typeof value === 'object' && !Array.isArray(value) && value.constructor === Object) {
+          // Try to stringify if it's a plain object
+          try {
+            return <TextTruncateCell value={JSON.stringify(value)} maxLength={field.maxLength || 60} />;
+          } catch {
+            return <span className="text-muted fst-italic">Invalid value</span>;
+          }
+        }
+        // Convert to string for TextTruncateCell (handles strings, numbers, etc.)
+        const stringValue = value != null ? String(value) : null;
+        return <TextTruncateCell value={stringValue} maxLength={field.maxLength || 60} />;
     }
   };
   

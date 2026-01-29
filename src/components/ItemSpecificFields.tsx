@@ -3,11 +3,12 @@
 import React from 'react';
 import ImageDisplay from './ImageDisplay';
 import KeyValueList, { FieldSchema } from './KeyValueList';
+import GeolocationMap from './GeolocationMapClient';
 import { useTranslations } from 'next-intl';
 
 interface FieldDefinition {
   name: string;
-  type: 'text' | 'number' | 'email' | 'date' | 'select' | 'image';
+  type: 'text' | 'number' | 'email' | 'date' | 'select' | 'image' | 'geolocation';
   required?: boolean;
   options?: string[];
 }
@@ -56,6 +57,25 @@ export default function ItemSpecificFields({
               clickable={true}
               modalTitle={label}
               style={{ maxWidth: '150px', maxHeight: '150px', width: 'auto', height: 'auto', borderRadius: 8 }}
+            />
+          );
+        }
+      } as FieldSchema;
+    }
+
+    if (field.type === 'geolocation') {
+      return {
+        key,
+        label,
+        format: 'custom',
+        customRender: (value: any) => {
+          if (!value || typeof value !== 'object' || !('lat' in value) || !('lng' in value)) {
+            return <span className="text-muted fst-italic">{t('unspecified')}</span>;
+          }
+          return (
+            <GeolocationMap
+              value={{ lat: value.lat, lng: value.lng }}
+              readOnly={true}
             />
           );
         }
