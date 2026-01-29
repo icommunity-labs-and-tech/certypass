@@ -86,11 +86,6 @@ export default function KycStep({
     checkStatus();
     previousStatusRef.current = initialStatus;
   }, [checkStatus, initialStatus]);
-  
-  // Debug: Log cuando showEmbedded cambia
-  useEffect(() => {
-    console.log('showEmbedded changed:', showEmbedded, 'kycURL:', kycURL);
-  }, [showEmbedded, kycURL]);
 
   // Escuchar mensajes postMessage del iframe (si la página externa los envía)
   useEffect(() => {
@@ -229,10 +224,8 @@ export default function KycStep({
   }, [verificationStatus, checkStatus, showEmbedded]);
 
   const handleOpenKyc = () => {
-    console.log('handleOpenKyc called', { kycURL, verificationStatus, showEmbedded });
     if (kycURL) {
       // Mostrar iframe embebido en lugar de abrir en nueva ventana
-      console.log('Setting showEmbedded to true');
       setShowEmbedded(true);
       onEmbeddedChange?.(true);
       // Si estaba en NOT_VERIFIED, cambiar a WAITING y empezar polling
@@ -376,12 +369,6 @@ export default function KycStep({
 
       {showEmbedded && kycURL && (
         <div style={{ margin: '0 -1rem', position: 'relative', minHeight: '600px', zIndex: 1 }}>
-          {/* Debug info - remover después */}
-          {process.env.NODE_ENV === 'development' && (
-            <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 10000, background: 'yellow', padding: '4px', fontSize: '10px' }}>
-              Debug: showEmbedded={String(showEmbedded)}, kycURL={kycURL ? 'exists' : 'null'}
-            </div>
-          )}
           {/* Botón flotante discreto en la esquina inferior derecha */}
           <div style={{
             position: 'absolute',
