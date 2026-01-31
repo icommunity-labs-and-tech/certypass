@@ -10,10 +10,11 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Generar cliente Prisma principal
+
+# Generar clientes Prisma
 RUN npx prisma generate
-# Generar cliente Prisma e2e (necesario para compilación aunque no se use en producción)
 RUN npx prisma generate --schema prisma/schema.e2e.prisma || echo "Warning: e2e schema generation failed, continuing..."
+
 RUN npm run build
 
 FROM node:18-alpine AS runner
@@ -26,14 +27,12 @@ ENV HOSTNAME="0.0.0.0"
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copiar solo los archivos necesarios para producción
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
 EXPOSE 8080
 
-# Comando para ejecutar en modo producción
 CMD ["node", "server.js"]
