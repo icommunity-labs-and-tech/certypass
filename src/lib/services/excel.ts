@@ -5,10 +5,10 @@ import type { ExcelItemInput, ExcelResult } from '../excel/types';
 export interface ExcelExportService {
   generateExcelWithQRCodes(items: ExcelItemInput[]): Promise<ExcelResult>;
 }
-import { getAppUrl } from '@/lib/env';
+import { getDynamicAppUrl } from '@/lib/env';
 
-function buildItemUrl(id: string): string {
-  const base = getAppUrl().replace(/\/$/, '');
+async function buildItemUrl(id: string): Promise<string> {
+  const base = (await getDynamicAppUrl()).replace(/\/$/, '');
   return `${base}/customer/item/${encodeURIComponent(id)}`;
 }
 
@@ -51,7 +51,7 @@ export function createExcelExportService(): ExcelExportService {
           });
 
           // Generar QR como buffer PNG
-          const url = item.url || buildItemUrl(item.id);
+          const url = item.url || (await buildItemUrl(item.id));
           const qrBuffer = await QRCode.toBuffer(url, {
             type: 'png',
             errorCorrectionLevel: 'M',

@@ -5,10 +5,10 @@ import type { QrItemInput, QrZipResult } from '../qr/types';
 export interface QrExportService {
   generateZipForItems(items: QrItemInput[]): Promise<QrZipResult>;
 }
-import { getAppUrl } from '@/lib/env';
+import { getDynamicAppUrl } from '@/lib/env';
 
-function buildItemUrl(id: string): string {
-  const base = getAppUrl().replace(/\/$/, '');
+async function buildItemUrl(id: string): Promise<string> {
+  const base = (await getDynamicAppUrl()).replace(/\/$/, '');
   return `${base}/customer/item/${encodeURIComponent(id)}`;
 }
 
@@ -19,7 +19,7 @@ export function createQrExportService(): QrExportService {
         const zip = new JSZip();
 
         for (const item of items) {
-          const url = item.url || buildItemUrl(item.id);
+          const url = item.url || (await buildItemUrl(item.id));
           const pngBuffer = await QRCode.toBuffer(url, {
             type: 'png',
             errorCorrectionLevel: 'M',

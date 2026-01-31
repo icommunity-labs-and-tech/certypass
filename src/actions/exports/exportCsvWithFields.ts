@@ -2,7 +2,7 @@
 
 import { itemRepository } from '@/infrastructure/prisma/repositories/ItemRepositoryPrisma';
 import { requireOrganizationId } from '@/lib/auth/tenant';
-import { getAppUrl } from '@/lib/env';
+import { getDynamicAppUrl } from '@/lib/env';
 
 function toCsvValue(value: unknown): string {
   if (value === null || value === undefined) return '';
@@ -28,6 +28,9 @@ export async function exportItemsCsvWithFields(
     items = items.filter((it) => itemIds.includes(it.id));
   }
 
+  // Get base URL once for customerUrl field
+  const baseUrl = keys.includes('customerUrl') ? (await getDynamicAppUrl()).replace(/\/$/, '') : '';
+
   const headers = keys.map(k => k);
   const lines: string[] = [];
   lines.push(headers.join(','));
@@ -43,8 +46,7 @@ export async function exportItemsCsvWithFields(
         case 'lastStateTitle': return toCsvValue(last?.title ?? '');
         case 'lastStateBacked': return toCsvValue(last?.backed ?? '');
         case 'customerUrl': {
-          const baseUrl = getAppUrl();
-          return toCsvValue(`${baseUrl.replace(/\/$/, '')}/customer/item/${encodeURIComponent(it.id)}`);
+          return toCsvValue(`${baseUrl}/customer/item/${encodeURIComponent(it.id)}`);
         }
         case 'passportJson': {
           const passport = {
