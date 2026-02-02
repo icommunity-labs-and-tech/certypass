@@ -40,6 +40,16 @@ export default function KycStep({
   const verifiedCalledRef = useRef(false); // Prevenir llamadas múltiples a onVerified
   const retryCheckRef = useRef<NodeJS.Timeout | null>(null); // Para el retry de verificación
 
+  // Función para enviar postMessage al iframe para forzar layout responsive
+  const sendForceResponsive = useCallback(() => {
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        { type: 'FORCE_RESPONSIVE' },
+        '*'
+      );
+    }
+  }, []);
+
   // Función para verificar el estado del KYC (usando useCallback para estabilidad)
   const checkStatus = useCallback(async () => {
     try {
@@ -225,7 +235,7 @@ export default function KycStep({
 
   const handleOpenKyc = () => {
     if (kycURL) {
-      // Mostrar iframe embebido en lugar de abrir en nueva ventana
+      // Mostrar iframe embebido (responsive gracias a FORCE_RESPONSIVE postMessage)
       setShowEmbedded(true);
       onEmbeddedChange?.(true);
       // Si estaba en NOT_VERIFIED, cambiar a WAITING y empezar polling
@@ -502,13 +512,11 @@ export default function KycStep({
           ) : (
             <div style={{
               width: '100%',
-              minWidth: '1200px',
-              height: '600px',
-              border: '1px solid #e9ecef',
+              maxWidth: '100%',
+              overflow: 'hidden',
               borderRadius: '8px',
-              overflow: 'auto',
+              border: '1px solid #e9ecef',
               background: '#f8f9fa',
-              margin: '0 auto'
             }}>
               <iframe
                 ref={iframeRef}
@@ -516,8 +524,7 @@ export default function KycStep({
                 key={showEmbedded ? kycURL : undefined}
                 style={{
                   width: '100%',
-                  minWidth: '1200px',
-                  height: '100%',
+                  height: '600px',
                   border: 'none'
                 }}
                 title="Proceso de verificación KYC"
@@ -526,6 +533,9 @@ export default function KycStep({
                   setIframeError(true);
                 }}
                 onLoad={(e) => {
+                  // Enviar postMessage para forzar layout responsive
+                  sendForceResponsive();
+
                   // Detectar errores comunes en el iframe
                   try {
                     const iframe = e.target as HTMLIFrameElement;
