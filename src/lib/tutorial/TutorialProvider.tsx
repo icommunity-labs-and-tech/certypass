@@ -46,12 +46,12 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const [completedTours, setCompletedTours] = useState<TourId[]>(() => getCompletedToursStorage());
 
   // Ref para evitar marcar el tour como completado múltiples veces
-  const isMarkingCompletedRef = useRef(false);
+  const hasMarkedCompletedRef = useRef(false);
 
-  // Función para marcar el tour como completado y limpiar el estado
+  // Función para marcar el tour como completado
   const markTourCompleted = useCallback((tourId: TourId | null) => {
-    if (tourId && !isMarkingCompletedRef.current) {
-      isMarkingCompletedRef.current = true;
+    if (tourId && !hasMarkedCompletedRef.current) {
+      hasMarkedCompletedRef.current = true;
       markTourAsCompleted(tourId);
       setCompletedTours(prev => {
         if (!prev.includes(tourId)) {
@@ -59,10 +59,6 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         }
         return prev;
       });
-      // Resetear el flag después de un breve delay
-      setTimeout(() => {
-        isMarkingCompletedRef.current = false;
-      }, 100);
     }
   }, []);
 
@@ -74,50 +70,32 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
     const driverInstance = driver({
       ...defaultDriverConfig,
-      onCloseClick: (element, step, opts) => {
-        // Cuando el usuario hace clic en el botón de cerrar (X)
+      onCloseClick: () => {
+        // Usuario hizo clic en el botón de cerrar (X)
         const tourId = currentTourIdRef.current;
-        if (tourId && !isMarkingCompletedRef.current) {
-          markTourCompleted(tourId);
-        }
-        // Cerrar el tour explícitamente
+        markTourCompleted(tourId);
         if (driverInstance.isActive()) {
           driverInstance.destroy();
         }
       },
-      onNextClick: (element, step, opts) => {
-        // Verificar si es el último paso
+      onNextClick: () => {
+        // Verificar si es el último paso ANTES de hacer cualquier acción
         if (driverInstance.isLastStep()) {
-          // Si es el último paso, el botón "Finalizar" se mostrará
-          // Cuando se hace clic, marcar como completado y destruir
+          // Usuario hizo clic en "Finalizar"
           const tourId = currentTourIdRef.current;
-          if (tourId && !isMarkingCompletedRef.current) {
-            markTourCompleted(tourId);
+          markTourCompleted(tourId);
+          if (driverInstance.isActive()) {
+            driverInstance.destroy();
           }
-          // Llamar a destroy() explícitamente para cerrar el tour
-          setTimeout(() => {
-            if (driverInstance.isActive()) {
-              driverInstance.destroy();
-            }
-          }, 10);
         } else {
-          // Si NO es el último paso, avanzar manualmente al siguiente paso
-          // Esto es necesario porque al definir onNextClick, sobrescribimos el comportamiento por defecto
+          // Avanzar al siguiente paso
           driverInstance.moveNext();
         }
       },
-      onDestroyStarted: (element, step, opts) => {
-        // Este evento se dispara cuando el tour se está destruyendo
-        // Marcar como completado si aún no se ha hecho (fallback para otros métodos de cierre)
-        const tourId = currentTourIdRef.current;
-        if (tourId && !isMarkingCompletedRef.current) {
-          markTourCompleted(tourId);
-        }
-      },
       onDestroyed: () => {
-        // Limpiar el tourId después de que el tour se haya destruido completamente
+        // Limpiar refs cuando el tour se destruye
         currentTourIdRef.current = null;
-        isMarkingCompletedRef.current = false;
+        hasMarkedCompletedRef.current = false;
       },
     });
 
@@ -130,57 +108,60 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     };
   }, [markTourCompleted]);
 
-      const startTour = useCallback(
-        (tourId: TourId, steps: DriveStep[], config?: Partial<Config>) => {
-          if (!driverInstanceRef.current) {
-            console.warn('Driver.js not initialized yet');
-            return;
-          }
+  const startTour = useCallback(
+    (tourId: TourId, steps: DriveStep[], config?: Partial<Config>) => {
+      if (!driverInstanceRef.current) {
+        console.warn('Driver.js not initialized yet');
+        return;
+      }
 
-          // Verificar si el tour ya fue completado (a menos que se fuerce con config.allowClose)
-          if (!config?.allowClose && !shouldShowTour(tourId)) {
-            return;
-          }
+      // Verificar si el tour ya fue completado (a menos que se fuerce con config.allowClose)
+      if (!config?.allowClose && !shouldShowTour(tourId)) {
+        return;
+      }
 
-          // Guardar el tourId actual para poder trackearlo cuando se destruya
-          currentTourIdRef.current = tourId;
+      // Resetear el flag de completado para el nuevo tour
+      hasMarkedCompletedRef.current = false;
 
-          // Filtrar pasos que no tienen elementos válidos en el DOM
-          const validSteps = steps.filter((step) => {
-            if (!step.element) {
-              return true; // Permitir pasos sin elemento (popover flotante)
-            }
-            
-            const element = typeof step.element === 'string'
-              ? document.querySelector(step.element)
-              : step.element;
-            
-            if (!element) {
-              return false;
-            }
-            
-            return true;
-          });
+      // Guardar el tourId actual para poder trackearlo cuando se destruya
+      currentTourIdRef.current = tourId;
 
-          if (validSteps.length === 0) {
-            console.warn(`Tutorial "${tourId}" has no valid steps`);
-            return;
-          }
+      // Filtrar pasos que no tienen elementos válidos en el DOM
+      const validSteps = steps.filter((step) => {
+        if (!step.element) {
+          return true; // Permitir pasos sin elemento (popover flotante)
+        }
 
-          // Asegurar que cada paso tenga los botones habilitados
-          const stepsWithButtons = validSteps.map((step) => ({
-            ...step,
-            popover: {
-              ...step.popover,
-              showButtons: step.popover?.showButtons || ['next', 'previous', 'close'],
-            },
-          }));
+        const element = typeof step.element === 'string'
+          ? document.querySelector(step.element)
+          : step.element;
 
-          // Iniciar el tour
-          driverInstanceRef.current.setSteps(stepsWithButtons);
-          driverInstanceRef.current.drive();
+        if (!element) {
+          return false;
+        }
+
+        return true;
+      });
+
+      if (validSteps.length === 0) {
+        console.warn(`Tutorial "${tourId}" has no valid steps`);
+        return;
+      }
+
+      // Asegurar que cada paso tenga los botones habilitados
+      const stepsWithButtons = validSteps.map((step) => ({
+        ...step,
+        popover: {
+          ...step.popover,
+          showButtons: step.popover?.showButtons || ['next', 'previous', 'close'],
+        },
+      }));
+
+      // Iniciar el tour
+      driverInstanceRef.current.setSteps(stepsWithButtons);
+      driverInstanceRef.current.drive();
     },
-    [markTourCompleted]
+    []
   );
 
   const isCompleted = useCallback((tourId: TourId): boolean => {

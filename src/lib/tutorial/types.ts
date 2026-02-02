@@ -33,24 +33,6 @@ export interface TourConfig {
 }
 
 /**
- * Opciones para el hook useTutorial
- */
-export interface UseTutorialOptions {
-  /**
-   * Si es true, el tour se iniciará automáticamente si no ha sido completado
-   */
-  autoStart?: boolean;
-  /**
-   * Dependencias que pueden causar que el tour se re-ejecute
-   */
-  dependencies?: any[];
-  /**
-   * Delay en ms antes de iniciar el tour (útil para esperar que elementos se rendericen)
-   */
-  delay?: number;
-}
-
-/**
  * Valor del contexto de tutorial
  */
 export interface TutorialContextValue {
