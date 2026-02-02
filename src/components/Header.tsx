@@ -46,7 +46,9 @@ export default function PageHeader() {
         >
           <i className="bi bi-list fs-4" />
         </button>
-        <Breadcrumbs />
+        <div className="d-none d-md-block">
+          <Breadcrumbs />
+        </div>
 
         <div className="d-flex align-items-center gap-3">
           <LanguageSwitcher />
