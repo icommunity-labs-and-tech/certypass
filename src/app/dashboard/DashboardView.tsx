@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { useTranslations } from 'next-intl';
 import Box from '@/components/Box';
@@ -8,9 +9,10 @@ import DashboardKPIs from '@/components/charts/DashboardKPIs';
 import MonthlyActivityChart from '@/components/charts/MonthlyActivityChart';
 import CategoryDistributionChart from '@/components/charts/CategoryDistributionChart';
 import { BackupStatusByUserChart } from '@/components/charts/BackupStatusByUserChart';
-import { useAuthSeparated } from '@/hooks/useAuthSeparated';
-import { useTutorial } from '@/lib/tutorial/useTutorial';
+import { useTutorialContext } from '@/lib/tutorial/TutorialProvider';
+import { shouldShowTour } from '@/lib/tutorial/tutorialStorage';
 import { TOUR_IDS, sidebarTour } from '@/lib/tutorial/tutorialConfig';
+import { useSidebar } from '@/components/SidebarContext';
 import type { DashboardKPIs as DashboardKPIsType, MonthlyActivity, CategoryDistribution, BackupStatus, BackupStatusByUser } from '@/types/dashboard';
 
 interface DashboardClientProps {
@@ -22,22 +24,49 @@ interface DashboardClientProps {
   backupStatusByUser: BackupStatusByUser[];
 }
 
-export default function DashboardClient({ 
-  pieData: _pieData, 
-  kpis, 
-  monthlyActivity, 
-  categoryDistribution, 
-  backupStatus: _backupStatus, 
-  backupStatusByUser 
+export default function DashboardClient({
+  pieData: _pieData,
+  kpis,
+  monthlyActivity,
+  categoryDistribution,
+  backupStatus: _backupStatus,
+  backupStatusByUser
 }: DashboardClientProps) {
   const t = useTranslations('dashboard');
-  const { logout } = useAuthSeparated();
-  
+  const { startTour, isCompleted } = useTutorialContext();
+  const { isDesktop, isOpenMobile, toggle } = useSidebar();
+  const hasStartedRef = useRef(false);
+
   // Activar tour del sidebar automáticamente en primera visita
-  useTutorial(TOUR_IDS.SIDEBAR_TOUR, sidebarTour, {
-    autoStart: true,
-    delay: 2000, // Esperar 2 segundos para que todo se renderice
-  });
+  // En móvil, abrir el sidebar primero para que los elementos sean visibles
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (isCompleted(TOUR_IDS.SIDEBAR_TOUR) || hasStartedRef.current) return;
+    if (!shouldShowTour(TOUR_IDS.SIDEBAR_TOUR)) return;
+
+    const startTutorial = () => {
+      const firstStep = sidebarTour[0];
+      if (firstStep?.element) {
+        const element = document.querySelector(firstStep.element as string);
+        if (element) {
+          hasStartedRef.current = true;
+          startTour(TOUR_IDS.SIDEBAR_TOUR, sidebarTour);
+        }
+      }
+    };
+
+    // En móvil, abrir el sidebar antes de iniciar el tutorial
+    if (!isDesktop && !isOpenMobile) {
+      toggle(); // Abrir sidebar
+      // Esperar a que el sidebar se abra y luego iniciar el tutorial
+      const timeoutId = setTimeout(startTutorial, 2500);
+      return () => clearTimeout(timeoutId);
+    } else {
+      // En desktop o si el sidebar ya está abierto, esperar el delay normal
+      const timeoutId = setTimeout(startTutorial, 2000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isDesktop, isOpenMobile, toggle, startTour, isCompleted]);
 
   return (
     <>
