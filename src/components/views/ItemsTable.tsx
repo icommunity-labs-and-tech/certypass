@@ -15,6 +15,7 @@ import { getCascadeInfo } from '@/config/entityConfig';
 import ItemsTableCustom from './ItemsTableCustom';
 import { Divider } from '@/components/Divider';
 import CategoryEditor from '@/components/CategoryEditor';
+import KycInfoBanner from '@/components/KycInfoBanner';
 import { useTranslations, useLocale } from 'next-intl';
  
 
@@ -346,6 +347,8 @@ export default function ItemsTable({
 
   return (
     <>
+      <KycInfoBanner />
+
       {showBox && (
         <Box>
           <h6 className="mb-2">{t('whatIsInventory')}</h6>

@@ -6,7 +6,6 @@ import PageHeader from '@/components/Header';
 import PageBody from '@/components/Body';
 import { SidebarProvider, useSidebar } from '@/components/SidebarContext';
 import { AuthProvider } from '@/hooks/useAuthSeparated';
-import OrganizationKycBanner from '@/components/OrganizationKycBanner';
 import { TutorialProvider } from '@/lib/tutorial/TutorialProvider';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -66,10 +65,7 @@ function Shell({ children }: { children: React.ReactNode }) {
       >
         <main className="flex-grow-1 px-4 py-3 d-flex flex-column">
           <PageHeader />
-          <div className="mt-4">
-            <OrganizationKycBanner />
-          </div>
-          <div className="flex-grow-1 d-flex">
+          <div className="flex-grow-1 d-flex mt-4">
             <PageBody>{children}</PageBody>
           </div>
         </main>
