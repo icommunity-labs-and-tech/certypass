@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, Button, Alert, Spinner } from 'react-bootstrap';
+import { useLocale } from 'next-intl';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { checkKycStatus } from '@/actions/organizations/check-kyc-status';
@@ -27,6 +28,7 @@ export default function KycStep({
   onPrevious,
   onEmbeddedChange,
 }: KycStepProps) {
+  const locale = useLocale();
   const [verificationStatus, setVerificationStatus] = useState<
     'NOT_VERIFIED' | 'WAITING' | 'VERIFIED' | 'REJECTED'
   >(initialStatus);
@@ -40,15 +42,21 @@ export default function KycStep({
   const verifiedCalledRef = useRef(false); // Prevenir llamadas múltiples a onVerified
   const retryCheckRef = useRef<NodeJS.Timeout | null>(null); // Para el retry de verificación
 
-  // Función para enviar postMessage al iframe para forzar layout responsive
-  const sendForceResponsive = useCallback(() => {
+  // Función para configurar el iframe (responsive + idioma)
+  const configureIframe = useCallback(() => {
     if (iframeRef.current?.contentWindow) {
+      // Forzar layout responsive
       iframeRef.current.contentWindow.postMessage(
         { type: 'FORCE_RESPONSIVE' },
         '*'
       );
+      // Establecer idioma
+      iframeRef.current.contentWindow.postMessage(
+        { type: 'SET_LANGUAGE', language: locale },
+        '*'
+      );
     }
-  }, []);
+  }, [locale]);
 
   // Función para verificar el estado del KYC (usando useCallback para estabilidad)
   const checkStatus = useCallback(async () => {
@@ -533,8 +541,8 @@ export default function KycStep({
                   setIframeError(true);
                 }}
                 onLoad={(e) => {
-                  // Enviar postMessage para forzar layout responsive
-                  sendForceResponsive();
+                  // Configurar iframe (responsive + idioma)
+                  configureIframe();
 
                   // Detectar errores comunes en el iframe
                   try {
