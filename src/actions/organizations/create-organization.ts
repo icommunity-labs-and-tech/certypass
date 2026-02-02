@@ -9,13 +9,59 @@ import crypto from "crypto";
 export interface CreateOrganizationInput {
   // Datos de la organización
   nombre: string;
-  slug: string;
   plan?: string;
-  
+
   // Datos del primer administrador
   adminName: string;
   adminEmail: string;
   adminPhone?: string;
+
+  // Idioma del email de invitación
+  language?: 'es' | 'en';
+}
+
+/**
+ * Genera un slug a partir del nombre
+ */
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
+    .replace(/[^a-z0-9]+/g, '-') // Reemplazar caracteres especiales con guiones
+    .replace(/^-+|-+$/g, ''); // Eliminar guiones al inicio/fin
+}
+
+/**
+ * Genera un slug único verificando colisiones
+ */
+async function generateUniqueSlug(name: string): Promise<string> {
+  const baseSlug = generateSlug(name);
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const existing = await prisma.organization.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return slug;
+    }
+
+    // Si existe, añadir un sufijo numérico
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+
+    // Prevenir bucle infinito (muy improbable)
+    if (counter > 100) {
+      slug = `${baseSlug}-${Date.now()}`;
+      break;
+    }
+  }
+
+  return slug;
 }
 
 export interface CreateOrganizationResult {
@@ -48,19 +94,10 @@ export async function createOrganizationWithAdmin(
     if (!superAdmin) {
       throw new Error("Solo SUPER_ADMIN puede crear organizaciones");
     }
-    
-    // Validar que el slug no exista
-    const existingOrg = await prisma.organization.findUnique({
-      where: { slug: input.slug },
-    });
-    
-    if (existingOrg) {
-      return {
-        success: false,
-        error: `El slug "${input.slug}" ya está en uso`,
-      };
-    }
-    
+
+    // Generar slug único automáticamente
+    const slug = await generateUniqueSlug(input.nombre);
+
     // Validar que el email no exista
     const existingUser = await prisma.user.findUnique({
       where: { email: input.adminEmail },
@@ -106,7 +143,7 @@ export async function createOrganizationWithAdmin(
         data: {
           id: crypto.randomUUID(),
           nombre: input.nombre,
-          slug: input.slug,
+          slug: slug,
           plan: input.plan || "basic",
           activa: true,
           signatureID: signatureID,
@@ -144,6 +181,7 @@ export async function createOrganizationWithAdmin(
         recipientName: input.adminName,
         organizationName: result.organization.nombre,
         activationToken,
+        language: input.language,
       });
     } catch (emailError) {
       // Si falla el email, eliminar todo lo creado (rollback manual)

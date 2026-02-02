@@ -113,6 +113,7 @@ export function createMailgunService(): MailgunService {
           appName: data.appName,
           activationUrl: data.activationUrl,
           appUrl: data.appUrl,
+          language: data.language,
         });
 
         const text = generateInvitationEmailText({
@@ -120,9 +121,12 @@ export function createMailgunService(): MailgunService {
           organizationName: data.organizationName,
           appName: data.appName,
           activationUrl: data.activationUrl,
+          language: data.language,
         });
 
-        const subject = `Invitación a ${data.organizationName} en ${data.appName}`;
+        const subject = data.language === 'en'
+          ? `Invitation to ${data.organizationName} on ${data.appName}`
+          : `Invitación a ${data.organizationName} en ${data.appName}`;
 
         await sendEmailWithRetry(
           config.domain,

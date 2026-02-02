@@ -10,6 +10,7 @@ export interface SendInvitationEmailParams {
   recipientName: string;
   organizationName: string;
   activationToken: string;
+  language?: 'es' | 'en';
 }
 
 /**
@@ -17,7 +18,7 @@ export interface SendInvitationEmailParams {
  * Lanza error si falla - debe ser parte de la transacción lógica
  */
 export async function sendInvitationEmail(params: SendInvitationEmailParams): Promise<void> {
-  const { recipientEmail, recipientName, organizationName, activationToken } = params;
+  const { recipientEmail, recipientName, organizationName, activationToken, language = 'es' } = params;
 
   // Construir URL de activación desde el host de la request
   const appUrl = await getDynamicAppUrl();
@@ -28,10 +29,11 @@ export async function sendInvitationEmail(params: SendInvitationEmailParams): Pr
     recipientEmail,
     recipientName,
     organizationName,
-    appName: 'certypass',
+    appName: 'CertyPass',
     activationToken,
     activationUrl,
     appUrl: appUrl,
+    language,
   });
 }
 

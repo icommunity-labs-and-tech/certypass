@@ -387,47 +387,6 @@ export default function KycStep({
 
       {showEmbedded && kycURL && (
         <div style={{ margin: '0 -1rem', position: 'relative', minHeight: '600px', zIndex: 1 }}>
-          {/* Botón flotante discreto en la esquina inferior derecha */}
-          <div style={{
-            position: 'absolute',
-            bottom: '20px',
-            right: '20px',
-            zIndex: 1000
-          }}>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={async () => {
-                // Verificar el estado antes de redirigir
-                const result = await checkKycStatus(organizationId);
-                // Cerrar el iframe primero
-                handleCloseEmbedded();
-                // Si está verificado, activar cuenta y redirigir
-                // Si no, redirigir directamente al dashboard
-                setTimeout(() => {
-                  if (result.success && result.verificationStatus === 'VERIFIED') {
-                    setVerificationStatus('VERIFIED');
-                    onVerified();
-                  } else {
-                    window.location.href = '/dashboard';
-                  }
-                }, 300);
-              }}
-              style={{
-                borderRadius: '20px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                border: 'none',
-                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
-                fontWeight: 600,
-                padding: '10px 20px',
-                fontSize: '0.9rem'
-              }}
-            >
-              <i className="bi bi-speedometer2 me-2"></i>
-              Continuar al Dashboard
-            </Button>
-          </div>
-          
           {iframeError ? (
             <div style={{
               position: 'absolute',

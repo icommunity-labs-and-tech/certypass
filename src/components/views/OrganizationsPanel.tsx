@@ -26,9 +26,9 @@ export default function OrganizationsPanel({
   
   const [formData, setFormData] = useState({
     organizationName: '',
-    organizationSlug: '',
     adminName: '',
     adminEmail: '',
+    language: 'es' as 'es' | 'en',
   });
 
   useEffect(() => {
@@ -60,9 +60,9 @@ export default function OrganizationsPanel({
     try {
       const result = await createOrganizationWithAdmin({
         nombre: formData.organizationName,
-        slug: formData.organizationSlug,
         adminName: formData.adminName,
         adminEmail: formData.adminEmail,
+        language: formData.language,
       });
 
       if (result.success) {
@@ -73,9 +73,9 @@ export default function OrganizationsPanel({
         setSuccess(successMessage);
         setFormData({
           organizationName: '',
-          organizationSlug: '',
           adminName: '',
           adminEmail: '',
+          language: 'es',
         });
         setShowCreateModal(false); // Cerrar modal tras éxito
         await loadOrganizations(); // Recargar lista
@@ -91,17 +91,6 @@ export default function OrganizationsPanel({
     }
   };
 
-  const handleSlugChange = (name: string) => {
-    // Auto-generar slug desde el nombre
-    const slug = name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remover acentos
-      .replace(/[^a-z0-9]+/g, '-') // Reemplazar caracteres especiales con guiones
-      .replace(/^-+|-+$/g, ''); // Remover guiones al inicio/fin
-    
-    setFormData({ ...formData, organizationName: name, organizationSlug: slug });
-  };
 
   const content = (
     <>
@@ -287,7 +276,7 @@ export default function OrganizationsPanel({
           </Alert>
 
           <h5 className="mt-4 mb-3">📝 Paso a Paso</h5>
-          
+
           <Card className="mb-3">
             <Card.Body>
               <Badge bg="primary" className="mb-2">Paso 1</Badge>
@@ -296,7 +285,7 @@ export default function OrganizationsPanel({
                 <strong>Ejemplo:</strong> &quot;Acme Corporation&quot;, &quot;Hospital San José&quot;, &quot;Tienda El Punto&quot;
               </p>
               <p className="mb-0">
-                Este es el nombre que verán los usuarios de esta organización.
+                Este es el nombre que verán los usuarios. El identificador único se generará automáticamente.
               </p>
             </Card.Body>
           </Card>
@@ -304,19 +293,6 @@ export default function OrganizationsPanel({
           <Card className="mb-3">
             <Card.Body>
               <Badge bg="primary" className="mb-2">Paso 2</Badge>
-              <h6>Verifica el &quot;slug&quot; (identificador único)</h6>
-              <p className="text-muted mb-2">
-                <strong>Se genera automáticamente</strong> del nombre: &quot;Acme Corporation&quot; → &quot;acme-corporation&quot;
-              </p>
-              <p className="mb-0">
-                El slug es un identificador técnico único. Solo usa minúsculas, números y guiones (-).
-              </p>
-            </Card.Body>
-          </Card>
-
-          <Card className="mb-3">
-            <Card.Body>
-              <Badge bg="primary" className="mb-2">Paso 3</Badge>
               <h6>Asigna el primer administrador</h6>
               <p className="text-muted mb-2">
                 <strong>Ejemplo:</strong> Juan Pérez (juan.perez@acme.com)
@@ -329,13 +305,13 @@ export default function OrganizationsPanel({
 
           <Card className="mb-3">
             <Card.Body>
-              <Badge bg="success" className="mb-2">Paso 4</Badge>
+              <Badge bg="success" className="mb-2">Paso 3</Badge>
               <h6>Envía el link de activación</h6>
               <p className="text-muted mb-2">
                 Después de crear la organización, se genera un <strong>link único de activación</strong>.
               </p>
               <p className="mb-0">
-                <strong>Email automático:</strong> El sistema enviará automáticamente un email de invitación al administrador 
+                <strong>Email automático:</strong> El sistema enviará automáticamente un email de invitación al administrador
                 con un link de activación. Con ese link podrá establecer su contraseña y acceder al sistema.
               </p>
             </Card.Body>
@@ -391,40 +367,12 @@ export default function OrganizationsPanel({
                     type="text"
                     placeholder="Ej: Acme Corporation"
                     value={formData.organizationName}
-                    onChange={(e) => handleSlugChange(e.target.value)}
+                    onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
                     required
                   />
                   <Form.Text className="text-muted">
-                    Nombre completo de la empresa o cliente
+                    Nombre completo de la empresa o cliente. El identificador único se generará automáticamente.
                   </Form.Text>
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>
-                    Slug (Identificador técnico) *
-                    <i className="bi bi-info-circle ms-2 text-muted" title="Identificador único en minúsculas"></i>
-                  </Form.Label>
-                  <div className="input-group">
-                    <span className="input-group-text bg-light">
-                      <i className="bi bi-link-45deg"></i>
-                    </span>
-                    <Form.Control
-                      type="text"
-                      placeholder="ej: acme-corporation"
-                      value={formData.organizationSlug}
-                      onChange={(e) => setFormData({ ...formData, organizationSlug: e.target.value })}
-                      required
-                      pattern="[a-z0-9\-]+"
-                    />
-                  </div>
-                  <Form.Text className="text-muted">
-                    Se genera automáticamente. Solo minúsculas, números y guiones (-).
-                  </Form.Text>
-                  {formData.organizationSlug && (
-                    <div className="mt-2">
-                      <Badge bg="success">✓ Slug válido</Badge>
-                    </div>
-                  )}
                 </Form.Group>
               </Card.Body>
             </Card>
@@ -474,6 +422,23 @@ export default function OrganizationsPanel({
                   </div>
                   <Form.Text className="text-muted">
                     Se enviará automáticamente un email de invitación con el link de activación.
+                  </Form.Text>
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>
+                    Idioma del Email
+                    <i className="bi bi-info-circle ms-2 text-muted" title="Idioma en que se enviará el email de invitación"></i>
+                  </Form.Label>
+                  <Form.Select
+                    value={formData.language}
+                    onChange={(e) => setFormData({ ...formData, language: e.target.value as 'es' | 'en' })}
+                  >
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇬🇧 English</option>
+                  </Form.Select>
+                  <Form.Text className="text-muted">
+                    El email de invitación se enviará en este idioma.
                   </Form.Text>
                 </Form.Group>
               </Card.Body>

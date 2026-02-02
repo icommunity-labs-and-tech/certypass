@@ -6,10 +6,11 @@ export interface InvitationEmailData {
   recipientEmail: string;
   recipientName: string;
   organizationName: string;
-  appName: string; // Nombre de la aplicación (ej: "certypass")
+  appName: string; // Nombre de la aplicación (ej: "CertyPass")
   activationToken: string;
   activationUrl: string;
   appUrl?: string; // URL base de la aplicación para recursos (logo, etc.)
+  language?: 'es' | 'en'; // Idioma del email (default: 'es')
 }
 
 export interface VerificationEmailData {
