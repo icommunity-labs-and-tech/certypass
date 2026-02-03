@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { SignerBadge, BlockchainLink } from './ui';
 
 interface EvidenceVerificationProps {
   evidenceId: string;
@@ -35,29 +36,17 @@ export function EvidenceVerification({ evidenceId, type, entityId, createdAt: _c
         return res.json();
       })
       .then((data) => {
-        // Extraer información de la red blockchain principal (major) solamente
         const cert = data?.data?.certification || {};
-
-        // Intentar obtener la URL del checker desde la respuesta de la API
         const checkerUrlFromApi = cert?.links?.checker ||
                                   data?.data?.links?.checker ||
                                   data?.links?.checker ||
                                   null;
-
-        // Si no está en la API, construirla manualmente
         const checkerUrl = checkerUrlFromApi || `https://checker.icommunitylabs.com/lookup/${evidenceId}`;
 
         if (cert?.network) {
-          setMajorNetwork({
-            name: cert.network,
-            url: checkerUrl,
-          });
+          setMajorNetwork({ name: cert.network, url: checkerUrl });
         } else {
-          // Si no hay red principal, usar el checker
-          setMajorNetwork({
-            name: 'Blockchain',
-            url: checkerUrl,
-          });
+          setMajorNetwork({ name: 'Blockchain', url: checkerUrl });
         }
       })
       .catch((e: Error) => {
@@ -108,82 +97,19 @@ export function EvidenceVerification({ evidenceId, type, entityId, createdAt: _c
     );
   }
 
-  // Si no hay nada que mostrar, no renderizar
   if (!createdBy && !majorNetwork?.url) {
     return null;
   }
 
   return (
     <div style={{ marginTop: '1rem' }}>
-      {/* Sección: Firmante y Certificación blockchain */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
         gap: '0.5rem',
       }}>
-        {/* Tile del Firmante */}
-        {createdBy && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 0.75rem',
-              borderRadius: '6px',
-              border: '1px solid rgba(59, 130, 246, 0.3)',
-              background: 'rgba(219, 234, 254, 0.3)',
-              minWidth: 0,
-            }}
-          >
-            <svg viewBox="0 0 24 24" width="14" height="14" style={{ color: '#3b82f6', flexShrink: 0 }} fill="currentColor">
-              <title>Firmante</title>
-              <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-            </svg>
-            <div style={{ fontSize: '0.8rem', fontWeight: 500, color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }} title={createdBy.name}>
-              {createdBy.name}
-            </div>
-          </div>
-        )}
-
-        {/* Tile de Certificación blockchain */}
-        {majorNetwork && majorNetwork.url && (
-          <a
-            href={majorNetwork.url}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 0.75rem',
-              borderRadius: '6px',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
-              background: 'linear-gradient(135deg, rgba(233, 213, 255, 0.4), rgba(216, 180, 254, 0.4))',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease',
-              cursor: 'pointer',
-              minWidth: 0,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(233, 213, 255, 0.6), rgba(216, 180, 254, 0.6))';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 2px 4px rgba(139, 92, 246, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(233, 213, 255, 0.4), rgba(216, 180, 254, 0.4))';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            <svg viewBox="0 0 24 24" width="14" height="14" style={{ color: '#7c3aed', flexShrink: 0 }} fill="currentColor">
-              <title>Blockchain</title>
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="none" stroke="currentColor" strokeWidth="2"/>
-            </svg>
-            <span style={{ fontSize: '0.8rem', fontWeight: 500, color: '#7c3aed', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-              Certificación blockchain
-            </span>
-          </a>
-        )}
+        {createdBy && <SignerBadge name={createdBy.name} />}
+        {majorNetwork?.url && <BlockchainLink href={majorNetwork.url} />}
       </div>
     </div>
   );
