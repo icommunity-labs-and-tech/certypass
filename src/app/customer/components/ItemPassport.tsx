@@ -182,6 +182,20 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
     });
   }, []);
 
+  const formatDateTime = useCallback((dateString: string) => {
+    const date = new Date(dateString);
+    const dateStr = date.toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+    const timeStr = date.toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    return `${dateStr} · ${timeStr}`;
+  }, []);
+
   // Detectar layout móvil
   useEffect(() => {
     const check = () => setIsMobile(typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches);
@@ -302,13 +316,36 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
               }}></div>
               <div
                 style={{
-                background: '#f8fafc',
-                borderRadius: '12px',
-                padding: '1rem',
+                  position: 'relative',
+                  background: '#f8fafc',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  paddingTop: '0.75rem',
                   borderLeft: '4px solid #3b82f6',
                 }}
               >
-                <h5 style={{ fontSize: '1rem', fontWeight: '600', color: '#1e293b', margin: '0 0 0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {/* Timestamp en esquina superior derecha */}
+                <div style={{
+                  position: 'absolute',
+                  top: '0.5rem',
+                  right: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  padding: '0.25rem 0.5rem',
+                  background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                  borderRadius: '4px',
+                }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" style={{ width: '12px', height: '12px', flexShrink: 0 }}>
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  <span style={{ fontSize: '0.7rem', fontWeight: '500', color: '#1e40af' }}>
+                    {formatDateTime(state.createdAt)}
+                  </span>
+                </div>
+
+                <h5 style={{ fontSize: '1rem', fontWeight: '600', color: '#1e293b', margin: '0 0 0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', paddingRight: '120px' }}>
                   {state.title}
                   {state.evidenceID && (
                     <svg
@@ -330,20 +367,7 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
                 <p style={{ color: '#64748b', margin: '0 0 0.75rem', lineHeight: '1.5' }}>
                   {state.description}
                 </p>
-                
-                {/* Mostrar mapa de geolocalización si existe en templateConfig */}
-                {(() => {
-                  const geolocationField = extractGeolocationField(state.templateConfig);
-                  if (geolocationField) {
-                    return (
-                      <div style={{ marginBottom: '0.75rem' }}>
-                        <GeolocationMap value={geolocationField} readOnly={true} />
-                      </div>
-                    );
-                  }
-                  return null;
-                })()}
-                
+
                 {state.imageUrls && state.imageUrls.length > 0 && (
                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
                     {state.imageUrls.map((url, index) => (
