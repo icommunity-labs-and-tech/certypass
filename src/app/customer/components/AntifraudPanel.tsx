@@ -154,6 +154,14 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
 
   const hasValidEvidence = item.antifraudEvidenceId && item.antifraudEvidenceId !== 'NO_SIGNATURE';
 
+  // Solo mostrar el panel si:
+  // 1. El item tiene evidencia de verificación (ya fue verificado), O
+  // 2. Es la primera verificación (acabamos de verificar en /verify)
+  // Si no hay evidencia Y no es primera verificación, no mostrar nada
+  if (!hasValidEvidence && !item.isFirstVerification) {
+    return null;
+  }
+
   if (item.isFirstVerification) {
     return (
       <StatusCard

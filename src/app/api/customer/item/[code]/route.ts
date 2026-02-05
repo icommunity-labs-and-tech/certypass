@@ -63,7 +63,8 @@ export async function GET(
 
     // No ejecutar verificación antifraude aquí - se hace en /api/customer/verify/[code]
     // Solo retornar el estado actual
-    const isFirstVerification = !item.antifraudEvidenceId;
+    // IMPORTANTE: isFirstVerification = false porque NO estamos verificando en esta ruta
+    const isFirstVerification = false;
     const antifraudEvidenceId = item.antifraudEvidenceId;
 
     // Transformar los datos para el frontend
