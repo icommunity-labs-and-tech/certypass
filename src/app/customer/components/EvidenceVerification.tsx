@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { SignerBadge, BlockchainLink } from './ui';
+import { retryFetch } from '../utils/apiRetry';
 
 interface EvidenceVerificationProps {
   evidenceId: string;
@@ -19,23 +20,26 @@ export function EvidenceVerification({ evidenceId, type, entityId, createdAt: _c
   useEffect(() => {
     if (!evidenceId) return;
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30_000);
-
     const endpoint = type === 'item'
       ? `/api/checker/item/${encodeURIComponent(entityId)}`
       : `/api/checker/${encodeURIComponent(entityId)}`;
 
-    fetch(endpoint, { signal: controller.signal })
-      .then(async (res) => {
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({ error: 'Error desconocido' }));
-          const errorMessage = errorData.error || `Error ${res.status}`;
-          throw new Error(errorMessage);
-        }
-        return res.json();
-      })
+    let cancelled = false;
+
+    // Use retryFetch with exponential backoff and circuit breaker
+    retryFetch<{ data?: { certification?: { network?: string; links?: { checker?: string } }; links?: { checker?: string } }; links?: { checker?: string } }>(
+      endpoint,
+      {},
+      {
+        maxRetries: 3,
+        initialDelay: 1000,
+        maxDelay: 8000,
+        timeout: 30000,
+      }
+    )
       .then((data) => {
+        if (cancelled) return;
+
         const cert = data?.data?.certification || {};
         const checkerUrlFromApi = cert?.links?.checker ||
                                   data?.data?.links?.checker ||
@@ -50,18 +54,19 @@ export function EvidenceVerification({ evidenceId, type, entityId, createdAt: _c
         }
       })
       .catch((e: Error) => {
+        if (cancelled) return;
         if (e.name !== 'AbortError') {
           setError(e.message);
         }
       })
       .finally(() => {
-        clearTimeout(timeout);
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       });
 
     return () => {
-      clearTimeout(timeout);
-      controller.abort();
+      cancelled = true;
     };
   }, [evidenceId, type, entityId]);
 

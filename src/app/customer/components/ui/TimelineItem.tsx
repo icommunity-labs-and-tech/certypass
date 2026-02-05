@@ -8,12 +8,18 @@ import { EvidenceVerification } from '../EvidenceVerification';
 import { timelineStyles } from '../../styles/passportStyles';
 import GeolocationMap from '@/components/GeolocationMapClient';
 import { extractGeolocationField } from '@/lib/template-helpers';
+import type { StateLoadStatus } from '../sections/ItemHistorySection';
 
 interface TimelineItemProps {
   state: StateData;
+  loadStatus?: StateLoadStatus;
 }
 
-export function TimelineItem({ state }: TimelineItemProps) {
+export function TimelineItem({ state, loadStatus = 'loaded' }: TimelineItemProps) {
+  const isPending = loadStatus === 'pending';
+  const isLoading = loadStatus === 'loading';
+  const showLoadingSpinner = (isPending || isLoading) && state.evidenceID;
+
   return (
     <div style={timelineStyles.item}>
       <div style={timelineStyles.dot} />
@@ -72,7 +78,20 @@ export function TimelineItem({ state }: TimelineItemProps) {
           </div>
         )}
 
-        {state.evidenceID && (
+        {/* Loading spinner for pending states */}
+        {showLoadingSpinner && isPending && (
+          <div style={{ marginTop: '0.75rem', padding: '0.5rem', textAlign: 'center', color: '#64748b' }}>
+            <div style={{ display: 'inline-block' }}>
+              <svg viewBox="0 0 24 24" width="16" height="16" className="animate-spin" style={{ color: '#3b82f6' }}>
+                <path d="M21 12a9 9 0 11-6.219-8.56" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            </div>
+            <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem' }}>Cargando certificación...</span>
+          </div>
+        )}
+
+        {/* Show EvidenceVerification only when loading or loaded */}
+        {state.evidenceID && !isPending && (
           <EvidenceVerification
             evidenceId={state.evidenceID}
             type="state"
