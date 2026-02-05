@@ -95,7 +95,7 @@ export default function ItemVerifyQrModal({ show, onHide, itemId, itemName }: It
         setEmailSuccess(true);
         setEmail('');
         setName('');
-        // Ocultar formulario despu?s de 2 segundos
+        // Ocultar formulario después de 2 segundos
         setTimeout(() => {
           setShowEmailForm(false);
           setEmailSuccess(false);
@@ -123,9 +123,9 @@ export default function ItemVerifyQrModal({ show, onHide, itemId, itemName }: It
     <Modal show={show} onHide={handleClose} centered size={showEmailForm ? 'lg' : undefined}>
       <Modal.Header closeButton>
         <Modal.Title>
-          {showEmailForm 
-            ? 'Enviar enlace de verificaci?n por correo'
-            : (itemName ? `QR de Verificaci?n - ${itemName}` : 'C?digo QR de Verificaci?n')
+          {showEmailForm
+            ? 'Enviar enlace de verificación por correo'
+            : (itemName ? `QR de Verificación - ${itemName}` : 'Código QR de Verificación')
           }
         </Modal.Title>
       </Modal.Header>
@@ -165,7 +165,7 @@ export default function ItemVerifyQrModal({ show, onHide, itemId, itemName }: It
                 disabled={isLoadingEmail || emailSuccess}
               />
               <Form.Text className="text-muted">
-                Se enviar? el enlace de verificaci?n a este correo electr?nico
+                Se enviará el enlace de verificación a este correo electrónico
               </Form.Text>
             </Form.Group>
 
@@ -182,14 +182,14 @@ export default function ItemVerifyQrModal({ show, onHide, itemId, itemName }: It
 
             <Alert variant="info" className="mb-0">
               <i className="bi bi-info-circle me-2"></i>
-              El enlace ejecutar? autom?ticamente la verificaci?n antifalsificaci?n del producto al ser abierto.
+              El enlace ejecutará automáticamente la verificación antifalsificación del producto al ser abierto.
             </Alert>
           </Form>
         ) : (
           <div className="d-flex flex-column align-items-center text-center">
             <div className="alert alert-info mb-3" role="alert">
               <i className="bi bi-info-circle me-2"></i>
-              Este QR ejecuta la verificaci?n antifraude al escanearlo
+              Este QR ejecuta la verificación antifraude al escanearlo
             </div>
             <canvas ref={canvasRef} style={{ width: 260, height: 260 }} />
             <div className="text-muted small mt-2" style={{ wordBreak: 'break-all' }}>{verifyUrl}</div>
