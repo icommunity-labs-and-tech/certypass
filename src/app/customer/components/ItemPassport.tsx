@@ -24,6 +24,10 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
   const [activeTab, setActiveTab] = useState<'info' | 'history' | 'antifraud'>('info');
   const isMobile = useMobileDetection();
 
+  // Determinar si se debe mostrar la pestaña de antifalsificación
+  const hasEvidence = item.antifraudEvidenceId && item.antifraudEvidenceId !== 'NO_SIGNATURE';
+  const shouldShowAntifraud = hasEvidence || item.isFirstVerification;
+
   const handleBack = () => {
     if (onBack) {
       onBack();
@@ -99,15 +103,17 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
             >
               Pasaporte Digital
             </button>
-            <button
-              style={{
-                ...passportStyles.tab,
-                ...(activeTab === 'antifraud' ? passportStyles.tabActive : {}),
-              }}
-              onClick={() => setActiveTab('antifraud')}
-            >
-              Antifalsificación
-            </button>
+            {shouldShowAntifraud && (
+              <button
+                style={{
+                  ...passportStyles.tab,
+                  ...(activeTab === 'antifraud' ? passportStyles.tabActive : {}),
+                }}
+                onClick={() => setActiveTab('antifraud')}
+              >
+                Antifalsificación
+              </button>
+            )}
           </div>
         )}
 
@@ -118,14 +124,18 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
               <ItemInfoSection item={item} isMobile={isMobile} />
               <div style={{ height: '1rem' }} />
               <ItemHistorySection states={item.states} />
-              <div style={{ height: '1rem' }} />
-              <AntifraudPanel item={item} />
+              {shouldShowAntifraud && (
+                <>
+                  <div style={{ height: '1rem' }} />
+                  <AntifraudPanel item={item} />
+                </>
+              )}
             </>
           ) : (
             <>
               {activeTab === 'info' && <ItemInfoSection item={item} isMobile={isMobile} />}
               {activeTab === 'history' && <ItemHistorySection states={item.states} />}
-              {activeTab === 'antifraud' && <AntifraudPanel item={item} />}
+              {activeTab === 'antifraud' && shouldShowAntifraud && <AntifraudPanel item={item} />}
             </>
           )}
         </div>
