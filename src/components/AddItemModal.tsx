@@ -533,10 +533,9 @@ export default function AddItemModal({
           )}
           
           {formTemplate.filter(field => field && field.name).map((field) => renderField(field))}
-          
+
           {customFormContent && (
             <>
-              <hr className="my-3" />
               {customFormContent}
             </>
           )}

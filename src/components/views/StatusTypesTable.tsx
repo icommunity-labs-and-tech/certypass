@@ -146,7 +146,7 @@ export default function StatusTypesTable({
       initialData={statusTypes}
       title={defaultTitle}
       icon="bi-collection"
-      formTemplate={statusTypeFormTemplate}
+      formTemplate={[]}
       onAddSubmit={async (formData: any) => {
         // El template viene del customFormContent a través del formState
         const created = await addStatusType(formData);
@@ -158,13 +158,41 @@ export default function StatusTypesTable({
       customFormContent={({ formState, setFormState }) => {
         const template = formState.template || [];
         return (
-          <StatusTypeFieldBuilder
-            fields={template}
-            onChange={(fields: StatusTypeFieldDefinition[]) => {
-              setFormState({ ...formState, template: fields });
-            }}
-            className="mt-3"
-          />
+          <div className="row g-3">
+            {/* Columna izquierda: Nombre y Descripción */}
+            <div className="col-md-5">
+              <Form.Group className="mb-3">
+                <Form.Label className="small fw-medium">{tForms('labels.name')}</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={formState.name || ''}
+                  onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                  placeholder={tForms('labels.statusTypeName')}
+                  required
+                />
+              </Form.Group>
+              <Form.Group>
+                <Form.Label className="small fw-medium">{tForms('labels.description')}</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={4}
+                  value={formState.description || ''}
+                  onChange={(e) => setFormState({ ...formState, description: e.target.value })}
+                  placeholder={tForms('labels.statusTypeDescription')}
+                />
+              </Form.Group>
+            </div>
+
+            {/* Columna derecha: Campos personalizados */}
+            <div className="col-md-7">
+              <StatusTypeFieldBuilder
+                fields={template}
+                onChange={(fields: StatusTypeFieldDefinition[]) => {
+                  setFormState({ ...formState, template: fields });
+                }}
+              />
+            </div>
+          </div>
         );
       }}
       actions={statusTypeActions}
@@ -244,31 +272,39 @@ export default function StatusTypesTable({
             </Alert>
           )}
           <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>{t('columnLabels.name')}</Form.Label>
-              <Form.Control
-                type="text"
-                value={editFormData.name}
-                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>{t('columnLabels.description')}</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={editFormData.description}
-                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-              />
-            </Form.Group>
-            <StatusTypeFieldBuilder
-              fields={editFormData.template}
-              onChange={(fields: StatusTypeFieldDefinition[]) => {
-                setEditFormData({ ...editFormData, template: fields });
-              }}
-              className="mt-3"
-            />
+            <div className="row g-3">
+              {/* Columna izquierda: Nombre y Descripción */}
+              <div className="col-md-5">
+                <Form.Group className="mb-3">
+                  <Form.Label className="small fw-medium">{t('columnLabels.name')}</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={editFormData.name}
+                    onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label className="small fw-medium">{t('columnLabels.description')}</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={4}
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                  />
+                </Form.Group>
+              </div>
+
+              {/* Columna derecha: Campos personalizados */}
+              <div className="col-md-7">
+                <StatusTypeFieldBuilder
+                  fields={editFormData.template}
+                  onChange={(fields: StatusTypeFieldDefinition[]) => {
+                    setEditFormData({ ...editFormData, template: fields });
+                  }}
+                />
+              </div>
+            </div>
           </Form>
         </Modal.Body>
         <Modal.Footer>
