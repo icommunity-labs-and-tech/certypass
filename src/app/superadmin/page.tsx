@@ -68,17 +68,24 @@ export default function SuperAdminDashboard() {
         </Col>
 
         <Col md={6} lg={4}>
-          <Card 
+          <Card
             className="h-100 shadow-sm border-0"
             style={{
               transition: 'all 0.3s ease',
               borderRadius: '16px',
-              border: '1px solid #e5e7eb',
-              opacity: 0.7
+              border: '1px solid #e5e7eb'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
             }}
           >
             <Card.Body className="text-center p-4">
-              <div 
+              <div
                 className="mb-4"
                 style={{
                   width: '80px',
@@ -91,27 +98,31 @@ export default function SuperAdminDashboard() {
                   justifyContent: 'center'
                 }}
               >
-                <i className="bi bi-people text-primary" style={{ fontSize: '2.5rem' }}></i>
+                <i className="bi bi-chat-dots text-primary" style={{ fontSize: '2.5rem' }}></i>
               </div>
               <Card.Title style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem', color: '#1f2937' }}>
-                Usuarios Globales
+                Mensajes de Soporte
               </Card.Title>
               <Card.Text className="text-muted mb-4" style={{ minHeight: '48px' }}>
-                Ver todos los usuarios de todas las organizaciones
+                Revisa y gestiona los mensajes de soporte de las organizaciones
               </Card.Text>
-              <Button 
-                variant="outline-primary" 
-                className="w-100" 
-                disabled
-                style={{
-                  borderRadius: '10px',
-                  padding: '10px',
-                  fontWeight: 500
-                }}
-              >
-                <i className="bi bi-people me-2"></i>
-                Próximamente
-              </Button>
+              <Link href="/superadmin/support-messages" className="text-decoration-none">
+                <Button
+                  variant="primary"
+                  className="w-100"
+                  style={{
+                    borderRadius: '10px',
+                    padding: '10px',
+                    fontWeight: 600,
+                    border: 'none',
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                    boxShadow: '0 4px 6px rgba(59, 130, 246, 0.2)'
+                  }}
+                >
+                  <i className="bi bi-chat-dots me-2"></i>
+                  Ver Mensajes
+                </Button>
+              </Link>
             </Card.Body>
           </Card>
         </Col>

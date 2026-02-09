@@ -6,8 +6,12 @@ import LoadingOverlay from '@/components/Loading';
 import ItemImageColumn from '@/components/ItemImageColumn';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useMemo } from 'react';
-import ExportItemsBox from '@/components/ExportItemsBox';
+import Button from 'react-bootstrap/Button';
 import { getItems, addItem, deleteItem, getItemDetails } from '@/actions/items';
+import { exportItemsCsvWithFields } from '@/actions/exports';
+import ItemSelectionModal from '@/components/ItemSelectionModal';
+import FieldSelector, { type FieldKey } from '@/components/FieldSelector';
+import DownloadZipButton from '@/components/DownloadZipButton';
 import { getCategories } from '@/actions/categories';
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
 import { useDeleteEntity } from '@/hooks/useDeleteEntity';
@@ -47,6 +51,7 @@ export default function ItemsTable({
   const t = useTranslations('tables');
   const tModals = useTranslations('modals');
   const tForms = useTranslations('forms');
+  const tExports = useTranslations('exports');
   const locale = useLocale();
   const defaultTitle = title || t('items');
   const baseItemFormTemplate = useMemo(() => createBaseItemFormTemplate(tForms), [tForms]);
@@ -56,6 +61,19 @@ export default function ItemsTable({
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [filterValue, setFilterValue] = useState<string>('');
   const [filterType, setFilterType] = useState<'name' | 'id' | 'category'>('name');
+  const [showCsvExportModal, setShowCsvExportModal] = useState(false);
+  const availableFields = useMemo(() => [
+    { key: 'id' as FieldKey, label: tExports('fieldLabels.id') },
+    { key: 'name' as FieldKey, label: tExports('fieldLabels.name') },
+    { key: 'description' as FieldKey, label: tExports('fieldLabels.description') },
+    { key: 'categoryName' as FieldKey, label: tExports('fieldLabels.categoryName') },
+    { key: 'createdAt' as FieldKey, label: tExports('fieldLabels.createdAt') },
+    { key: 'lastStateTitle' as FieldKey, label: tExports('fieldLabels.lastStateTitle') },
+    { key: 'lastStateBacked' as FieldKey, label: tExports('fieldLabels.lastStateBacked') },
+    { key: 'customerUrl' as FieldKey, label: tExports('fieldLabels.customerUrl') },
+    { key: 'passportJson' as FieldKey, label: tExports('fieldLabels.passportJson') },
+  ], [tExports]);
+  const [selectedFields, setSelectedFields] = useState<FieldKey[]>(['id', 'name', 'categoryName']);
   const router = useRouter();
 
   // Usar el hook refactorizado
@@ -315,6 +333,15 @@ export default function ItemsTable({
     setItems(prev => [newItem, ...prev]);
   };
 
+  const toggleField = (key: FieldKey) => {
+    setSelectedFields(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+  };
+
+  const getCsvFile = async (selectedItemIds: string[], allItems: any[]) => {
+    const ids = selectedItemIds.length ? selectedItemIds : allItems.map((it: any) => it.id);
+    return exportItemsCsvWithFields(selectedFields, ids);
+  };
+
   const tableContent = (
     <ItemsTableCustom 
       title={defaultTitle}
@@ -339,6 +366,8 @@ export default function ItemsTable({
       categories={products}
       addButtonLabel={t('addProduct')}
       onCategoryChange={setSelectedProductId}
+      onExportCsvClick={() => setShowCsvExportModal(true)}
+      exportCsvLabel={t('exportCsv')}
     />
   );
 
@@ -359,8 +388,6 @@ export default function ItemsTable({
         </Box>
       )}
 
-      <ExportItemsBox />
-
       <div className="mt-3">
         {showBox ? <Box>{tableContent}</Box> : tableContent}
       </div>
@@ -374,6 +401,36 @@ export default function ItemsTable({
         cascadeInfo={cascadeInfo}
         isLoading={isDeleting}
       />
+
+      <ItemSelectionModal
+        show={showCsvExportModal}
+        onHide={() => setShowCsvExportModal(false)}
+        title={tExports('selectProductsAndFields')}
+        footer={(selectedItemIds, modalItems) => (
+          <>
+            <Button variant="secondary" onClick={() => setShowCsvExportModal(false)}>
+              {tExports('selectProducts')}
+            </Button>
+            <DownloadZipButton
+              label={tExports('exportCsv')}
+              iconClassName="bi bi-filetype-csv me-2"
+              variant="primary"
+              getZip={() => getCsvFile(selectedItemIds, modalItems)}
+            />
+          </>
+        )}
+      >
+        <h6 className="mb-2">{tExports('selectFields')}</h6>
+        <p className="text-muted small mb-3">{tExports('selectFields')}</p>
+        <FieldSelector
+          fields={availableFields}
+          selected={selectedFields}
+          onToggle={toggleField}
+          idPrefix="csv-field"
+        />
+        <hr className="my-3" />
+        <h6 className="mb-2">{tExports('selectProducts')}</h6>
+      </ItemSelectionModal>
     </>
   );
 }

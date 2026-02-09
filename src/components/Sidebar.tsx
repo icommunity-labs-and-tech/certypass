@@ -21,6 +21,8 @@ export default function Sidebar() {
     { href: '/dashboard', icon: 'bi-house', label: t('home') },
     { href: '/dashboard/status-types', icon: 'bi-collection', label: t('statusTypes') },
     { href: '/dashboard/items', icon: 'bi-list-columns', label: t('products') },
+    { href: '/dashboard/export-qrs', icon: 'bi-qr-code', label: t('exportQrs') },
+    { href: '/dashboard/import-products', icon: 'bi-cloud-upload', label: t('importProducts') },
     { href: '/dashboard/users', icon: 'bi-people', label: t('users') },
     { href: '/dashboard/profile', icon: 'bi-person', label: t('profile') },
   ];

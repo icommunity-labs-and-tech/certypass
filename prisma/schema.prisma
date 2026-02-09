@@ -200,10 +200,28 @@ model Organization {
   User              User[]
   Webhook           Webhook[]
   ImportJob         ImportJob[]
+  SupportMessage    SupportMessage[]
 
   @@index([activa])
   @@index([slug])
   @@index([signatureID])
+}
+
+model SupportMessage {
+  id             String       @id
+  subject        String
+  message        String
+  page           String?
+  status         String       @default("pending")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  userId         String
+  userName       String?
+  organizationId String
+  Organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([status])
 }
 
 model PasswordResetToken {

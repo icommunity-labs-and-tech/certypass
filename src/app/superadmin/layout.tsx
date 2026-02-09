@@ -121,6 +121,23 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
               <i className="bi bi-building me-1"></i>
               Organizaciones
             </Nav.Link>
+            <Nav.Link
+              as={Link}
+              href="/superadmin/support-messages"
+              className={pathname === '/superadmin/support-messages' ? 'text-danger fw-semibold' : 'text-muted'}
+              style={{
+                transition: 'all 0.2s',
+                borderRadius: '6px',
+                padding: '6px 12px',
+                ...(pathname === '/superadmin/support-messages' && {
+                  background: '#fef2f2',
+                  color: '#dc2626'
+                })
+              }}
+            >
+              <i className="bi bi-chat-dots me-1"></i>
+              Soporte
+            </Nav.Link>
             <div className="vr mx-3" style={{ opacity: 0.2 }}></div>
             <Nav.Link className="text-muted d-flex align-items-center" style={{ padding: '6px 12px' }}>
               <i className="bi bi-person-circle me-2" style={{ fontSize: '1.25rem' }}></i>

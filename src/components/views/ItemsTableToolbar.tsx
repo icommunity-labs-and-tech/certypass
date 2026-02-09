@@ -20,6 +20,8 @@ export interface ItemsTableToolbarProps {
   className?: string;
   filterType: 'name' | 'id' | 'category';
   onFilterTypeChange: (type: 'name' | 'id' | 'category') => void;
+  onExportCsvClick?: () => void;
+  exportCsvLabel?: string;
 }
 
 export default function ItemsTableToolbar({
@@ -36,7 +38,9 @@ export default function ItemsTableToolbar({
   addButtonLabel = "Añadir",
   className = "",
   filterType,
-  onFilterTypeChange
+  onFilterTypeChange,
+  onExportCsvClick,
+  exportCsvLabel = "Exportar CSV"
 }: ItemsTableToolbarProps) {
   return (
     <div className={`table-toolbar ${className}`}>
@@ -76,6 +80,12 @@ export default function ItemsTableToolbar({
             </Dropdown.Menu>
           </Dropdown>
         ) : null}
+        {onExportCsvClick && (
+          <Button variant="outline-primary" onClick={onExportCsvClick} title={exportCsvLabel}>
+            <i className="bi bi-filetype-csv me-1" />
+            <span className="d-none d-lg-inline">{exportCsvLabel}</span>
+          </Button>
+        )}
         {showAddButton && (
           <Button variant="primary" onClick={onAddClick}>
             <span className="d-none d-md-inline">{addButtonLabel}</span>

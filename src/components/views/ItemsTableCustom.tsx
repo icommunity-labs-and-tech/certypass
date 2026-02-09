@@ -17,6 +17,8 @@ interface ItemsTableCustomProps<TFormData = Record<string, unknown>> extends Gen
   onFilterTypeChange: (type: 'name' | 'id' | 'category') => void;
   categories?: Array<{ id: string; name: string }>;
   onCategoryChange?: (categoryId: string | null) => void;
+  onExportCsvClick?: () => void;
+  exportCsvLabel?: string;
 }
 
 export default function ItemsTableCustom<TFormData = Record<string, unknown>>({
@@ -38,7 +40,9 @@ export default function ItemsTableCustom<TFormData = Record<string, unknown>>({
   filterType,
   onFilterTypeChange,
   categories = [],
-  onCategoryChange
+  onCategoryChange,
+  onExportCsvClick,
+  exportCsvLabel
 }: ItemsTableCustomProps<TFormData>) {
   const [data, setData] = useState(initialData);
   
@@ -199,6 +203,8 @@ export default function ItemsTableCustom<TFormData = Record<string, unknown>>({
         addButtonLabel={addButtonLabel}
         filterType={filterType}
         onFilterTypeChange={onFilterTypeChange}
+        onExportCsvClick={onExportCsvClick}
+        exportCsvLabel={exportCsvLabel}
       />
 
       <Divider />
