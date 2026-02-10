@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import './tutorial.css';
@@ -13,6 +14,8 @@ import {
   resetAllTours as resetAllToursStorage,
   getCompletedTours as getCompletedToursStorage,
 } from './tutorialStorage';
+import { sidebarTourNavigation } from './tutorialConfig';
+import { getOrganizationSector } from '@/actions/sectors';
 
 const TutorialContext = createContext<TutorialContextValue | undefined>(undefined);
 
@@ -25,7 +28,7 @@ interface TutorialProviderProps {
  */
 const defaultDriverConfig: Partial<Config> = {
   showProgress: true,
-  showButtons: ['next', 'previous', 'close'],
+  showButtons: ['next', 'close'],
   nextBtnText: 'Siguiente',
   prevBtnText: 'Anterior',
   doneBtnText: 'Finalizar',
@@ -41,12 +44,25 @@ const defaultDriverConfig: Partial<Config> = {
 };
 
 export function TutorialProvider({ children }: TutorialProviderProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const driverInstanceRef = useRef<ReturnType<typeof driver> | null>(null);
   const currentTourIdRef = useRef<TourId | null>(null);
   const [completedTours, setCompletedTours] = useState<TourId[]>(() => getCompletedToursStorage());
+  const [isTourActive, setIsTourActive] = useState(false);
+  const [organizationSector, setOrganizationSector] = useState<string | null>(null);
 
   // Ref para evitar marcar el tour como completado múltiples veces
   const hasMarkedCompletedRef = useRef(false);
+  // Ref para saber si estamos en medio de una navegación
+  const isNavigatingRef = useRef(false);
+  // Ref para guardar el pathname al que queremos navegar
+  const pendingNavigationRef = useRef<string | null>(null);
+  // Refs para usar valores actuales dentro de callbacks sin re-crear el driver
+  const pathnameRef = useRef(pathname);
+  const routerRef = useRef(router);
+  pathnameRef.current = pathname;
+  routerRef.current = router;
 
   // Función para marcar el tour como completado
   const markTourCompleted = useCallback((tourId: TourId | null) => {
@@ -61,6 +77,31 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       });
     }
   }, []);
+
+  // Función para finalizar el tour (limpiar estado)
+  const finishTour = useCallback(() => {
+    setIsTourActive(false);
+    setOrganizationSector(null);
+    isNavigatingRef.current = false;
+    pendingNavigationRef.current = null;
+    document.body.classList.remove('tutorial-navigating');
+  }, []);
+
+  // Detectar cuando la navegación se completa para avanzar el paso del tour
+  useEffect(() => {
+    if (isNavigatingRef.current && pendingNavigationRef.current && pathname === pendingNavigationRef.current) {
+      isNavigatingRef.current = false;
+      pendingNavigationRef.current = null;
+      // Dar tiempo al DOM para renderizar antes de avanzar el paso
+      setTimeout(() => {
+        if (driverInstanceRef.current?.isActive()) {
+          driverInstanceRef.current.moveNext();
+        }
+        // Restaurar visibilidad del overlay tras avanzar el paso
+        document.body.classList.remove('tutorial-navigating');
+      }, 400);
+    }
+  }, [pathname]);
 
   // Inicializar Driver.js solo en el cliente
   useEffect(() => {
@@ -88,7 +129,23 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
             driverInstance.destroy();
           }
         } else {
-          // Avanzar al siguiente paso
+          // Comprobar si el siguiente paso necesita navegación
+          const currentIndex = driverInstance.getActiveIndex();
+          if (currentIndex !== undefined) {
+            const nextIndex = currentIndex + 1;
+            const navPath = sidebarTourNavigation[nextIndex];
+            if (navPath && pathnameRef.current !== navPath) {
+              // Ocultar el overlay mientras se navega para evitar el salto visual
+              document.body.classList.add('tutorial-navigating');
+              // Navegar a la ruta y esperar a que se complete
+              isNavigatingRef.current = true;
+              pendingNavigationRef.current = navPath;
+              routerRef.current.push(navPath);
+              // No llamamos moveNext() aquí; se hará cuando el pathname cambie
+              return;
+            }
+          }
+          // Sin navegación necesaria, avanzar normalmente
           driverInstance.moveNext();
         }
       },
@@ -96,6 +153,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         // Limpiar refs cuando el tour se destruye
         currentTourIdRef.current = null;
         hasMarkedCompletedRef.current = false;
+        finishTour();
       },
     });
 
@@ -106,10 +164,10 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         driverInstanceRef.current.destroy();
       }
     };
-  }, [markTourCompleted]);
+  }, [markTourCompleted, finishTour]);
 
   const startTour = useCallback(
-    (tourId: TourId, steps: DriveStep[], config?: Partial<Config>) => {
+    async (tourId: TourId, steps: DriveStep[], config?: Partial<Config>) => {
       if (!driverInstanceRef.current) {
         console.warn('Driver.js not initialized yet');
         return;
@@ -126,34 +184,29 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       // Guardar el tourId actual para poder trackearlo cuando se destruya
       currentTourIdRef.current = tourId;
 
-      // Filtrar pasos que no tienen elementos válidos en el DOM
-      const validSteps = steps.filter((step) => {
-        if (!step.element) {
-          return true; // Permitir pasos sin elemento (popover flotante)
-        }
+      // Marcar el tour como activo ANTES de cualquier llamada async
+      setIsTourActive(true);
 
-        const element = typeof step.element === 'string'
-          ? document.querySelector(step.element)
-          : step.element;
+      // Obtener el sector de la organización para datos de ejemplo
+      const result = await getOrganizationSector();
+      setOrganizationSector(result.sectorSlug);
 
-        if (!element) {
-          return false;
-        }
+      // No filtramos pasos por existencia en el DOM: algunos elementos están
+      // en páginas a las que se navegará durante el tour (la navegación ocurre
+      // antes de mostrar el paso, así que el elemento existirá cuando se necesite).
 
-        return true;
-      });
-
-      if (validSteps.length === 0) {
-        console.warn(`Tutorial "${tourId}" has no valid steps`);
+      if (steps.length === 0) {
+        console.warn(`Tutorial "${tourId}" has no steps`);
+        setIsTourActive(false);
         return;
       }
 
       // Asegurar que cada paso tenga los botones habilitados
-      const stepsWithButtons = validSteps.map((step) => ({
+      const stepsWithButtons = steps.map((step) => ({
         ...step,
         popover: {
           ...step.popover,
-          showButtons: step.popover?.showButtons || ['next', 'previous', 'close'],
+          showButtons: step.popover?.showButtons || ['next', 'close'],
         },
       }));
 
@@ -188,6 +241,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     resetTour,
     resetAllTours,
     getCompletedTours,
+    isTourActive,
+    organizationSector,
   };
 
   return <TutorialContext.Provider value={value}>{children}</TutorialContext.Provider>;

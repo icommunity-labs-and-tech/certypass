@@ -40,7 +40,7 @@ export default function ImageModal({ show, onHide, imageUrl, alt, title }: Image
       className="image-modal"
     >
       <Modal.Header closeButton>
-        <Modal.Title>{title || 'Imagen'}</Modal.Title>
+        <Modal.Title><i className="bi bi-image"></i>{title || 'Imagen'}</Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-0 d-flex justify-content-center align-items-center">
         {isLoading && (

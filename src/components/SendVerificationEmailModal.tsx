@@ -69,6 +69,7 @@ export default function SendVerificationEmailModal({
     <Modal show={show} onHide={handleClose} centered>
       <Modal.Header closeButton>
         <Modal.Title>
+          <i className="bi bi-envelope-paper"></i>
           Enviar enlace de verificación
         </Modal.Title>
       </Modal.Header>

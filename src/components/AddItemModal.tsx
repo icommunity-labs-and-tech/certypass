@@ -151,26 +151,41 @@ export default function AddItemModal({
     return errors;
   };
 
+  // Función para obtener el icono del modal basado en el contexto
+  const getModalIcon = () => {
+    if (isIssueTemplate) return 'bi bi-journal-plus';
+    const isUserForm = formTemplate.some(field =>
+      field.name === 'email' || field.name === 'role'
+    );
+    if (isUserForm) return 'bi bi-person-plus';
+    switch (uploadType) {
+      case 'item': return 'bi bi-box-seam';
+      case 'product': return 'bi bi-folder-plus';
+      case 'issue': return 'bi bi-journal-plus';
+      default: return 'bi bi-plus-circle';
+    }
+  };
+
   // Función para generar el título del modal basado en el contexto
   const getModalTitle = () => {
     // Si se proporciona un título personalizado, usarlo
     if (modalTitle) {
       return modalTitle;
     }
-    
+
     if (isIssueTemplate) {
       return t('newState');
     }
-    
+
     // Detectar si es un formulario de usuario por los campos específicos
-    const isUserForm = formTemplate.some(field => 
+    const isUserForm = formTemplate.some(field =>
       field.name === 'email' || field.name === 'role'
     );
-    
+
     if (isUserForm) {
       return t('addUser');
     }
-    
+
     switch (uploadType) {
       case 'item':
         return t('addProduct');
@@ -486,7 +501,7 @@ export default function AddItemModal({
   return (
     <Modal show={show} onHide={onHide} centered size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>{getModalTitle()}</Modal.Title>
+        <Modal.Title><i className={getModalIcon()}></i>{getModalTitle()}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>

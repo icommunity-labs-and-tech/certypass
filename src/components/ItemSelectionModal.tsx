@@ -63,7 +63,7 @@ export default function ItemSelectionModal({
   return (
     <Modal show={show} onHide={onHide} size="lg" centered>
       <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
+        <Modal.Title><i className="bi bi-check2-square"></i>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {isLoadingItems ? (

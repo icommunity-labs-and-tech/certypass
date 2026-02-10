@@ -43,3 +43,11 @@
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
   color: white !important;
 }
+
+/* Ocultar overlay y popover durante la navegación entre páginas */
+body.tutorial-navigating .driver-popover,
+body.tutorial-navigating .driver-overlay {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.15s ease !important;
+}

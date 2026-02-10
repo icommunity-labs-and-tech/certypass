@@ -123,6 +123,7 @@ export default function ItemVerifyQrModal({ show, onHide, itemId, itemName }: It
     <Modal show={show} onHide={handleClose} centered size={showEmailForm ? 'lg' : undefined}>
       <Modal.Header closeButton>
         <Modal.Title>
+          <i className={showEmailForm ? "bi bi-envelope-paper" : "bi bi-shield-check"}></i>
           {showEmailForm
             ? 'Enviar enlace de verificación por correo'
             : (itemName ? `QR de Verificación - ${itemName}` : 'Código QR de Verificación')

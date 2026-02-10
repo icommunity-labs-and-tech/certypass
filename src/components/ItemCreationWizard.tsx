@@ -240,19 +240,33 @@ export default function ItemCreationWizard({
     }
   };
 
+  const getModalIcon = () => {
+    if (isIssueTemplate) return 'bi bi-journal-plus';
+    const isUserForm = formTemplate.some(field =>
+      field.name === 'email' || field.name === 'role'
+    );
+    if (isUserForm) return 'bi bi-person-plus';
+    switch (uploadType) {
+      case 'item': return 'bi bi-box-seam';
+      case 'product': return 'bi bi-folder-plus';
+      case 'issue': return 'bi bi-journal-plus';
+      default: return 'bi bi-plus-circle';
+    }
+  };
+
   const getModalTitle = () => {
     if (isIssueTemplate) {
       return 'Nuevo Estado';
     }
-    
-    const isUserForm = formTemplate.some(field => 
+
+    const isUserForm = formTemplate.some(field =>
       field.name === 'email' || field.name === 'role'
     );
-    
+
     if (isUserForm) {
       return 'Añadir Usuario';
     }
-    
+
     switch (uploadType) {
       case 'item':
         return 'Crear Nuevo Item';
@@ -598,10 +612,13 @@ export default function ItemCreationWizard({
     <Modal show={show} onHide={onHide} centered size="lg">
       <Modal.Header closeButton>
         <Modal.Title>
+          <i className={getModalIcon()}></i>
+          <span>
           {getModalTitle()}
           <small className="text-muted d-block mt-1">
             Paso {currentStep} de 4: {getStepTitle(currentStep)}
           </small>
+          </span>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>

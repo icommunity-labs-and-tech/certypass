@@ -112,7 +112,7 @@ export default function DeleteConfirmationModal({
   return (
     <Modal show={show} onHide={onHide} centered>
       <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
+        <Modal.Title><i className="bi bi-trash3"></i>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p>{message}</p>

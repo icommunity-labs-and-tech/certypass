@@ -39,7 +39,7 @@ export interface TutorialContextValue {
   /**
    * Inicia un tour específico
    */
-  startTour: (tourId: TourId, steps: DriveStep[], config?: Partial<Config>) => void;
+  startTour: (tourId: TourId, steps: DriveStep[], config?: Partial<Config>) => void | Promise<void>;
   /**
    * Verifica si un tour ha sido completado
    */
@@ -56,4 +56,12 @@ export interface TutorialContextValue {
    * Obtiene la lista de tours completados
    */
   getCompletedTours: () => TourId[];
+  /**
+   * Indica si hay un tour activo en este momento
+   */
+  isTourActive: boolean;
+  /**
+   * Slug del sector de la organización (disponible durante el tour)
+   */
+  organizationSector: string | null;
 }

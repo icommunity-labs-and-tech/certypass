@@ -16,6 +16,7 @@ export interface OrganizationListItem {
   adminActivated: boolean;
   activeUsersCount: number;
   pendingUsersCount: number;
+  sectorName: string | null;
 }
 
 export interface ListOrganizationsResult {
@@ -46,6 +47,11 @@ export async function listOrganizations(): Promise<ListOrganizationsResult> {
         plan: true,
         activa: true,
         createdAt: true,
+        Sector: {
+          select: {
+            name: true,
+          },
+        },
         _count: {
           select: {
             User: true,
@@ -134,6 +140,7 @@ export async function listOrganizations(): Promise<ListOrganizationsResult> {
         adminActivated,
         activeUsersCount: counts.active,
         pendingUsersCount: counts.pending,
+        sectorName: org.Sector?.name ?? null,
       };
     });
     

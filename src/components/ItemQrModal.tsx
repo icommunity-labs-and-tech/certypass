@@ -75,6 +75,7 @@ export default function ItemQrModal({ show, onHide, itemId, itemName }: ItemQrMo
     <Modal show={show} onHide={onHide} centered>
       <Modal.Header closeButton>
         <Modal.Title>
+          <i className="bi bi-qr-code"></i>
           {itemName ? `QR de ${itemName}` : 'Código QR del item'}
         </Modal.Title>
       </Modal.Header>

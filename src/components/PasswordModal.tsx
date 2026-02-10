@@ -48,7 +48,7 @@ export default function PasswordModal({ show, onHide, user }: PasswordModalProps
     <Modal show={show} onHide={onHide} centered size="lg">
       <Modal.Header closeButton>
         <Modal.Title>
-          <i className="bi bi-person-check me-2"></i>
+          <i className="bi bi-person-check"></i>
           {t('title')}
         </Modal.Title>
       </Modal.Header>

@@ -10,6 +10,7 @@ export interface CreateOrganizationInput {
   // Datos de la organización
   nombre: string;
   plan?: string;
+  sectorId?: string;
 
   // Datos del primer administrador
   adminName: string;
@@ -149,6 +150,7 @@ export async function createOrganizationWithAdmin(
           signatureID: signatureID,
           kycURL: kycURL,
           verificationStatus: signatureID ? 'WAITING' : 'NOT_VERIFIED',
+          sectorId: input.sectorId || null,
           updatedAt: now,
         },
       });

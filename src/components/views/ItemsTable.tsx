@@ -21,6 +21,8 @@ import { Divider } from '@/components/Divider';
 import CategoryEditor from '@/components/CategoryEditor';
 import KycInfoBanner from '@/components/KycInfoBanner';
 import { useTranslations, useLocale } from 'next-intl';
+import { useTutorialContext } from '@/lib/tutorial/TutorialProvider';
+import { getTutorialItems } from '@/lib/tutorial/tutorialExampleData';
  
 
 // Función helper para crear el template base de items con traducciones
@@ -75,6 +77,8 @@ export default function ItemsTable({
   ], [tExports]);
   const [selectedFields, setSelectedFields] = useState<FieldKey[]>(['id', 'name', 'categoryName']);
   const router = useRouter();
+  const { isTourActive, organizationSector } = useTutorialContext();
+  const showTutorialExamples = isTourActive;
 
   // Usar el hook refactorizado
   const {
@@ -102,6 +106,12 @@ export default function ItemsTable({
   useEffect(() => {
     const loadData = async () => {
       try {
+        if (showTutorialExamples) {
+          setItems(getTutorialItems(organizationSector || 'fashion'));
+          setProducts([]);
+          setIsLoading(false);
+          return;
+        }
         const [itemsData, categoriesData] = await Promise.all([
           getItems(),
           getCategories()
@@ -116,7 +126,7 @@ export default function ItemsTable({
     };
 
     loadData();
-  }, []);
+  }, [showTutorialExamples, organizationSector]);
 
   // Los items se pasan sin filtrar, el filtrado se hace en ItemsTableCustom
   const filteredItems = items;
@@ -236,8 +246,20 @@ export default function ItemsTable({
       label: t('columns.categories'),
       enableSorting: false,
       render: (item: any) => {
+        // Durante el tutorial, mostrar badges estáticos en vez del CategoryEditor
+        if (showTutorialExamples) {
+          return (
+            <div className="d-flex flex-wrap gap-1">
+              {(item.categories || []).map((cat: { id: string; name: string }) => (
+                <span key={cat.id} className="badge bg-secondary bg-opacity-10 text-secondary">
+                  {cat.name}
+                </span>
+              ))}
+            </div>
+          );
+        }
+
         const handleCategoryUpdate = (updatedCategories: Array<{ id: string; name: string }>) => {
-          // Actualizar el item en la lista local
           setItems((prevItems) =>
             prevItems.map((i) =>
               i.id === item.id
@@ -289,7 +311,7 @@ export default function ItemsTable({
         return <ItemImageColumn item={item} />;
       },
     },
-    {
+    ...(!showTutorialExamples ? [{
       key: 'item-actions',
       label: t('columns.actions'),
       enableSorting: false,
@@ -311,7 +333,7 @@ export default function ItemsTable({
           </button>
         </div>
       ),
-    },
+    }] : []),
   ];
 
   if (isLoading) {
@@ -388,7 +410,7 @@ export default function ItemsTable({
         </Box>
       )}
 
-      <div className="mt-3">
+      <div className="mt-3" data-tour="items-table">
         {showBox ? <Box>{tableContent}</Box> : tableContent}
       </div>
 
