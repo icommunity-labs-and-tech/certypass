@@ -498,12 +498,12 @@
       "id": "ID",
       "name": "Name",
       "description": "Description",
-      "categoryName": "Category",
+      "categoryName": "Category (first)",
+      "allCategories": "All categories",
       "createdAt": "Creation date",
       "lastStateTitle": "Passport: Last state",
-      "lastStateBacked": "Passport: Last backed state",
-      "customerUrl": "Public URL",
-      "passportJson": "Complete digital passport (JSON)"
+      "lastStateDate": "Passport: Last state date",
+      "customerUrl": "Public URL"
     }
   },
   "exportQrsPage": {

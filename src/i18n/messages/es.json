@@ -502,12 +502,12 @@
       "id": "ID",
       "name": "Nombre",
       "description": "Descripción",
-      "categoryName": "Categoría",
+      "categoryName": "Categoría (primera)",
+      "allCategories": "Todas las categorías",
       "createdAt": "Fecha de creación",
       "lastStateTitle": "Pasaporte: Último estado",
-      "lastStateBacked": "Pasaporte: Último estado respaldado",
-      "customerUrl": "URL pública",
-      "passportJson": "Pasaporte digital completo (JSON)"
+      "lastStateDate": "Pasaporte: Fecha del último estado",
+      "customerUrl": "URL pública"
     }
   },
   "exportQrsPage": {

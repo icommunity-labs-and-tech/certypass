@@ -22,14 +22,13 @@ export default function ExportItemsBox() {
     { key: 'id' as FieldKey, label: t('fieldLabels.id') },
     { key: 'name' as FieldKey, label: t('fieldLabels.name') },
     { key: 'description' as FieldKey, label: t('fieldLabels.description') },
-    { key: 'categoryName' as FieldKey, label: t('fieldLabels.categoryName') },
+    { key: 'allCategories' as FieldKey, label: t('fieldLabels.allCategories') },
     { key: 'createdAt' as FieldKey, label: t('fieldLabels.createdAt') },
     { key: 'lastStateTitle' as FieldKey, label: t('fieldLabels.lastStateTitle') },
-    { key: 'lastStateBacked' as FieldKey, label: t('fieldLabels.lastStateBacked') },
+    { key: 'lastStateDate' as FieldKey, label: t('fieldLabels.lastStateDate') },
     { key: 'customerUrl' as FieldKey, label: t('fieldLabels.customerUrl') },
-    { key: 'passportJson' as FieldKey, label: t('fieldLabels.passportJson') },
   ], [t]);
-  const [selectedFields, setSelectedFields] = useState<FieldKey[]>(['id', 'name', 'categoryName']);
+  const [selectedFields, setSelectedFields] = useState<FieldKey[]>(['id', 'name', 'allCategories', 'createdAt', 'customerUrl']);
   const [showCsvModal, setShowCsvModal] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -47,19 +46,16 @@ export default function ExportItemsBox() {
     setSelectedFields(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
   };
 
-  const getCsvFile = async (selectedItemIds: string[], items: any[]) => {
-    const ids = selectedItemIds.length ? selectedItemIds : items.map((it: any) => it.id);
-    return exportItemsCsvWithFields(selectedFields, ids);
+  const getCsvFile = async (selectedItemIds: string[]) => {
+    return exportItemsCsvWithFields(selectedFields, selectedItemIds);
   };
 
-  const getQrZip = async (selectedItemIds: string[], items: any[]) => {
-    const ids = selectedItemIds.length ? selectedItemIds : items.map((it: any) => it.id);
-    return exportItemQRCodes({ itemIds: ids });
+  const getQrZip = async (selectedItemIds: string[]) => {
+    return exportItemQRCodes({ itemIds: selectedItemIds });
   };
 
-  const getExcelFile = async (selectedItemIds: string[], items: any[]) => {
-    const ids = selectedItemIds.length ? selectedItemIds : items.map((it: any) => it.id);
-    return exportItemsExcel({ itemIds: ids });
+  const getExcelFile = async (selectedItemIds: string[]) => {
+    return exportItemsExcel({ itemIds: selectedItemIds });
   };
 
   return (
@@ -121,7 +117,7 @@ export default function ExportItemsBox() {
         show={showCsvModal}
         onHide={() => setShowCsvModal(false)}
         title={t('selectProductsAndFields')}
-        footer={(selectedItemIds, items) => (
+        footer={(selectedItemIds) => (
           <>
             <Button variant="secondary" onClick={() => setShowCsvModal(false)}>
               {tCommon('cancel')}
@@ -130,7 +126,7 @@ export default function ExportItemsBox() {
               label={t('exportCsv')}
               iconClassName="bi bi-filetype-csv me-2"
               variant="primary"
-              getZip={() => getCsvFile(selectedItemIds, items)}
+              getZip={() => getCsvFile(selectedItemIds)}
             />
           </>
         )}
@@ -153,7 +149,7 @@ export default function ExportItemsBox() {
         show={showQrModal}
         onHide={() => setShowQrModal(false)}
         title="Seleccionar productos para exportar QRs"
-        footer={(selectedItemIds, items) => (
+        footer={(selectedItemIds) => (
           <>
             <Button variant="secondary" onClick={() => setShowQrModal(false)}>
               Cancelar
@@ -162,13 +158,13 @@ export default function ExportItemsBox() {
               label="Exportar como ZIP"
               iconClassName="bi bi-file-zip me-2"
               variant="primary"
-              getZip={() => getQrZip(selectedItemIds, items)}
+              getZip={() => getQrZip(selectedItemIds)}
             />
             <DownloadZipButton
               label="Exportar como Excel"
               iconClassName="bi bi-file-earmark-spreadsheet me-2"
               variant="success"
-              getZip={() => getExcelFile(selectedItemIds, items)}
+              getZip={() => getExcelFile(selectedItemIds)}
             />
           </>
         )}

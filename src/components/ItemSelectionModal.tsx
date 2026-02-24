@@ -31,6 +31,13 @@ export default function ItemSelectionModal({
     selectedItemIds,
     search,
     setSearch,
+    categoryFilter,
+    setCategoryFilter,
+    availableCategories,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
     isLoadingItems,
     selectedCount,
     toggleItem,
@@ -77,6 +84,13 @@ export default function ItemSelectionModal({
               onToggleItem={toggleItem}
               search={search}
               onSearchChange={setSearch}
+              categoryFilter={categoryFilter}
+              onCategoryFilterChange={setCategoryFilter}
+              availableCategories={availableCategories}
+              dateFrom={dateFrom}
+              onDateFromChange={setDateFrom}
+              dateTo={dateTo}
+              onDateToChange={setDateTo}
               selectedCount={selectedCount}
               onSelectAll={selectAllFiltered}
               onClearSelection={clearSelection}

@@ -2,7 +2,7 @@
 
 import Form from 'react-bootstrap/Form';
 
-export type FieldKey = 'id' | 'name' | 'description' | 'categoryName' | 'createdAt' | 'lastStateTitle' | 'lastStateBacked' | 'customerUrl' | 'passportJson';
+export type FieldKey = 'id' | 'name' | 'description' | 'allCategories' | 'createdAt' | 'lastStateTitle' | 'lastStateDate' | 'customerUrl';
 
 export interface FieldOption {
   key: FieldKey;

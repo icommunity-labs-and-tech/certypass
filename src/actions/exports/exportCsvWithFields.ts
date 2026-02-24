@@ -12,16 +12,14 @@ function toCsvValue(value: unknown): string {
   return needsQuotes ? `"${escaped}"` : escaped;
 }
 
-export type ExportFieldKey = 'id' | 'name' | 'description' | 'categoryName' | 'createdAt' | 'lastStateTitle' | 'lastStateBacked' | 'customerUrl' | 'passportJson';
+export type ExportFieldKey = 'id' | 'name' | 'description' | 'allCategories' | 'createdAt' | 'lastStateTitle' | 'lastStateDate' | 'customerUrl';
 
 export async function exportItemsCsvWithFields(
   keys: Array<ExportFieldKey>,
   itemIds?: string[],
 ): Promise<{ filename: string; contentType: string; base64: string }> {
-  const needFullPassport = keys.includes('passportJson');
-
   const organizationId = await requireOrganizationId();
-  let items = await itemRepository.listForExport(organizationId, { fullPassport: needFullPassport });
+  let items = await itemRepository.listForExport(organizationId, { fullPassport: false });
 
   // Filtrar por itemIds si se proporcionan
   if (itemIds && itemIds.length > 0) {
@@ -41,23 +39,12 @@ export async function exportItemsCsvWithFields(
         case 'id': return toCsvValue(it.id);
         case 'name': return toCsvValue(it.name);
         case 'description': return toCsvValue(it.description ?? '');
-        case 'categoryName': return toCsvValue((it as any).categoryName ?? '');
+        case 'allCategories': return toCsvValue(((it as any).categories ?? []).map((c: any) => c.name).join('; '));
         case 'createdAt': return toCsvValue(it.createdAt?.toISOString?.() ?? (it as any).createdAt);
         case 'lastStateTitle': return toCsvValue(last?.title ?? '');
-        case 'lastStateBacked': return toCsvValue(last?.backed ?? '');
+        case 'lastStateDate': return toCsvValue(last?.createdAt?.toISOString?.() ?? last?.createdAt ?? '');
         case 'customerUrl': {
           return toCsvValue(`${baseUrl}/customer/item/${encodeURIComponent(it.id)}`);
-        }
-        case 'passportJson': {
-          const passport = {
-            id: it.id,
-            name: it.name,
-            description: it.description,
-            categoryName: (it as any).category?.name ?? '',
-            createdAt: (it.createdAt as any)?.toISOString?.() ?? (it as any).createdAt,
-            states: (it as any).states || [],
-          };
-          return toCsvValue(JSON.stringify(passport));
         }
       }
     });
