@@ -149,7 +149,7 @@
     "deleteStatusType": "Eliminar Tipo de Estado",
     "confirmDeleteStatusType": "¿Estás seguro de que quieres eliminar el tipo de estado \"{name}\"?",
     "editStatusType": "Editar Tipo de Estado",
-    "statusTypesDescription": "Los tipos de estado definen las plantillas y estructuras de datos para los diferentes estados que pueden tener los items. Cada tipo de estado puede tener campos personalizados que permiten capturar información específica, como inspecciones, reparaciones o verificaciones, y se utilizan para crear estados consistentes y estructurados en el sistema.",
+    "statusTypesDescription": "Los tipos de estados son categorizaciones predefinidas de los productos/elementos para tener un control más dinámico de las operaciones que se hacen sobre ellos. Por ejemplo, si ha pasado el producto a reparación, se se ha enviado logísticamente a otro lugar, etc. Desde aquí podrás crear nuevos estados o modificarlos para luego poder asignarlos desde el producto en concreto.",
     "whatIsStatusTypes": "¿Qué son los tipos de estado?",
     "deleteStatusTypeError": "Error al eliminar el tipo de estado",
     "loadStatusTypeError": "Error al cargar el tipo de estado",
