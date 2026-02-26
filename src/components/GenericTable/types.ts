@@ -67,6 +67,7 @@ export type GenericTableProps<TFormData = Record<string, unknown>> = {
   filterPlaceholder?: string;
   addButtonLabel?: string;
   modalTitle?: string;
+  onRowDoubleClick?: (row: Record<string, any>) => void;
 };
 
 

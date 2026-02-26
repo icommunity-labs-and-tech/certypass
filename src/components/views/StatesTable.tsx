@@ -71,13 +71,6 @@ export default function StatesTable({
           return (
             <div className="btn-group btn-group-sm">
               <button
-                className="btn btn-outline-primary btn-sm"
-                onClick={() => router.push(`/dashboard/states/${state.id}`)}
-                title={t('viewDetail')}
-              >
-                <i className="bi bi-eye"></i>
-              </button>
-              <button
                 className="btn btn-outline-secondary btn-sm"
                 onClick={() => router.push(`/dashboard/states/${state.id}/edit`)}
                 title={tCommon('edit')}
@@ -111,19 +104,6 @@ export default function StatesTable({
     loadData();
   }, []);
 
-  const defaultActions = [
-    {
-      label: t('viewDetail'),
-      onClick: (row: Record<string, any>) => {
-        if (onStateSelect) {
-          onStateSelect(row);
-        } else {
-          router.push(`/dashboard/states/${row.id}`);
-        }
-      },
-    }
-  ];
-
   if (isLoading) return <LoadingOverlay />;
 
   const tableContent = (
@@ -144,9 +124,10 @@ export default function StatesTable({
       icon="bi-flag"
       allowTemplateEditing={false}
       customColumns={customColumns.length > 0 ? customColumns : stateColumns}
-      actions={[...defaultActions, ...customActions]}
+      actions={customActions}
       filterPlaceholder={t('filterPlaceholder')}
       addButtonLabel={t('addButton')}
+      onRowDoubleClick={(row) => onStateSelect ? onStateSelect(row) : router.push(`/dashboard/states/${row.id}`)}
     />
     </>
   );

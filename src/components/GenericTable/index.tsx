@@ -32,6 +32,7 @@ export default function GenericTable<TFormData = Record<string, unknown>>({
   filterPlaceholder,
   addButtonLabel,
   modalTitle,
+  onRowDoubleClick,
 }: GenericTableProps<TFormData>) {
   const [data, setData] = useState(initialData);
   // Mantener sincronizado el estado interno cuando cambie initialData (por ejemplo, tras borrar)
@@ -96,14 +97,14 @@ export default function GenericTable<TFormData = Record<string, unknown>>({
   };
 
   // Usar solo las columnas personalizadas si se proporcionan, evitando duplicación
-  const customColumnsData = customColumns && customColumns.length > 0 
+  const customColumnsData = customColumns && customColumns.length > 0
     ? customColumns.map(col => ({
         accessorKey: col.key,
         header: col.label,
         cell: ({ row }: any) => col.render(row.original),
         sortDescFirst: false,
         enableSorting: col.enableSorting !== false, // Respetar la configuración de enableSorting
-        sortingFn: col.sortingFn, // Incluir la función de ordenamiento personalizada
+        ...(typeof col.sortingFn === 'function' ? { sortingFn: col.sortingFn } : {}),
       }))
     : null;
 
@@ -152,6 +153,7 @@ export default function GenericTable<TFormData = Record<string, unknown>>({
             selectedRow={selectedRow}
             setSelectedRow={setSelectedRow}
             lastAddedId={lastAddedId}
+            onRowDoubleClick={onRowDoubleClick}
           />
         )}
       </div>

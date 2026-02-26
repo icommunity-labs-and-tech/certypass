@@ -155,6 +155,7 @@ export default function StatusTypesTable({
       initialData={statusTypes}
       title={defaultTitle}
       icon="bi-collection"
+      onRowDoubleClick={!showTutorialExamples ? (st) => router.push(`/dashboard/status-types/${st.id}`) : undefined}
       formTemplate={[]}
       onAddSubmit={async (formData: any) => {
         // El template viene del customFormContent a través del formState

@@ -316,13 +316,6 @@ export default function ItemsTable({
       render: (item: any) => (
         <div className="btn-group btn-group-sm">
           <button
-            className="btn btn-outline-primary btn-sm"
-            onClick={() => router.push(`/dashboard/items/${item.id}`)}
-            title={t('columns.viewDetail')}
-          >
-            <i className="bi bi-eye"></i>
-          </button>
-          <button
             className="btn btn-outline-danger btn-sm"
             onClick={() => openDeleteModalWithDetails(item)}
             title={t('columns.delete')}
@@ -363,10 +356,10 @@ export default function ItemsTable({
   };
 
   const tableContent = (
-    <ItemsTableCustom 
+    <ItemsTableCustom
       title={defaultTitle}
       icon={"bi-list-columns"}
-      initialData={filteredItems} 
+      initialData={filteredItems}
       formTemplate={!isLoading ? getSelectedProductTemplate() : undefined}
       onAddSubmit={handleAddItem}
       onItemCreated={handleItemCreated}
@@ -374,6 +367,7 @@ export default function ItemsTable({
       allowTemplateEditing={false}
       customColumns={[...defaultColumns, ...customColumns]}
       actions={customActions}
+      onRowDoubleClick={!showTutorialExamples ? (item) => router.push(`/dashboard/items/${item.id}`) : undefined}
       filterPlaceholder={
         filterType === 'name' 
           ? t('searchByName')

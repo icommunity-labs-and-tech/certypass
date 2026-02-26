@@ -196,13 +196,6 @@ export default function UsersTable({
           return (
             <div className="btn-group btn-group-sm">
               <button
-                className="btn btn-outline-primary btn-sm"
-                onClick={() => router.push(`/dashboard/users/${row.id}`)}
-                title={t('columns.viewDetail')}
-              >
-                <i className="bi bi-eye"></i>
-              </button>
-              <button
                 className="btn btn-outline-secondary btn-sm"
                 onClick={() => router.push(`/dashboard/users/${row.id}/edit`)}
                 title={t('columns.edit')}
@@ -263,6 +256,7 @@ export default function UsersTable({
         allowTemplateEditing={false}
         filterPlaceholder={t('filterUserPlaceholder')}
         addButtonLabel={t('addUser')}
+        onRowDoubleClick={(row) => router.push(`/dashboard/users/${row.id}`)}
       />
 
       <DeleteConfirmationModal

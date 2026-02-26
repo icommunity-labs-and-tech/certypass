@@ -1,10 +1,12 @@
 import { flexRender } from '@tanstack/react-table';
+import { useRef } from 'react';
 
 type Props = {
   table: any;
   selectedRow: Record<string, any> | null;
   setSelectedRow: (row: Record<string, any> | null) => void;
   lastAddedId: string | null;
+  onRowDoubleClick?: (row: Record<string, any>) => void;
 };
 
 export default function DataTable({
@@ -12,7 +14,9 @@ export default function DataTable({
   selectedRow,
   setSelectedRow,
   lastAddedId,
+  onRowDoubleClick,
 }: Props) {
+  const lastClickRef = useRef<{ time: number; rowId: string } | null>(null);
   const headerGroups = table.getHeaderGroups();
   const rows = table.getRowModel().rows;
 
@@ -60,9 +64,20 @@ export default function DataTable({
                 if (e.target instanceof HTMLElement && e.target.closest('[data-image-clickable]')) {
                   return;
                 }
+                if (onRowDoubleClick) {
+                  const now = Date.now();
+                  const last = lastClickRef.current;
+                  if (last && last.rowId === String(rowId) && now - last.time < 300) {
+                    lastClickRef.current = null;
+                    onRowDoubleClick(row.original);
+                    return;
+                  }
+                  lastClickRef.current = { time: now, rowId: String(rowId) };
+                }
                 setSelectedRow(isSelected ? null : row.original);
               }}
-              style={{ cursor: 'default' }}
+              style={{ cursor: onRowDoubleClick ? 'pointer' : 'default' }}
+              title={onRowDoubleClick ? 'Doble clic para ver detalles' : undefined}
             >
               {row.getVisibleCells().map((cell: any) => (
                 <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
