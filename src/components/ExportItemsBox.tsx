@@ -117,6 +117,7 @@ export default function ExportItemsBox() {
         show={showCsvModal}
         onHide={() => setShowCsvModal(false)}
         title={t('selectProductsAndFields')}
+        previewFields={availableFields.filter(f => selectedFields.includes(f.key))}
         footer={(selectedItemIds) => (
           <>
             <Button variant="secondary" onClick={() => setShowCsvModal(false)}>
@@ -131,18 +132,12 @@ export default function ExportItemsBox() {
           </>
         )}
       >
-        <h6 className="mb-2">{t('selectFields')}</h6>
-        <p className="text-muted small mb-3">
-          {t('selectFields')}
-        </p>
         <FieldSelector
           fields={availableFields}
           selected={selectedFields}
           onToggle={toggleField}
           idPrefix="csv-field"
         />
-        <hr className="my-3" />
-        <h6 className="mb-2">{t('selectProducts')}</h6>
       </ItemSelectionModal>
 
       <ItemSelectionModal

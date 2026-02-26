@@ -426,6 +426,7 @@ export default function ItemsTable({
         show={showCsvExportModal}
         onHide={() => setShowCsvExportModal(false)}
         title={tExports('selectProductsAndFields')}
+        previewFields={availableFields.filter(f => selectedFields.includes(f.key))}
         footer={(selectedItemIds, modalItems) => (
           <DownloadZipButton
             label={tExports('exportCsv')}
@@ -435,16 +436,12 @@ export default function ItemsTable({
           />
         )}
       >
-        <h6 className="mb-2">{tExports('selectFields')}</h6>
-        <p className="text-muted small mb-3">{tExports('selectFields')}</p>
         <FieldSelector
           fields={availableFields}
           selected={selectedFields}
           onToggle={toggleField}
           idPrefix="csv-field"
         />
-        <hr className="my-3" />
-        <h6 className="mb-2">{tExports('selectProducts')}</h6>
       </ItemSelectionModal>
     </>
   );

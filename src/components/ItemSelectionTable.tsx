@@ -29,6 +29,7 @@ interface ItemSelectionTableProps {
   selectedCount: number;
   onSelectAll: () => void;
   onClearSelection: () => void;
+  tableHeight?: number;
 }
 
 function SelectAllHeader({
@@ -83,6 +84,7 @@ export default function ItemSelectionTable({
   selectedCount,
   onSelectAll,
   onClearSelection,
+  tableHeight = 400,
 }: ItemSelectionTableProps) {
   const t = useTranslations('common');
   return (
@@ -148,8 +150,9 @@ export default function ItemSelectionTable({
       </div>
       <div
         style={{
-          maxHeight: '400px',
+          maxHeight: tableHeight,
           overflowY: 'auto',
+          overflowX: 'auto',
           border: '1px solid #eee',
           borderRadius: 4,
         }}
