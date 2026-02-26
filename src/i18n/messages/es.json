@@ -635,7 +635,7 @@
     "metrics": "Métricas",
     "monthlyActivityTitle": "Actividad Mensual de Estados",
     "categoryDistributionTitle": "Distribución por Categorías",
-    "backupStatusByUserTitle": "Estado de Respaldos por Usuario",
+    "backupStatusByUserTitle": "Estados creados por usuario",
     "loadingData": "Cargando datos...",
     "charts": {
       "monthlyActivity": {
@@ -661,16 +661,16 @@
         "subtitle": "Productos registrados"
       },
       "backupRate": {
-        "title": "Respaldados",
+        "title": "Estados certificados",
         "subtitle": "{backed} de {total}"
       },
       "operators": {
         "title": "Operadores",
         "subtitle": "Operadores activos"
       },
-      "activeUsers": {
-        "title": "Usuarios Activos",
-        "subtitle": "Últimos 30 días"
+      "statesThisMonth": {
+        "title": "Estados este mes",
+        "subtitle": "Mes en curso"
       }
     }
   },

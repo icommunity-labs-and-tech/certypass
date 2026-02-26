@@ -9,7 +9,7 @@ export const KPI_CONFIG = {
     getValue: (kpis: DashboardKPIs) => kpis.totalPassports
   },
   backupRate: {
-    title: 'Respaldados',
+    title: 'Estados certificados',
     subtitle: (kpis: DashboardKPIs) => `${kpis.backedPassports} de ${kpis.backedPassports + kpis.pendingPassports}`,
     color: 'success' as const,
     icon: 'bi-shield-check',
@@ -22,12 +22,12 @@ export const KPI_CONFIG = {
     icon: 'bi-person-gear',
     getValue: (kpis: DashboardKPIs) => kpis.activeOperators
   },
-  activeUsers: {
-    title: 'Usuarios Activos',
-    subtitle: 'Últimos 30 días',
+  statesThisMonth: {
+    title: 'Estados este mes',
+    subtitle: 'Mes en curso',
     color: 'info' as const,
-    icon: 'bi-people',
-    getValue: (kpis: DashboardKPIs) => kpis.activeUsers
+    icon: 'bi-calendar-check',
+    getValue: (kpis: DashboardKPIs) => kpis.statesThisMonth
   }
 } as const;
 

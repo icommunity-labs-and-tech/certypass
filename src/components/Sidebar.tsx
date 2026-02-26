@@ -167,9 +167,9 @@ export default function Sidebar() {
               key={href}
               as={Link}
               href={href}
-              className={`d-flex align-items-center px-3 py-2 rounded ${
-                pathname === href ? 'bg-success text-white' : 'text-dark'
-              }`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="d-flex align-items-center px-3 py-2 rounded text-dark"
               style={{ transition: 'background-color 0.2s' }}
               onClick={handleNavClick}
             >

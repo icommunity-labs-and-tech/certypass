@@ -54,33 +54,29 @@ export default function DashboardKPIs({ kpis }: DashboardKPIsProps) {
       <KPICard
         title={t('totalItems.title')}
         value={KPI_CONFIG.totalItems.getValue(kpis)}
-        subtitle={t('totalItems.subtitle')}
         color={KPI_CONFIG.totalItems.color}
         icon={KPI_CONFIG.totalItems.icon}
       />
-      
+
       <KPICard
         title={t('backupRate.title')}
         value={KPI_CONFIG.backupRate.getValue(kpis)}
-        subtitle={t('backupRate.subtitle', { backed: kpis.backedPassports, total: kpis.backedPassports + kpis.pendingPassports })}
         color={KPI_CONFIG.backupRate.color}
         icon={KPI_CONFIG.backupRate.icon}
       />
-      
+
       <KPICard
         title={t('operators.title')}
         value={KPI_CONFIG.operators.getValue(kpis)}
-        subtitle={t('operators.subtitle')}
         color={KPI_CONFIG.operators.color}
         icon={KPI_CONFIG.operators.icon}
       />
       
       <KPICard
-        title={t('activeUsers.title')}
-        value={KPI_CONFIG.activeUsers.getValue(kpis)}
-        subtitle={t('activeUsers.subtitle')}
-        color={KPI_CONFIG.activeUsers.color}
-        icon={KPI_CONFIG.activeUsers.icon}
+        title={t('statesThisMonth.title')}
+        value={KPI_CONFIG.statesThisMonth.getValue(kpis)}
+        color={KPI_CONFIG.statesThisMonth.color}
+        icon={KPI_CONFIG.statesThisMonth.icon}
       />
     </Row>
   );

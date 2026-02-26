@@ -52,7 +52,7 @@ export default function LanguageSwitcher() {
         <span className="d-md-none">{currentLanguage.code.toUpperCase()}</span>
       </Dropdown.Toggle>
 
-      <Dropdown.Menu align="end">
+      <Dropdown.Menu align="end" popperConfig={{ strategy: 'fixed' }}>
         {languages.map((language) => (
           <Dropdown.Item
             key={language.code}

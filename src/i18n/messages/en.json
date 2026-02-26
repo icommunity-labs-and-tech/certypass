@@ -631,7 +631,7 @@
     "metrics": "Metrics",
     "monthlyActivityTitle": "Monthly State Activity",
     "categoryDistributionTitle": "Distribution by Categories",
-    "backupStatusByUserTitle": "Backup Status by User",
+    "backupStatusByUserTitle": "States Created by User",
     "loadingData": "Loading data...",
     "charts": {
       "monthlyActivity": {
@@ -657,16 +657,16 @@
         "subtitle": "Registered products"
       },
       "backupRate": {
-        "title": "Backed",
+        "title": "Certified States",
         "subtitle": "{backed} of {total}"
       },
       "operators": {
         "title": "Operators",
         "subtitle": "Active operators"
       },
-      "activeUsers": {
-        "title": "Active Users",
-        "subtitle": "Last 30 days"
+      "statesThisMonth": {
+        "title": "States this month",
+        "subtitle": "Current month"
       }
     }
   },
