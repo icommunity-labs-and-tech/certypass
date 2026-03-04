@@ -1,5 +1,5 @@
 import { flexRender } from '@tanstack/react-table';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { RowAction } from './types';
 
 type Props = {
@@ -10,6 +10,67 @@ type Props = {
   onRowDoubleClick?: (row: Record<string, any>) => void;
   rowActions?: RowAction[];
 };
+
+function CopyButton({ tdRef }: { tdRef: React.RefObject<HTMLTableCellElement | null> }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const inner = tdRef.current?.querySelector('.cell-inner');
+    const text = (inner as HTMLElement)?.innerText?.trim() ?? '';
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+
+  return (
+    <button
+      className={`copy-cell-btn${copied ? ' copied' : ''}`}
+      onClick={handleCopy}
+      title={copied ? '¡Copiado!' : 'Copiar'}
+    >
+      <i className={`bi ${copied ? 'bi-check-lg' : 'bi-copy'}`} />
+    </button>
+  );
+}
+
+function DataCell({ cell, isLast, rowActions, row }: {
+  cell: any;
+  isLast: boolean;
+  rowActions?: RowAction[];
+  row: any;
+}) {
+  const tdRef = useRef<HTMLTableCellElement>(null);
+
+  return (
+    <td
+      ref={tdRef}
+      className={isLast ? undefined : 'data-cell'}
+      style={isLast ? { position: 'relative', overflow: 'visible' } : undefined}
+    >
+      <div className="cell-inner">
+        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+      </div>
+      {!isLast && <CopyButton tdRef={tdRef} />}
+      {isLast && (
+        <div className="row-hover-actions">
+          {rowActions!.map((action, i) => (
+            <button
+              key={i}
+              className={`btn btn-${action.variant || 'outline-secondary'} btn-sm`}
+              onClick={(e) => { e.stopPropagation(); action.onClick(row.original); }}
+              title={action.label}
+            >
+              {action.icon && <i className={`bi ${action.icon}`}></i>}
+            </button>
+          ))}
+        </div>
+      )}
+    </td>
+  );
+}
 
 export default function DataTable({
   table,
@@ -31,10 +92,10 @@ export default function DataTable({
             {headerGroup.headers.map((header: any) => {
               const canSort = header.column.getCanSort?.() ?? true;
               const sortDir = header.column.getIsSorted?.();
-              const indicator = sortDir === 'asc' ? 
-                <i className="bi bi-arrow-up ms-1"></i> : 
-                sortDir === 'desc' ? 
-                <i className="bi bi-arrow-down ms-1"></i> : 
+              const indicator = sortDir === 'asc' ?
+                <i className="bi bi-arrow-up ms-1"></i> :
+                sortDir === 'desc' ?
+                <i className="bi bi-arrow-down ms-1"></i> :
                 <i className="bi bi-arrow-up-down ms-1 text-muted" style={{opacity: 0.5}}></i>;
               return (
                 <th
@@ -63,7 +124,6 @@ export default function DataTable({
               key={row.id}
               className={className}
               onClick={(e) => {
-                // No seleccionar la fila si se hace click en una imagen clickeable
                 if (e.target instanceof HTMLElement && e.target.closest('[data-image-clickable]')) {
                   return;
                 }
@@ -85,26 +145,13 @@ export default function DataTable({
               {row.getVisibleCells().map((cell: any, idx: number, arr: any[]) => {
                 const isLast = idx === arr.length - 1 && !!rowActions?.length;
                 return (
-                  <td
+                  <DataCell
                     key={cell.id}
-                    style={isLast ? { position: 'relative', overflow: 'visible' } : undefined}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    {isLast && (
-                      <div className="row-hover-actions">
-                        {rowActions!.map((action, i) => (
-                          <button
-                            key={i}
-                            className={`btn btn-${action.variant || 'outline-secondary'} btn-sm`}
-                            onClick={(e) => { e.stopPropagation(); action.onClick(row.original); }}
-                            title={action.label}
-                          >
-                            {action.icon && <i className={`bi ${action.icon}`}></i>}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </td>
+                    cell={cell}
+                    isLast={isLast}
+                    rowActions={rowActions}
+                    row={row}
+                  />
                 );
               })}
             </tr>
@@ -114,5 +161,3 @@ export default function DataTable({
     </table>
   );
 }
-
-

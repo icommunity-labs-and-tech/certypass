@@ -107,6 +107,48 @@ tr.table-active:hover {
   min-width: 70px;
 }
 
+/* Botón copiar por celda */
+.data-cell {
+  position: relative;
+}
+
+.copy-cell-btn {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  border: 1px solid #dee2e6;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+  padding: 2px 5px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #6c757d;
+  line-height: 1;
+  z-index: 5;
+}
+
+.copy-cell-btn:hover {
+  background: #f8f9fa;
+  color: #495057;
+  border-color: #adb5bd;
+}
+
+.copy-cell-btn.copied {
+  color: #198754;
+  border-color: #198754;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.data-cell:hover .copy-cell-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 /* Acciones en hover sobre filas */
 .row-hover-actions {
   position: absolute;
