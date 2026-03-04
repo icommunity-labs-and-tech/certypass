@@ -1,5 +1,6 @@
 import { flexRender } from '@tanstack/react-table';
 import { useRef } from 'react';
+import type { RowAction } from './types';
 
 type Props = {
   table: any;
@@ -7,6 +8,7 @@ type Props = {
   setSelectedRow: (row: Record<string, any> | null) => void;
   lastAddedId: string | null;
   onRowDoubleClick?: (row: Record<string, any>) => void;
+  rowActions?: RowAction[];
 };
 
 export default function DataTable({
@@ -15,6 +17,7 @@ export default function DataTable({
   setSelectedRow,
   lastAddedId,
   onRowDoubleClick,
+  rowActions,
 }: Props) {
   const lastClickRef = useRef<{ time: number; rowId: string } | null>(null);
   const headerGroups = table.getHeaderGroups();
@@ -79,9 +82,31 @@ export default function DataTable({
               style={{ cursor: onRowDoubleClick ? 'pointer' : 'default' }}
               title={onRowDoubleClick ? 'Doble clic para ver detalles' : undefined}
             >
-              {row.getVisibleCells().map((cell: any) => (
-                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-              ))}
+              {row.getVisibleCells().map((cell: any, idx: number, arr: any[]) => {
+                const isLast = idx === arr.length - 1 && !!rowActions?.length;
+                return (
+                  <td
+                    key={cell.id}
+                    style={isLast ? { position: 'relative', overflow: 'visible' } : undefined}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    {isLast && (
+                      <div className="row-hover-actions">
+                        {rowActions!.map((action, i) => (
+                          <button
+                            key={i}
+                            className={`btn btn-${action.variant || 'outline-secondary'} btn-sm`}
+                            onClick={(e) => { e.stopPropagation(); action.onClick(row.original); }}
+                            title={action.label}
+                          >
+                            {action.icon && <i className={`bi ${action.icon}`}></i>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </td>
+                );
+              })}
             </tr>
           );
         })}

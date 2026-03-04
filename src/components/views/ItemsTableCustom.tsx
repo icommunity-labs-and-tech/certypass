@@ -44,6 +44,7 @@ export default function ItemsTableCustom<TFormData = Record<string, unknown>>({
   onExportCsvClick,
   exportCsvLabel,
   onRowDoubleClick,
+  rowActions,
 }: ItemsTableCustomProps<TFormData>) {
   const [data, setData] = useState(initialData);
   
@@ -223,6 +224,7 @@ export default function ItemsTableCustom<TFormData = Record<string, unknown>>({
             setSelectedRow={setSelectedRow}
             lastAddedId={lastAddedId}
             onRowDoubleClick={onRowDoubleClick}
+            rowActions={rowActions}
           />
         )}
       </div>

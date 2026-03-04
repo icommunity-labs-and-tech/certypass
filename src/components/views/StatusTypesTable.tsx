@@ -1,7 +1,7 @@
 "use client";
 
 import Box from '@/components/Box';
-import GenericTable, { FormTemplate, TableAction } from '@/components/GenericTable';
+import GenericTable, { FormTemplate } from '@/components/GenericTable';
 import LoadingOverlay from '@/components/Loading';
 import { addStatusType, listStatusTypes, updateStatusType, deleteStatusType, getStatusType } from '@/actions/statusTypes';
 import { useEffect, useState, useMemo } from 'react';
@@ -132,21 +132,6 @@ export default function StatusTypesTable({
   };
 
   const tCommon = useTranslations('common.actions');
-  const statusTypeActions: TableAction[] = showTutorialExamples ? [] : [
-    {
-      label: tCommon('edit'),
-      onClick: handleEditStatusType,
-      icon: 'bi-pencil',
-      variant: 'outline-secondary'
-    },
-    {
-      label: tCommon('delete'),
-      onClick: (statusType: any) => openDeleteModal(statusType),
-      icon: 'bi-trash',
-      variant: 'outline-danger'
-    },
-    ...customActions
-  ];
 
   if (isLoading) return <LoadingOverlay />;
 
@@ -205,7 +190,10 @@ export default function StatusTypesTable({
           </div>
         );
       }}
-      actions={statusTypeActions}
+      rowActions={!showTutorialExamples ? [
+        { icon: 'bi-pencil', label: tCommon('edit'), onClick: handleEditStatusType, variant: 'outline-secondary' },
+        { icon: 'bi-trash', label: tCommon('delete'), onClick: (row) => openDeleteModal(row), variant: 'outline-danger' },
+      ] : []}
       customColumns={customColumns.length > 0 ? customColumns : [
         {
           key: 'name',

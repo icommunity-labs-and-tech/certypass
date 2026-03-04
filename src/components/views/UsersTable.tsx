@@ -163,7 +163,7 @@ export default function UsersTable({
 
 
 
-  const userColumns = listColumnPresets.users.map(col => ({
+  const userColumns = listColumnPresets.users.filter(col => col.key !== 'actions').map(col => ({
     key: col.key,
     label: col.label,
     enableSorting: col.sortable !== false, // Por defecto true, a menos que se especifique false
@@ -192,25 +192,6 @@ export default function UsersTable({
         case 'createdAt':
           const localeString = locale === 'en' ? 'en-US' : 'es-ES';
           return new Date(value).toLocaleDateString(localeString);
-        case 'actions':
-          return (
-            <div className="btn-group btn-group-sm">
-              <button
-                className="btn btn-outline-secondary btn-sm"
-                onClick={() => router.push(`/dashboard/users/${row.id}/edit`)}
-                title={t('columns.edit')}
-              >
-                <i className="bi bi-pencil"></i>
-              </button>
-              <button
-                className="btn btn-outline-danger btn-sm"
-                onClick={() => openDeleteModalWithUser(row)}
-                title={t('columns.delete')}
-              >
-                <i className="bi bi-trash"></i>
-              </button>
-            </div>
-          );
         default:
           return value || '-';
       }
@@ -257,6 +238,10 @@ export default function UsersTable({
         filterPlaceholder={t('filterUserPlaceholder')}
         addButtonLabel={t('addUser')}
         onRowDoubleClick={(row) => router.push(`/dashboard/users/${row.id}`)}
+        rowActions={[
+          { icon: 'bi-pencil', label: t('columns.edit'), onClick: (row) => router.push(`/dashboard/users/${row.id}/edit`), variant: 'outline-secondary' },
+          { icon: 'bi-trash', label: t('columns.delete'), onClick: openDeleteModalWithUser, variant: 'outline-danger' },
+        ]}
       />
 
       <DeleteConfirmationModal

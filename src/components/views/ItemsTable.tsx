@@ -309,22 +309,6 @@ export default function ItemsTable({
         return <ItemImageColumn item={item} />;
       },
     },
-    ...(!showTutorialExamples ? [{
-      key: 'item-actions',
-      label: t('columns.actions'),
-      enableSorting: false,
-      render: (item: any) => (
-        <div className="btn-group btn-group-sm">
-          <button
-            className="btn btn-outline-danger btn-sm"
-            onClick={() => openDeleteModalWithDetails(item)}
-            title={t('columns.delete')}
-          >
-            <i className="bi bi-trash"></i>
-          </button>
-        </div>
-      ),
-    }] : []),
   ];
 
   if (isLoading) {
@@ -368,6 +352,9 @@ export default function ItemsTable({
       customColumns={[...defaultColumns, ...customColumns]}
       actions={customActions}
       onRowDoubleClick={!showTutorialExamples ? (item) => router.push(`/dashboard/items/${item.id}`) : undefined}
+      rowActions={!showTutorialExamples ? [
+        { icon: 'bi-trash', label: t('columns.delete'), onClick: openDeleteModalWithDetails, variant: 'outline-danger' },
+      ] : []}
       filterPlaceholder={
         filterType === 'name' 
           ? t('searchByName')

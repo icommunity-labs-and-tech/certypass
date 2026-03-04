@@ -33,6 +33,7 @@ export default function GenericTable<TFormData = Record<string, unknown>>({
   addButtonLabel,
   modalTitle,
   onRowDoubleClick,
+  rowActions,
 }: GenericTableProps<TFormData>) {
   const [data, setData] = useState(initialData);
   // Mantener sincronizado el estado interno cuando cambie initialData (por ejemplo, tras borrar)
@@ -154,6 +155,7 @@ export default function GenericTable<TFormData = Record<string, unknown>>({
             setSelectedRow={setSelectedRow}
             lastAddedId={lastAddedId}
             onRowDoubleClick={onRowDoubleClick}
+            rowActions={rowActions}
           />
         )}
       </div>

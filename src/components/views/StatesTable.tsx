@@ -37,13 +37,11 @@ export default function StatesTable({
 
   // Generar columnas usando el preset de states
   const listColumnPresets = useMemo(() => getListColumnPresets(tTables), [tTables]);
-  const stateColumns = listColumnPresets.states.map(col => ({
+  const stateColumns = listColumnPresets.states.filter(col => col.key !== 'actions').map(col => ({
     key: col.key,
     label: col.label,
     render: (state: any) => {
       const value = state[col.key];
-      
-      // Renderizado especial para cada tipo de columna
       switch (col.key) {
         case 'status':
           return (
@@ -61,22 +59,10 @@ export default function StatesTable({
         case 'description':
           return (
             <div>
-              {state.description && state.description.length > 60 
-                ? state.description.substring(0, 60) + '...' 
+              {state.description && state.description.length > 60
+                ? state.description.substring(0, 60) + '...'
                 : state.description
               }
-            </div>
-          );
-        case 'actions':
-          return (
-            <div className="btn-group btn-group-sm">
-              <button
-                className="btn btn-outline-secondary btn-sm"
-                onClick={() => router.push(`/dashboard/states/${state.id}/edit`)}
-                title={tCommon('edit')}
-              >
-                <i className="bi bi-pencil"></i>
-              </button>
             </div>
           );
         default:
@@ -128,6 +114,9 @@ export default function StatesTable({
       filterPlaceholder={t('filterPlaceholder')}
       addButtonLabel={t('addButton')}
       onRowDoubleClick={(row) => onStateSelect ? onStateSelect(row) : router.push(`/dashboard/states/${row.id}`)}
+      rowActions={[
+        { icon: 'bi-pencil', label: tCommon('edit'), onClick: (row) => router.push(`/dashboard/states/${row.id}/edit`), variant: 'outline-secondary' },
+      ]}
     />
     </>
   );

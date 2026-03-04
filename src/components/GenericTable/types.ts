@@ -19,6 +19,13 @@ export type TableAction = {
   title?: string;
 };
 
+export type RowAction = {
+  label: string;
+  icon?: string;
+  onClick: (row: Record<string, any>) => void;
+  variant?: string;
+};
+
 export type CustomColumn = {
   key: string;
   label: string;
@@ -68,6 +75,7 @@ export type GenericTableProps<TFormData = Record<string, unknown>> = {
   addButtonLabel?: string;
   modalTitle?: string;
   onRowDoubleClick?: (row: Record<string, any>) => void;
+  rowActions?: RowAction[];
 };
 
 
