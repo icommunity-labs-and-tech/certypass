@@ -170,6 +170,21 @@
       "created": "Created",
       "stateTitle": "State Title",
       "creationDate": "Creation Date"
+    },
+    "statusTypeDetail": {
+      "notFound": "Status type information not found.",
+      "pageTitle": "Status Type: {name}",
+      "fields": "Fields",
+      "field": "Field",
+      "statesUsingType": "States using this type ({count})",
+      "deleteTitle": "Delete Status Type",
+      "deleteMessage": "Are you sure you want to delete the status type \"{name}\"?",
+      "deleteError": "Error deleting the status type",
+      "columns": {
+        "title": "Title",
+        "product": "Product",
+        "created": "Created"
+      }
     }
   },
   "modals": {

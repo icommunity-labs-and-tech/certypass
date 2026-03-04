@@ -170,6 +170,21 @@
       "created": "Creado",
       "stateTitle": "Título del Estado",
       "creationDate": "Fecha de Creación"
+    },
+    "statusTypeDetail": {
+      "notFound": "No se encontró información del tipo de estado.",
+      "pageTitle": "Tipo de Estado: {name}",
+      "fields": "Campos",
+      "field": "Campo",
+      "statesUsingType": "Estados que usan este tipo ({count})",
+      "deleteTitle": "Eliminar Tipo de Estado",
+      "deleteMessage": "¿Estás seguro de que quieres eliminar el tipo de estado \"{name}\"?",
+      "deleteError": "Error al eliminar el tipo de estado",
+      "columns": {
+        "title": "Título",
+        "product": "Producto",
+        "created": "Creado"
+      }
     }
   },
   "modals": {

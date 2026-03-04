@@ -16,6 +16,7 @@ import GenericTable from '@/components/GenericTable';
 
 export default function StatusTypeDetailPage() {
   const t = useTranslations('common');
+  const tTables = useTranslations('tables');
   const { id } = useParams();
   const router = useRouter();
   const statusTypeId = id as string;
@@ -31,13 +32,13 @@ export default function StatusTypeDetailPage() {
     closeDeleteModal,
     handleDelete,
   } = useDeleteEntity(deleteStatusType, {
-    entityName: 'Estado',
+    entityName: tTables('statusTypeDetail.deleteTitle'),
     redirectPath: '/dashboard/status-types',
     onSuccess: () => {
       router.push('/dashboard/status-types');
     },
-    onError: (error) => {
-      alert('Error al eliminar el estado');
+    onError: () => {
+      alert(tTables('statusTypeDetail.deleteError'));
     },
   });
 
@@ -66,8 +67,8 @@ export default function StatusTypeDetailPage() {
   if (!statusType) {
     return (
       <Box>
-        <BoxTitle message="Estado" />
-        <p className="text-danger mb-0">No se encontró información del estado.</p>
+        <BoxTitle message={tTables('statusTypes')} />
+        <p className="text-danger mb-0">{tTables('statusTypeDetail.notFound')}</p>
       </Box>
     );
   }
@@ -78,7 +79,7 @@ export default function StatusTypeDetailPage() {
         <div className="d-flex align-items-center justify-content-between mb-2">
           <div className="d-flex align-items-center">
             <i className="bi bi-collection me-2" />
-            <h4 className="mb-0">Estado: {statusType?.name}</h4>
+            <h4 className="mb-0">{tTables('statusTypeDetail.pageTitle', { name: statusType?.name })}</h4>
           </div>
           <div className="d-flex gap-2">
             <Button
@@ -87,7 +88,7 @@ export default function StatusTypeDetailPage() {
               onClick={() => router.push(`/dashboard/status-types/${statusTypeId}/edit`)}
             >
               <i className="bi bi-pencil me-1"></i>
-              Editar
+              {t('actions.edit')}
             </Button>
             <Button
               variant="outline-danger"
@@ -95,7 +96,7 @@ export default function StatusTypeDetailPage() {
               onClick={() => openDeleteModal(statusType)}
             >
               <i className="bi bi-trash me-1"></i>
-              Eliminar
+              {t('actions.delete')}
             </Button>
           </div>
         </div>
@@ -105,13 +106,16 @@ export default function StatusTypeDetailPage() {
 
       {statusType.template && Array.isArray(statusType.template) && statusType.template.length > 0 && (
         <Box>
-          <h6 className="mb-2">Template de Campos</h6>
+          <div className="d-flex align-items-center mb-3">
+            <i className="bi bi-card-list me-2" />
+            <h5 className="mb-0">{tTables('statusTypeDetail.fields')}</h5>
+          </div>
           <Divider />
           <div className="row g-3">
             {statusType.template.map((field: any, idx: number) => (
               <div key={idx} className="col-12 col-md-6">
                 <div className="d-flex justify-content-between border rounded p-2">
-                  <span className="text-muted">{field.label || field.name || 'Campo'}</span>
+                  <span className="text-muted">{field.label || field.name || tTables('statusTypeDetail.field')}</span>
                   <span>{field.type || 'text'}</span>
                 </div>
               </div>
@@ -122,13 +126,13 @@ export default function StatusTypeDetailPage() {
 
       <Box>
         <GenericTable
-          title={`Estados que usan este tipo (${states.length})`}
+          title={tTables('statusTypeDetail.statesUsingType', { count: states.length })}
           icon="bi-list-columns"
           initialData={states}
           customColumns={[
             {
               key: 'title',
-              label: 'Título',
+              label: tTables('statusTypeDetail.columns.title'),
               render: (state: any) => (
                 <div>
                   <div className="fw-medium text-primary">{state.title}</div>
@@ -140,7 +144,7 @@ export default function StatusTypeDetailPage() {
             },
             {
               key: 'itemId',
-              label: 'Item',
+              label: tTables('statusTypeDetail.columns.product'),
               render: (state: any) => (
                 <button
                   className="btn btn-link p-0 text-primary"
@@ -152,7 +156,7 @@ export default function StatusTypeDetailPage() {
             },
             {
               key: 'createdAt',
-              label: 'Creado',
+              label: tTables('statusTypeDetail.columns.created'),
               render: (state: any) => (
                 <span className="text-muted">
                   {new Date(state.createdAt).toLocaleDateString()}
@@ -167,8 +171,8 @@ export default function StatusTypeDetailPage() {
         show={showDeleteModal}
         onHide={closeDeleteModal}
         onConfirm={handleDelete}
-        title="Eliminar Estado"
-        message={`¿Estás seguro de que quieres eliminar el estado "${entityToDelete?.name}"?`}
+        title={tTables('statusTypeDetail.deleteTitle')}
+        message={tTables('statusTypeDetail.deleteMessage', { name: entityToDelete?.name || '' })}
         isLoading={isDeleting}
       />
     </>
