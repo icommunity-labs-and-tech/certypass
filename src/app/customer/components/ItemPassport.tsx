@@ -20,6 +20,7 @@ interface ItemPassportProps {
 
 export function ItemPassport({ item, onBack }: ItemPassportProps) {
   const t = useTranslations('common');
+  const tCustomer = useTranslations('customer');
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'info' | 'history' | 'antifraud'>('info');
   const isMobile = useMobileDetection();
@@ -43,9 +44,9 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '1rem', height: '1rem' }}>
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
-          Volver
+          {t('actions.back')}
         </button>
-        <h2 style={passportStyles.headerTitle}>Información del Producto</h2>
+        <h2 style={passportStyles.headerTitle}>{tCustomer('productInfo')}</h2>
       </div>
 
       <div style={passportStyles.card}>
@@ -72,12 +73,12 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
               }}
             >
               {item.name}
-              {item.evidenceID && <VerifiedBadge title="Producto verificado en blockchain" />}
+              {item.evidenceID && <VerifiedBadge title={tCustomer('verifiedProduct')} />}
             </h3>
             <p style={passportStyles.itemDescription}>{item.description || t('noDescription')}</p>
             <div style={passportStyles.itemMeta}>
               <span>ID: {item.id}</span>
-              <span>Creado: {formatDate(item.createdAt)}</span>
+              <span>{tCustomer('createdAt')} {formatDate(item.createdAt)}</span>
             </div>
           </div>
         </div>
@@ -92,7 +93,7 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
               }}
               onClick={() => setActiveTab('info')}
             >
-              Información
+              {tCustomer('tabInfo')}
             </button>
             <button
               style={{
@@ -101,7 +102,7 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
               }}
               onClick={() => setActiveTab('history')}
             >
-              Pasaporte Digital
+              {tCustomer('tabHistory')}
             </button>
             {shouldShowAntifraud && (
               <button
@@ -111,7 +112,7 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
                 }}
                 onClick={() => setActiveTab('antifraud')}
               >
-                Antifalsificación
+                {tCustomer('tabAntifraud')}
               </button>
             )}
           </div>

@@ -15,7 +15,7 @@ import { UnifiedScannerButton } from '@/components';
 import { useTranslations } from 'next-intl';
 import { usePagination } from '@/hooks/usePagination';
 import { useItemFilter } from '@/hooks/useItemFilter';
-import { OPERATOR_CONSTANTS, OPERATOR_MESSAGES, OPERATOR_BUTTONS } from '@/constants/operator';
+import { OPERATOR_CONSTANTS } from '@/constants/operator';
 import { useAdminOperatorAccess } from '@/hooks/useAdminOperatorAccess';
 import './operator.css';
 
@@ -111,8 +111,8 @@ export default function OperatorPage() {
   }, [isMobile, viewType]);
 
   return (
-    <Container id="main" fluid className="operator-page" role="main" aria-label="Aplicación de operador - Operador certypass">
-      <Row className="mb-4 operator-header" role="region" aria-label="Encabezado y acciones">
+    <Container id="main" fluid className="operator-page" role="main" aria-label={t('title')}>
+      <Row className="mb-4 operator-header" role="region">
         <Col>
           <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div className="me-2">
@@ -120,23 +120,23 @@ export default function OperatorPage() {
               <p className="text-muted mb-0">{t('welcome', { name: user?.name || '' })}</p>
             </div>
             <div className="d-flex gap-2 flex-wrap">
-              <UnifiedScannerButton 
+              <UnifiedScannerButton
                 appContext="operator"
                 returnUrl="/operator"
                 variant="primary"
                 aria-label={t('openScanner')}
               >
-                {OPERATOR_BUTTONS.START_SCAN}
+                {t('startScan')}
               </UnifiedScannerButton>
               {user?.role === 'ADMIN' && (
-                <Button variant="outline-primary" onClick={clearAdminOperatorAccess} aria-label="Volver al Dashboard" className="icon-button-mobile">
+                <Button variant="outline-primary" onClick={clearAdminOperatorAccess} aria-label={t('backToDashboard')} className="icon-button-mobile">
                   <i className="bi bi-speedometer2 me-md-2"></i>
-                  <span className="d-none d-md-inline">Volver al Dashboard</span>
+                  <span className="d-none d-md-inline">{t('backToDashboard')}</span>
                 </Button>
               )}
-              <Button variant="outline-secondary" onClick={handleLogout} aria-label={OPERATOR_BUTTONS.LOGOUT} className="icon-button-mobile">
+              <Button variant="outline-secondary" onClick={handleLogout} aria-label={t('logout')} className="icon-button-mobile">
                 <i className="bi bi-box-arrow-right me-md-2"></i>
-                <span className="d-none d-md-inline">{OPERATOR_BUTTONS.LOGOUT}</span>
+                <span className="d-none d-md-inline">{t('logout')}</span>
               </Button>
             </div>
           </div>
@@ -180,7 +180,7 @@ export default function OperatorPage() {
               {isLoadingItems ? (
                 <div className="text-center py-4" role="status" aria-live="polite">
                   <Spinner animation="border" variant="primary" />
-                  <p className="mt-2 text-muted">{OPERATOR_MESSAGES.LOADING_ITEMS}</p>
+                  <p className="mt-2 text-muted">{t('loadingProducts')}</p>
                 </div>
               ) : filteredItems.length > 0 ? (
                 viewType === 'grid' ? (
@@ -200,11 +200,11 @@ export default function OperatorPage() {
                   />
                 )
               ) : (
-                <div className="text-center py-4" role="region" aria-label="Estado vacío del listado de productos">
+                <div className="text-center py-4" role="region" aria-label={t('noProducts')}>
                   <div className="empty-state">
                     <span className="empty-icon">📦</span>
-                    <h6 className="empty-title">{OPERATOR_MESSAGES.NO_ITEMS}</h6>
-                    <p className="empty-message">{OPERATOR_MESSAGES.NO_ITEMS_DESCRIPTION}</p>
+                    <h6 className="empty-title">{t('noProducts')}</h6>
+                    <p className="empty-message">{t('noProductsDescription')}</p>
                   </div>
                 </div>
               )}

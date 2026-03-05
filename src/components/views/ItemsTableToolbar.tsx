@@ -2,6 +2,7 @@ import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
+import { useTranslations } from 'next-intl';
 import type { TableAction } from '@/components/GenericTable/types';
 import './ItemsTableToolbar.css';
 
@@ -42,13 +43,14 @@ export default function ItemsTableToolbar({
   onExportCsvClick,
   exportCsvLabel = "Exportar CSV"
 }: ItemsTableToolbarProps) {
+  const t = useTranslations('tables');
   return (
     <div className={`table-toolbar ${className}`}>
       <div className="title-section">
         {icon && <i className={`bi ${icon}`} />}
         {title && <h4>{title}</h4>}
       </div>
-      <div className="controls-section" role="search" aria-label="Buscar en la tabla">
+      <div className="controls-section" role="search" aria-label={t('searchTable')}>
         <div className="input-group">
           <select
             className="form-select"
@@ -56,9 +58,9 @@ export default function ItemsTableToolbar({
             onChange={(e) => onFilterTypeChange(e.target.value as 'name' | 'id' | 'category')}
             style={{ maxWidth: '120px' }}
           >
-            <option value="name">Nombre</option>
-            <option value="id">ID</option>
-            <option value="category">Categoría</option>
+            <option value="name">{t('filterType.name')}</option>
+            <option value="id">{t('filterType.id')}</option>
+            <option value="category">{t('filterType.category')}</option>
           </select>
           <Form.Control
             type="text"
@@ -70,7 +72,7 @@ export default function ItemsTableToolbar({
         </div>
         {selectedRow && actions?.length ? (
           <Dropdown align="end">
-            <Dropdown.Toggle variant="secondary">Acciones</Dropdown.Toggle>
+            <Dropdown.Toggle variant="secondary">{t('columns.actions')}</Dropdown.Toggle>
             <Dropdown.Menu>
               {actions.map((action, index) => (
                 <Dropdown.Item key={index} onClick={() => onActionClick(action)}>

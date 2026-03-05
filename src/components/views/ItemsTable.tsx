@@ -225,7 +225,7 @@ export default function ItemsTable({
   const defaultColumns = [
     {
       key: 'item-name',
-      label: 'Nombre del Producto',
+      label: t('columns.productName'),
       enableSorting: true,
       sortingFn: (a: any, b: any) => a.original.name.localeCompare(b.original.name),
       render: (item: any) => (

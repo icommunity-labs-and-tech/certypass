@@ -20,8 +20,10 @@ import ItemSpecificFields from '@/components/ItemSpecificFields';
 import ItemStatesMap from '@/components/ItemStatesMapClient';
 import CategoryInputField from '@/components/CategoryInputField';
 import AddStateForm from '@/components/AddStateForm';
+import { useTranslations } from 'next-intl';
 
 export default function ItemDetailPage() {
+  const t = useTranslations('itemDetail');
   const { id } = useParams();
   const router = useRouter();
   const itemId = id as string;
@@ -41,13 +43,13 @@ export default function ItemDetailPage() {
     closeDeleteModal,
     handleDelete,
   } = useDeleteEntity(deleteItem, {
-    entityName: 'Producto',
+    entityName: t('deleteEntityName'),
     redirectPath: '/dashboard/items',
     onSuccess: () => {
       router.push('/dashboard/items');
     },
-    onError: (error) => {
-      alert('Error al eliminar el producto');
+    onError: () => {
+      alert(t('deleteError'));
     },
   });
 
@@ -108,11 +110,11 @@ export default function ItemDetailPage() {
         <div className="d-flex align-items-center justify-content-between mb-2">
           <div className="d-flex align-items-center">
             <i className="bi bi-list-columns me-2" />
-            <h4 className="mb-0">Producto no encontrado</h4>
+            <h4 className="mb-0">{t('notFound')}</h4>
           </div>
         </div>
         <Divider />
-        <p className="text-muted">No se pudo cargar la información del producto.</p>
+        <p className="text-muted">{t('notFoundDescription')}</p>
       </Box>
     );
   }
@@ -129,7 +131,7 @@ export default function ItemDetailPage() {
         <div className="d-flex align-items-center justify-content-between mb-2">
           <div className="d-flex align-items-center">
             <i className="bi bi-list-columns me-2" />
-            <h4 className="mb-0">Producto: {item?.name}</h4>
+            <h4 className="mb-0">{t('title', { name: item?.name })}</h4>
           </div>
           <div className="d-flex gap-2">
             <Button
@@ -149,7 +151,7 @@ export default function ItemDetailPage() {
               disabled={!itemId}
             >
               <i className="bi bi-shield-check me-1"></i>
-              QR Verificación
+              {t('qrVerification')}
             </Button>
             <Button
               variant="outline-info"
@@ -161,7 +163,7 @@ export default function ItemDetailPage() {
               disabled={!itemId}
             >
               <i className="bi bi-eye me-1"></i>
-              Passport
+              {t('passport')}
             </Button>
             <Button
               variant="outline-danger"
@@ -170,7 +172,7 @@ export default function ItemDetailPage() {
               className="d-flex align-items-center gap-1"
             >
               <i className="bi bi-trash me-1"></i>
-              Eliminar
+              {t('delete')}
             </Button>
           </div>
         </div>
@@ -195,9 +197,9 @@ export default function ItemDetailPage() {
               <div className="d-flex justify-content-end">
                 <ImageDisplay
                   imageUrl={item.imageUrl}
-                  alt={`Imagen de ${item.name}`}
+                  alt={t('imageAlt', { name: item.name })}
                   clickable={true}
-                  modalTitle={`Imagen de ${item.name}`}
+                  modalTitle={t('imageAlt', { name: item.name })}
                   style={{ 
                     maxWidth: '150px', 
                     maxHeight: '150px',
@@ -231,7 +233,7 @@ export default function ItemDetailPage() {
         <div className="d-flex align-items-center justify-content-between mb-3">
           <div className="d-flex align-items-center">
             <i className="bi bi-flag me-2" />
-            <h5 className="mb-0">Estados del Producto</h5>
+            <h5 className="mb-0">{t('productStates')}</h5>
           </div>
           <Button
             variant="primary"
@@ -240,7 +242,7 @@ export default function ItemDetailPage() {
             className="d-flex align-items-center gap-1"
           >
             <i className="bi bi-plus-circle me-1"></i>
-            Añadir Estado
+            {t('addState')}
           </Button>
         </div>
         <Divider />
@@ -279,7 +281,7 @@ export default function ItemDetailPage() {
             <div className="d-flex align-items-center justify-content-between mb-3">
               <div className="d-flex align-items-center">
                 <i className="bi bi-geo-alt me-2" />
-                <h5 className="mb-0">Seguimiento con geolocalización</h5>
+                <h5 className="mb-0">{t('geotracking')}</h5>
               </div>
             </div>
             <Divider />
@@ -292,8 +294,8 @@ export default function ItemDetailPage() {
         show={showDeleteModal}
         onHide={closeDeleteModal}
         onConfirm={handleDelete}
-        title="Eliminar Producto"
-        message={`¿Estás seguro de que quieres eliminar el producto "${entityToDelete?.name}"?`}
+        title={t('deleteTitle')}
+        message={t('deleteMessage', { name: entityToDelete?.name ?? '' })}
         cascadeInfo={cascadeInfo}
         isLoading={isDeleting}
       />

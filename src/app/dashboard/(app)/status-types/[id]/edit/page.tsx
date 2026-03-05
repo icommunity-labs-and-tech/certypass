@@ -9,8 +9,12 @@ import { Divider } from '@/components/Divider';
 import { getStatusType, updateStatusType } from '@/actions/statusTypes';
 import { Button, Form, Alert } from 'react-bootstrap';
 import StatusTypeFieldBuilder, { StatusTypeFieldDefinition } from '@/components/StatusTypeFieldBuilder';
+import { useTranslations } from 'next-intl';
 
 export default function StatusTypeEditPage() {
+  const tCommon = useTranslations('common.actions');
+  const tForms = useTranslations('forms');
+  const tTables = useTranslations('tables');
   const { id } = useParams();
   const router = useRouter();
   const statusTypeId = id as string;
@@ -32,7 +36,7 @@ export default function StatusTypeEditPage() {
         });
       } catch (e) {
         console.error(e);
-        setError('Error al cargar el estado');
+        setError(tTables('loadStatusTypeError'));
       } finally {
         setIsLoading(false);
       }
@@ -53,7 +57,7 @@ export default function StatusTypeEditPage() {
       });
       router.push(`/dashboard/status-types/${statusTypeId}`);
     } catch (err: any) {
-      setError(err.message || 'Error al actualizar el estado');
+      setError(err.message || tTables('updateStatusTypeError'));
     } finally {
       setIsSaving(false);
     }
@@ -64,17 +68,17 @@ export default function StatusTypeEditPage() {
   if (!statusType) {
     return (
       <Box>
-        <BoxTitle message="Editar Estado" />
-        <p className="text-danger mb-0">No se encontró información del estado.</p>
+        <BoxTitle message={tForms('editState')} />
+        <p className="text-danger mb-0">{tTables('statusTypeDetail.notFound')}</p>
       </Box>
     );
   }
 
   return (
     <Box>
-      <BoxTitle message="Editar Estado" />
+      <BoxTitle message={tForms('editState')} />
       <Divider />
-      
+
       {error && (
         <Alert variant="danger" className="mb-3">
           {error}
@@ -83,7 +87,7 @@ export default function StatusTypeEditPage() {
 
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
-          <Form.Label>Nombre</Form.Label>
+          <Form.Label>{tForms('labels.name')}</Form.Label>
           <Form.Control
             type="text"
             value={formData.name}
@@ -93,7 +97,7 @@ export default function StatusTypeEditPage() {
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Descripción</Form.Label>
+          <Form.Label>{tForms('description')}</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
@@ -103,7 +107,7 @@ export default function StatusTypeEditPage() {
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Template de Campos</Form.Label>
+          <Form.Label>{tForms('statusTypeFields')}</Form.Label>
           <StatusTypeFieldBuilder
             fields={formData.template}
             onChange={(fields: StatusTypeFieldDefinition[]) => {
@@ -118,10 +122,10 @@ export default function StatusTypeEditPage() {
             variant="secondary"
             onClick={() => router.push(`/dashboard/status-types/${statusTypeId}`)}
           >
-            Cancelar
+            {tCommon('cancel')}
           </Button>
           <Button variant="primary" type="submit" disabled={isSaving}>
-            {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+            {isSaving ? tCommon('saving') : tCommon('saveChanges')}
           </Button>
         </div>
       </Form>

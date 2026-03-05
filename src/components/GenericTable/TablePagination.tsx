@@ -1,5 +1,6 @@
 import Pagination from 'react-bootstrap/Pagination';
 import { Form, InputGroup } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 
 type Props = {
   pageCount: number;
@@ -20,6 +21,8 @@ export default function TablePagination({
   showPageSizeSelector = false,
   onPageSizeChange
 }: Props) {
+  const t = useTranslations('tables.pagination');
+
   if (pageCount <= 1) return null;
 
   const startItem = pageIndex * pageSize + 1;
@@ -106,13 +109,9 @@ export default function TablePagination({
       {/* Información de páginas */}
       <div className="pagination-info text-muted small">
         {totalItems > 0 ? (
-          <>
-            Mostrando {startItem}-{endItem} de {totalItems} elementos
-          </>
+          <>{t('showing', { start: startItem, end: endItem, total: totalItems })}</>
         ) : (
-          <>
-            Página {currentPage} de {pageCount}
-          </>
+          <>{t('page', { currentPage, pageCount })}</>
         )}
       </div>
 
@@ -121,7 +120,7 @@ export default function TablePagination({
         {/* Selector de tamaño de página */}
         {showPageSizeSelector && onPageSizeChange && (
           <div className="page-size-selector">
-            <span className="text-muted small">Mostrar:</span>
+            <span className="text-muted small">{t('show')}</span>
             <Form.Select 
               size="sm" 
               style={{ width: 'auto' }}
@@ -142,14 +141,14 @@ export default function TablePagination({
           <Pagination.First 
             onClick={() => setPageIndex(0)}
             disabled={pageIndex === 0}
-            title="Primera página"
+            title={t('firstPage')}
           />
           
           {/* Botón Anterior */}
           <Pagination.Prev 
             onClick={() => setPageIndex(Math.max(0, pageIndex - 1))}
             disabled={pageIndex === 0}
-            title="Página anterior"
+            title={t('previousPage')}
           />
           
           {/* Números de página */}
@@ -159,14 +158,14 @@ export default function TablePagination({
           <Pagination.Next 
             onClick={() => setPageIndex(Math.min(pageCount - 1, pageIndex + 1))}
             disabled={pageIndex === pageCount - 1}
-            title="Página siguiente"
+            title={t('nextPage')}
           />
           
           {/* Botón Última página */}
           <Pagination.Last 
             onClick={() => setPageIndex(pageCount - 1)}
             disabled={pageIndex === pageCount - 1}
-            title="Última página"
+            title={t('lastPage')}
           />
         </Pagination>
       </div>

@@ -1,11 +1,15 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 interface BlockchainLinkProps {
   href: string;
   label?: string;
 }
 
-export function BlockchainLink({ href, label = 'Certificación blockchain' }: BlockchainLinkProps) {
+export function BlockchainLink({ href, label }: BlockchainLinkProps) {
+  const t = useTranslations('customer');
+  const displayLabel = label ?? t('blockchainCertification');
   return (
     <a
       href={href}
@@ -62,7 +66,7 @@ export function BlockchainLink({ href, label = 'Certificación blockchain' }: Bl
           minWidth: 0,
         }}
       >
-        {label}
+        {displayLabel}
       </span>
     </a>
   );

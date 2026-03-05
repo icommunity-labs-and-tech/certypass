@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import { ItemPassport } from '../../components/ItemPassport';
 import { AntifraudModal } from '@/components/customer/AntifraudModal';
 import { ItemData } from '../../types';
+import { useTranslations } from 'next-intl';
 
 export default function VerifyItemPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = useTranslations('customer');
   const router = useRouter();
   const [itemData, setItemData] = useState<ItemData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ export default function VerifyItemPage({ params }: { params: Promise<{ id: strin
         // Usar la ruta de verificación que ejecuta el trigger antifraude
         const response = await fetch(`/api/customer/verify/${itemId}`);
         if (!response.ok) {
-          throw new Error('Producto no encontrado');
+          throw new Error(t('productNotFound'));
         }
         
         const data = await response.json();
@@ -56,7 +58,7 @@ export default function VerifyItemPage({ params }: { params: Promise<{ id: strin
           console.log('[Frontend Verify] Not first verification, modal will not show');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error al obtener datos del producto');
+        setError(err instanceof Error ? err.message : t('errorGettingProduct'));
         setItemData(null);
       } finally {
         setLoading(false);
@@ -81,13 +83,13 @@ export default function VerifyItemPage({ params }: { params: Promise<{ id: strin
                   <path d="M21 12a9 9 0 11-6.219-8.56"/>
                 </svg>
               </div>
-              <h2>Cargando...</h2>
-              <p>Obteniendo información del producto</p>
+              <h2>{t('loading')}</h2>
+              <p>{t('loadingProduct')}</p>
             </div>
           </div>
         </div>
         <div className="customer-footer">
-          <p>&copy; 2026 certypass - Pasaporte Digital</p>
+          <p>{t('copyright')}</p>
         </div>
       </div>
     );
@@ -105,16 +107,16 @@ export default function VerifyItemPage({ params }: { params: Promise<{ id: strin
                   <path d="M15 9l-6 6M9 9l6 6"/>
                 </svg>
               </div>
-              <h3>Error</h3>
+              <h3>{t('error.title')}</h3>
               <p>{error}</p>
               <button className="retry-button" onClick={() => router.push('/customer')}>
-                Volver al Scanner
+                {t('error.backToScanner')}
               </button>
             </div>
           </div>
         </div>
         <div className="customer-footer">
-          <p>&copy; 2026 certypass - Pasaporte Digital</p>
+          <p>{t('copyright')}</p>
         </div>
       </div>
     );
@@ -132,16 +134,16 @@ export default function VerifyItemPage({ params }: { params: Promise<{ id: strin
                   <path d="M15 9l-6 6M9 9l6 6"/>
                 </svg>
               </div>
-              <h3>Producto no encontrado</h3>
-              <p>No se pudo encontrar el producto solicitado</p>
+              <h3>{t('productNotFound')}</h3>
+              <p>{t('productNotFoundMessage')}</p>
               <button className="retry-button" onClick={() => router.push('/customer')}>
-                Volver al Scanner
+                {t('error.backToScanner')}
               </button>
             </div>
           </div>
         </div>
         <div className="customer-footer">
-          <p>&copy; 2026 certypass - Pasaporte Digital</p>
+          <p>{t('copyright')}</p>
         </div>
       </div>
     );
@@ -164,7 +166,7 @@ export default function VerifyItemPage({ params }: { params: Promise<{ id: strin
       )}
       
       <div className="customer-footer">
-        <p>&copy; 2026 certypass - Pasaporte Digital</p>
+        <p>{t('copyright')}</p>
       </div>
     </div>
   );

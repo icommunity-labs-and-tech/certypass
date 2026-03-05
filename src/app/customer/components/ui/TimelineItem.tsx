@@ -1,6 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element */
 
+import { useTranslations } from 'next-intl';
 import { StateData } from '../../types';
 import { TimestampBadge } from './TimestampBadge';
 import { VerifiedBadge } from './VerifiedBadge';
@@ -16,6 +17,7 @@ interface TimelineItemProps {
 }
 
 export function TimelineItem({ state, loadStatus = 'loaded' }: TimelineItemProps) {
+  const t = useTranslations('customer');
   const isPending = loadStatus === 'pending';
   const isLoading = loadStatus === 'loading';
   const showLoadingSpinner = (isPending || isLoading) && state.evidenceID;
@@ -39,7 +41,7 @@ export function TimelineItem({ state, loadStatus = 'loaded' }: TimelineItemProps
           }}
         >
           {state.title}
-          {state.evidenceID && <VerifiedBadge title="Estado verificado en blockchain" size="sm" />}
+          {state.evidenceID && <VerifiedBadge title={t('stateVerified')} size="sm" />}
         </h5>
 
         <p style={{ color: '#64748b', margin: '0 0 0.75rem', lineHeight: '1.5' }}>
@@ -65,7 +67,7 @@ export function TimelineItem({ state, loadStatus = 'loaded' }: TimelineItemProps
               <img
                 key={index}
                 src={url}
-                alt={`Evidencia ${index + 1}`}
+                alt={t('evidenceImageAlt', { index: index + 1 })}
                 style={{
                   width: '60px',
                   height: '60px',
@@ -86,7 +88,7 @@ export function TimelineItem({ state, loadStatus = 'loaded' }: TimelineItemProps
                 <path d="M21 12a9 9 0 11-6.219-8.56" fill="none" stroke="currentColor" strokeWidth="2" />
               </svg>
             </div>
-            <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem' }}>Cargando certificación...</span>
+            <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem' }}>{t('loadingCertification')}</span>
           </div>
         )}
 

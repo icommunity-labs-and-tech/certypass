@@ -84,7 +84,7 @@ export default function OperatorItemDetailsPage() {
         <Col>
           <div className="d-flex justify-content-between align-items-center">
             <div>
-              <Button variant="outline-secondary" onClick={() => router.push('/operator')} className="me-2 icon-button-mobile" aria-label="Volver al listado">
+              <Button variant="outline-secondary" onClick={() => router.push('/operator')} className="me-2 icon-button-mobile" aria-label={t('backToList')}>
                 <i className="bi bi-arrow-left me-md-2"></i>
                 <span className="d-none d-md-inline">{tCommon('back')}</span>
               </Button>
@@ -113,7 +113,7 @@ export default function OperatorItemDetailsPage() {
                       <span className="info-value">{item.name}</span>
                     </div>
                     <div className="info-row">
-                      <span className="info-label">{t('columnLabels.description')}:</span>
+                      <span className="info-label">{t('description')}:</span>
                       <span className="info-value">{item.description || '-'}</span>
                     </div>
                     <div className="info-row">
@@ -173,7 +173,7 @@ export default function OperatorItemDetailsPage() {
       <Row>
         <Col>
           <Box>
-            <BoxHeader title="Pasaporte Digital" />
+            <BoxHeader title={t('digitalPassport')} />
             {loadingStates ? (
               <div className="text-center py-4">
                 <Spinner animation="border" variant="primary" />

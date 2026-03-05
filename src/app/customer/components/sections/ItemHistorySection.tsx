@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { StateData } from '../../types';
 import { TimelineItem } from '../ui/TimelineItem';
 import { timelineStyles } from '../../styles/passportStyles';
@@ -13,6 +14,7 @@ interface ItemHistorySectionProps {
 export type StateLoadStatus = 'pending' | 'loading' | 'loaded' | 'error';
 
 export function ItemHistorySection({ states }: ItemHistorySectionProps) {
+  const t = useTranslations('customer');
   const [loadedStates, setLoadedStates] = useState<Set<string>>(new Set());
   const [loadingStates, setLoadingStates] = useState<Set<string>>(new Set());
   const executorRef = useRef<SequentialExecutor<void> | null>(null);
@@ -85,7 +87,7 @@ export function ItemHistorySection({ states }: ItemHistorySectionProps) {
           </svg>
         </div>
         <p style={{ fontSize: '1rem', margin: '0', lineHeight: '1.5' }}>
-          No hay historial disponible para este producto
+          {t('noHistory')}
         </p>
       </div>
     );

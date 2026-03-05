@@ -123,7 +123,7 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
     if (evidenceDetails.loading) {
       return (
         <div style={styles.evidenceDetails}>
-          <div style={{ color: '#64748b', fontSize: '0.875rem' }}>Cargando información...</div>
+          <div style={{ color: '#64748b', fontSize: '0.875rem' }}>{t('loadingInfo')}</div>
         </div>
       );
     }
@@ -137,13 +137,13 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
         <div style={styles.infoGrid}>
           {evidenceDetails.verificationDate && (
             <div style={isMobile ? styles.infoItemMobile : styles.infoItem}>
-              <span style={styles.label}>Fecha de registro:</span>
+              <span style={styles.label}>{t('registrationDate')}</span>
               <span style={styles.value}>{formatFullDateTime(evidenceDetails.verificationDate)}</span>
             </div>
           )}
           {evidenceDetails.evidenceDate && (
             <div style={{ ...(isMobile ? styles.infoItemMobile : styles.infoItem), ...styles.infoItemLast }}>
-              <span style={styles.label}>Fecha de la evidencia:</span>
+              <span style={styles.label}>{t('evidenceDate')}</span>
               <span style={styles.value}>{formatFullDateTime(evidenceDetails.evidenceDate)}</span>
             </div>
           )}
@@ -166,8 +166,8 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
     return (
       <StatusCard
         variant="success"
-        title="✓ Producto Original Verificado"
-        description="Este es el primer registro de este producto en nuestro sistema. certypass garantiza la autenticidad de este artículo."
+        title={t('firstVerificationTitle')}
+        description={t('firstVerificationDescription')}
         link={hasValidEvidence ? { href: getIbsUrl(item.antifraudEvidenceId!), label: t('viewEvidence') } : undefined}
       >
         {renderEvidenceDetails()}

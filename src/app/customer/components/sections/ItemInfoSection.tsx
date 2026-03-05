@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { ItemData } from '../../types';
 import { EvidenceVerification } from '../EvidenceVerification';
 import { passportStyles } from '../../styles/passportStyles';
@@ -11,13 +12,14 @@ interface ItemInfoSectionProps {
 }
 
 export function ItemInfoSection({ item, isMobile }: ItemInfoSectionProps) {
+  const t = useTranslations('customer');
   return (
     <div>
       <div style={passportStyles.infoSection}>
-        <h4 style={passportStyles.infoSectionTitle}>Detalles del Producto</h4>
+        <h4 style={passportStyles.infoSectionTitle}>{t('productDetails')}</h4>
         <div style={passportStyles.infoGrid}>
           <div style={isMobile ? passportStyles.infoItemMobile : passportStyles.infoItem}>
-            <span style={passportStyles.label}>Categoría:</span>
+            <span style={passportStyles.label}>{t('category')}</span>
             <span style={passportStyles.value}>{item.category?.name || 'N/A'}</span>
           </div>
         </div>
@@ -25,7 +27,7 @@ export function ItemInfoSection({ item, isMobile }: ItemInfoSectionProps) {
 
       {item.templateFields && Object.keys(item.templateFields).length > 0 && (
         <div style={passportStyles.infoSection}>
-          <h4 style={passportStyles.infoSectionTitle}>Especificaciones</h4>
+          <h4 style={passportStyles.infoSectionTitle}>{t('specifications')}</h4>
           <div style={passportStyles.infoGrid}>
             {Object.entries(item.templateFields).map(([key, value]: [string, unknown]) => {
               const isGeolocation =
@@ -61,7 +63,7 @@ export function ItemInfoSection({ item, isMobile }: ItemInfoSectionProps) {
 
       {item.evidenceID && (
         <div style={passportStyles.infoSection}>
-          <h4 style={passportStyles.infoSectionTitle}>Certificación del producto</h4>
+          <h4 style={passportStyles.infoSectionTitle}>{t('productCertification')}</h4>
           <EvidenceVerification
             evidenceId={item.evidenceID}
             type="item"

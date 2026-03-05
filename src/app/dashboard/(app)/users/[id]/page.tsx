@@ -9,8 +9,11 @@ import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
 import { Button } from 'react-bootstrap';
 import { useDeleteEntity } from '@/hooks/useDeleteEntity';
 import { deleteUser, getUserById } from '@/actions/users';
+import { useTranslations } from 'next-intl';
 
 export default function UserDetailPage() {
+  const t = useTranslations('userDetail');
+  const tCommon = useTranslations('common.actions');
   const { id } = useParams();
   const router = useRouter();
   const userId = id as string;
@@ -22,7 +25,7 @@ export default function UserDetailPage() {
     const result = await deleteUser(id);
     return {
       success: result.success,
-      message: result.success ? (result.message || 'Usuario eliminado correctamente') : (result.error || 'Error al eliminar usuario')
+      message: result.success ? (result.message || t('deleteSuccess')) : (result.error || t('deleteError'))
     };
   };
 
@@ -35,13 +38,13 @@ export default function UserDetailPage() {
     closeDeleteModal,
     handleDelete,
   } = useDeleteEntity(deleteUserWrapper, {
-    entityName: 'Usuario',
+    entityName: t('entityName'),
     redirectPath: '/dashboard/users',
     onSuccess: () => {
       router.push('/dashboard/users');
     },
-    onError: (error) => {
-      alert('Error al eliminar el usuario');
+    onError: () => {
+      alert(t('deleteError'));
     },
   });
 
@@ -75,7 +78,7 @@ export default function UserDetailPage() {
         <div className="d-flex align-items-center justify-content-between mb-2">
           <div className="d-flex align-items-center">
             <i className="bi bi-people-fill me-2" />
-            <h4 className="mb-0">Usuario: {user?.name}</h4>
+            <h4 className="mb-0">{t('title', { name: user?.name })}</h4>
           </div>
           <div className="d-flex gap-2">
             <Button
@@ -84,7 +87,7 @@ export default function UserDetailPage() {
               onClick={() => router.push(`/dashboard/users/${userId}/edit`)}
             >
               <i className="bi bi-pencil me-1"></i>
-              Editar
+              {tCommon('edit')}
             </Button>
             <Button
               variant="outline-danger"
@@ -92,7 +95,7 @@ export default function UserDetailPage() {
               onClick={openDeleteModalWithUser}
             >
               <i className="bi bi-trash me-1"></i>
-              Eliminar
+              {tCommon('delete')}
             </Button>
           </div>
         </div>
@@ -101,14 +104,14 @@ export default function UserDetailPage() {
       </Box>
 
       <Box>
-        <h5>Información del Usuario</h5>
+        <h5>{t('info')}</h5>
         <div className="row">
           <div className="col-md-6">
-            <p><strong>Rol:</strong> {user?.role === 'ADMIN' ? 'Administrador' : 'Operador'}</p>
+            <p><strong>{t('role')}</strong> {user?.role === 'ADMIN' ? t('roleAdmin') : t('roleOperator')}</p>
           </div>
           <div className="col-md-6">
-            <p><strong>Teléfono:</strong> {user?.phone || 'No especificado'}</p>
-            <p><strong>Fecha de creación:</strong> {new Date(user?.createdAt).toLocaleDateString()}</p>
+            <p><strong>{t('phone')}</strong> {user?.phone || t('notSpecified')}</p>
+            <p><strong>{t('createdAt')}</strong> {new Date(user?.createdAt).toLocaleDateString()}</p>
           </div>
         </div>
       </Box>
@@ -121,8 +124,11 @@ export default function UserDetailPage() {
             handleDelete();
           }
         }}
-        title="Eliminar Usuario"
-        message={`¿Estás seguro de que quieres eliminar el ${entityToDelete?.userType === 'admin' ? 'administrador' : 'operario'} "${entityToDelete?.name}"?`}
+        title={t('deleteTitle')}
+        message={t('deleteMessage', {
+          role: entityToDelete?.userType === 'admin' ? t('adminRole') : t('operatorRole'),
+          name: entityToDelete?.name ?? '',
+        })}
         isLoading={isDeleting}
       />
     </>

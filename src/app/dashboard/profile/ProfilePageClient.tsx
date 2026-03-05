@@ -8,9 +8,11 @@ import { formatValueWithSmartDateDetection } from '@/lib/format';
 import ChangePasswordForm from '@/components/ChangePasswordForm';
 import { retryOrganizationKyc } from '@/actions/organizations/retry-organization-kyc';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 // import { updateSigningPreference } from '@/actions/users';
 
 export default function ProfilePageClient({ user }: { user: any }) {
+  const t = useTranslations('profile');
   const [retrying, setRetrying] = useState(false);
   const [retryError, setRetryError] = useState<string | null>(null);
   const [kycURL, setKycURL] = useState<string | null>(user?.Organization?.kycURL || null);
@@ -35,13 +37,13 @@ export default function ProfilePageClient({ user }: { user: any }) {
             window.location.reload();
           }, 1000);
         } else {
-          setRetryError('No se pudo obtener una URL de verificación. Por favor, intenta más tarde.');
+          setRetryError(t('kyc.noUrlError'));
         }
       } else {
-        setRetryError(result.error || 'Error al reintentar el KYC');
+        setRetryError(result.error || t('kyc.retry'));
       }
     } catch (error) {
-      setRetryError(error instanceof Error ? error.message : 'Error desconocido');
+      setRetryError(error instanceof Error ? error.message : t('kyc.noUrlError'));
     } finally {
       setRetrying(false);
     }
@@ -82,37 +84,37 @@ export default function ProfilePageClient({ user }: { user: any }) {
     <>
       {/* Información Personal */}
       <Box>
-        <BoxTitle message='Información Personal'/>
-        
+        <BoxTitle message={t('personalInfo')}/>
+
         <Row>
           <Col md={6}>
             <Card className="mb-3">
               <Card.Body>
-                <h6 className="card-title">Datos Básicos</h6>
+                <h6 className="card-title">{t('basicData')}</h6>
                 <div className="mb-2">
-                  <strong>Nombre:</strong> {user.name || 'No especificado'}
+                  <strong>{t('name')}</strong> {user.name || t('notSpecified')}
                 </div>
                 <div className="mb-2">
-                  <strong>Email:</strong> {user.email}
+                  <strong>{t('email')}</strong> {user.email}
                 </div>
                 <div className="mb-2">
-                  <strong>Teléfono:</strong> {user.phone || 'No especificado'}
+                  <strong>{t('phone')}</strong> {user.phone || t('notSpecified')}
                 </div>
               </Card.Body>
             </Card>
           </Col>
-          
+
           <Col md={6}>
             <Card className="mb-3">
               <Card.Body>
-                <h6 className="card-title">Estado de la Cuenta</h6>
+                <h6 className="card-title">{t('accountStatus')}</h6>
                 <div className="mb-2">
-                  <strong>Rol:</strong> {' '}
+                  <strong>{t('role')}</strong> {' '}
                   <Badge bg={getRoleBadgeVariant(user.role)}>
-                    {user.role === 'ADMIN' ? 'Administrador' : 'Usuario'}
+                    {user.role === 'ADMIN' ? t('roleAdmin') : t('roleUser')}
                   </Badge>
                 </div>
-                
+
               </Card.Body>
             </Card>
           </Col>
@@ -121,7 +123,7 @@ export default function ProfilePageClient({ user }: { user: any }) {
         {user.notes && (
           <Card className="mb-3">
             <Card.Body>
-              <h6 className="card-title">Notas</h6>
+              <h6 className="card-title">{t('notes')}</h6>
               <p className="card-text">{user.notes}</p>
             </Card.Body>
           </Card>
@@ -129,12 +131,12 @@ export default function ProfilePageClient({ user }: { user: any }) {
 
         <Card className="mb-3">
           <Card.Body>
-            <h6 className="card-title">Información de la Cuenta</h6>
+            <h6 className="card-title">{t('accountInfo')}</h6>
             <div className="mb-2">
-              <strong>Creada:</strong> {formatValueWithSmartDateDetection(user.createdAt, 'createdAt')}
+              <strong>{t('created')}</strong> {formatValueWithSmartDateDetection(user.createdAt, 'createdAt')}
             </div>
             <div className="mb-2">
-              <strong>Última actualización:</strong> {formatValueWithSmartDateDetection(user.updatedAt, 'updatedAt')}
+              <strong>{t('lastUpdated')}</strong> {formatValueWithSmartDateDetection(user.updatedAt, 'updatedAt')}
             </div>
           </Card.Body>
         </Card>
@@ -144,17 +146,17 @@ export default function ProfilePageClient({ user }: { user: any }) {
       {/* Verificación de Identidad (KYC) */}
       {user?.Organization && (
         <Box>
-          <BoxTitle message='Verificación de Identidad (KYC)'/>
-          
+          <BoxTitle message={t('kyc.title')}/>
+
           <Card className="mb-3">
             <Card.Body>
-              <h6 className="card-title">Estado de Verificación de la Organización</h6>
+              <h6 className="card-title">{t('kyc.orgVerificationStatus')}</h6>
               <div className="mb-3">
-                <strong>Organización:</strong> {user.Organization.nombre}
+                <strong>{t('kyc.organization')}</strong> {user.Organization.nombre}
               </div>
               <div className="mb-3">
-                <strong>Estado:</strong>{' '}
-                <Badge 
+                <strong>{t('kyc.status')}</strong>{' '}
+                <Badge
                   bg={
                     user.Organization.verificationStatus === 'VERIFIED' ? 'success' :
                     user.Organization.verificationStatus === 'WAITING' ? 'warning' :
@@ -162,10 +164,10 @@ export default function ProfilePageClient({ user }: { user: any }) {
                     'secondary'
                   }
                 >
-                  {user.Organization.verificationStatus === 'VERIFIED' ? 'Verificado' :
-                   user.Organization.verificationStatus === 'WAITING' ? 'En proceso' :
-                   user.Organization.verificationStatus === 'REJECTED' ? 'Rechazado' :
-                   'No verificado'}
+                  {user.Organization.verificationStatus === 'VERIFIED' ? t('kyc.verified') :
+                   user.Organization.verificationStatus === 'WAITING' ? t('kyc.waiting') :
+                   user.Organization.verificationStatus === 'REJECTED' ? t('kyc.rejected') :
+                   t('kyc.notVerified')}
                 </Badge>
               </div>
 
@@ -174,19 +176,19 @@ export default function ProfilePageClient({ user }: { user: any }) {
                   <Alert variant={user.Organization.verificationStatus === 'REJECTED' ? 'danger' : 'warning'} className="mb-3">
                     <Alert.Heading>
                       <i className={`bi bi-${user.Organization.verificationStatus === 'REJECTED' ? 'x-circle' : 'clock'}-fill me-2`}></i>
-                      {user.Organization.verificationStatus === 'REJECTED' 
-                        ? 'Verificación Rechazada' 
-                        : 'Verificación Pendiente'}
+                      {user.Organization.verificationStatus === 'REJECTED'
+                        ? t('kyc.rejectedTitle')
+                        : t('kyc.pendingTitle')}
                     </Alert.Heading>
                     <p className="mb-0">
                       {user.Organization.verificationStatus === 'REJECTED'
-                        ? 'La verificación de identidad fue rechazada. Por favor, revisa la información y reintenta el proceso.'
-                        : 'La verificación de identidad está pendiente de aprobación. Esto puede tomar unos días.'}
+                        ? t('kyc.rejectedDescription')
+                        : t('kyc.pendingDescription')}
                     </p>
                     {user.Organization.verificationStatus === 'WAITING' && (
                       <p className="mb-0 mt-2 small">
                         <i className="bi bi-info-circle me-1"></i>
-                        El proceso de verificación está en revisión. Recibirás una notificación cuando se complete.
+                        {t('kyc.waitingNote')}
                       </p>
                     )}
                   </Alert>
@@ -200,12 +202,12 @@ export default function ProfilePageClient({ user }: { user: any }) {
                       {retrying ? (
                         <>
                           <Spinner size="sm" className="me-2" />
-                          Creando nueva firma...
+                          {t('kyc.retrying')}
                         </>
                       ) : (
                         <>
                           <i className="bi bi-arrow-clockwise me-2"></i>
-                          Reintentar KYC
+                          {t('kyc.retry')}
                         </>
                       )}
                     </Button>
@@ -219,7 +221,7 @@ export default function ProfilePageClient({ user }: { user: any }) {
 
                   <p className="text-muted small mt-3 mb-0">
                     <i className="bi bi-info-circle me-1"></i>
-                    Necesitarás completar el KYC para crear items y estados certificados en blockchain.
+                    {t('kyc.needKycNote')}
                   </p>
                 </>
               )}
@@ -227,7 +229,7 @@ export default function ProfilePageClient({ user }: { user: any }) {
               {user.Organization.verificationStatus === 'VERIFIED' && (
                 <Alert variant="success">
                   <i className="bi bi-check-circle-fill me-2"></i>
-                  Tu organización está verificada. Ya puedes crear items y estados certificados.
+                  {t('kyc.verifiedMessage')}
                 </Alert>
               )}
             </Card.Body>
@@ -237,9 +239,9 @@ export default function ProfilePageClient({ user }: { user: any }) {
 
       {/* Cambio de Contraseña */}
       <Box>
-        <BoxTitle message='Cambio de contraseña'/>
-        
-        <p>Cambia tu contraseña para mantener la seguridad de tu cuenta</p>
+        <BoxTitle message={t('changePassword')}/>
+
+        <p>{t('changePasswordDescription')}</p>
 
         <ChangePasswordForm />
       </Box>

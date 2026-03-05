@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { SignerBadge, BlockchainLink } from './ui';
 import { retryFetch } from '../utils/apiRetry';
 
@@ -13,6 +14,7 @@ interface EvidenceVerificationProps {
 }
 
 export function EvidenceVerification({ evidenceId, type, entityId, createdAt: _createdAt, createdBy }: EvidenceVerificationProps) {
+  const t = useTranslations('customer');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [majorNetwork, setMajorNetwork] = useState<{ name: string; url?: string } | null>(null);
@@ -78,7 +80,7 @@ export function EvidenceVerification({ evidenceId, type, entityId, createdAt: _c
             <path d="M21 12a9 9 0 11-6.219-8.56" fill="none" stroke="currentColor" strokeWidth="2" />
           </svg>
         </div>
-        <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem' }}>Verificando evidencia...</p>
+        <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem' }}>{t('verifyingEvidence')}</p>
       </div>
     );
   }
@@ -93,7 +95,7 @@ export function EvidenceVerification({ evidenceId, type, entityId, createdAt: _c
         border: '1px solid rgba(239, 68, 68, 0.3)'
       }}>
         <div style={{ color: '#ef4444', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>
-          No se pudo verificar la certificación
+          {t('certificationError')}
         </div>
         <div style={{ color: '#64748b', fontSize: '0.75rem' }}>
           {error}
