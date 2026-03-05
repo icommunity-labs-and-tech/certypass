@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Container, Row, Col, Button, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Button, Spinner, Form } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import { useAuthSeparated } from '@/hooks/useAuthSeparated';
 import { Box, BoxHeader } from '@/components';
@@ -10,7 +10,7 @@ import { OperatorItemsTable } from '@/components/OperatorItemsTable';
 import { ViewToggle } from '@/components/ViewToggle';
 import { PaginationControls } from '@/components/PaginationControls';
 import { Toolbar } from '@/components/GenericTable/Toolbar';
-import { getAllItems } from '@/actions/items';
+import { getItems } from '@/actions/items';
 import { UnifiedScannerButton } from '@/components';
 import { useTranslations } from 'next-intl';
 import { usePagination } from '@/hooks/usePagination';
@@ -33,8 +33,21 @@ export default function OperatorPage() {
   const [viewType, setViewType] = useState<'grid' | 'table'>('grid');
 
   // Custom hooks
-  const { searchQuery, filteredItems, handleSearchChange: filterSearchChange } = useItemFilter(itemsList, {
-    searchFields: OPERATOR_CONSTANTS.SEARCH_FIELDS as any
+  const {
+    searchQuery,
+    filteredItems,
+    handleSearchChange: filterSearchChange,
+    categoryFilter,
+    setCategoryFilter,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    availableCategories,
+    clearFilters,
+    hasActiveFilters,
+  } = useItemFilter(itemsList, {
+    searchFields: OPERATOR_CONSTANTS.SEARCH_FIELDS as any,
   });
 
   const {
@@ -57,7 +70,7 @@ export default function OperatorPage() {
   useEffect(() => {
     const loadItems = async () => {
       try {
-        const data = await getAllItems();
+        const data = await getItems();
         setItemsList(data);
       } catch (err) {
         console.error('Error cargando items:', err);
@@ -68,38 +81,36 @@ export default function OperatorPage() {
     loadItems();
   }, []);
 
-
   // Handlers
   const handleLogout = useCallback(async () => {
     await logout();
     router.push('/auth/operator/login');
   }, [logout, router]);
 
-  // Scanner functionality is now handled by the unified scanner page
-
   const handleItemSelect = useCallback((item: Item) => {
     router.push(`/operator/items/${item.id}`);
   }, [router]);
-
 
   const handleSearchChange = useCallback((query: string) => {
     filterSearchChange(query);
     resetPagination();
   }, [filterSearchChange, resetPagination]);
 
+  const handleFilterChange = useCallback(() => {
+    resetPagination();
+  }, [resetPagination]);
+
   const handlePageChange = useCallback((newPage: number) => {
     setPage(newPage);
   }, [setPage]);
 
   const handleViewChange = useCallback((view: 'grid' | 'table') => {
-    // En móvil siempre usar grid
     if (isMobile) {
       setViewType('grid');
     } else {
       setViewType(view);
     }
   }, [isMobile]);
-
 
   const displayItems = isMobile ? filteredItems.slice(0, page * OPERATOR_CONSTANTS.PAGE_SIZE) : paginatedItems;
 
@@ -143,38 +154,74 @@ export default function OperatorPage() {
         </Col>
       </Row>
 
-
-
-      {/* Scanner functionality is now handled by the unified scanner page */}
-
-
       <Row className="mb-4">
         <Col>
           <Box>
             <div className="items-list-container">
               <BoxHeader title="">
-                       <div className="d-flex align-items-center gap-2 w-100 justify-content-between" aria-label="Barra de búsqueda y filtros">
-                         <div className="d-flex align-items-center gap-3">
-                           <ViewToggle
-                             currentView={viewType}
-                             onViewChange={handleViewChange}
-                             className="d-none d-md-flex"
-                           />
-                           <h5 className="mb-0">Inventario</h5>
-                         </div>
-                         <div className="d-flex align-items-center gap-2">
-                           <Toolbar
-                             filter={searchQuery}
-                             onFilterChange={handleSearchChange}
-                             selectedRow={null}
-                             onActionClick={() => {}}
-                             showAddButton={false}
-                             onAddClick={() => {}}
-                             filterPlaceholder={t('search')}
-                             className="mb-0"
-                           />
-                         </div>
-                       </div>
+                <div className="d-flex align-items-center gap-2 w-100 flex-wrap" aria-label="Barra de búsqueda y filtros">
+                  <ViewToggle
+                    currentView={viewType}
+                    onViewChange={handleViewChange}
+                    className="d-none d-md-flex"
+                  />
+                  <h5 className="mb-0 me-2">{t('inventory')}</h5>
+
+                  <div className="ms-auto d-flex align-items-center gap-2">
+                    <Form.Select
+                      value={categoryFilter}
+                      onChange={(e) => { setCategoryFilter(e.target.value); handleFilterChange(); }}
+                      disabled={availableCategories.length === 0}
+                      style={{ maxWidth: 200 }}
+                    >
+                      <option value="">{t('filterByCategory')}</option>
+                      {availableCategories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </Form.Select>
+
+                    <Form.Control
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => { setDateFrom(e.target.value); handleFilterChange(); }}
+                      style={{ maxWidth: 160 }}
+                      title={t('dateFrom')}
+                    />
+
+                    <Form.Control
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => { setDateTo(e.target.value); handleFilterChange(); }}
+                      style={{ maxWidth: 160 }}
+                      title={t('dateTo')}
+                    />
+
+                    {hasActiveFilters && (
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="text-muted p-0"
+                        onClick={() => { clearFilters(); handleFilterChange(); }}
+                        title={t('clearFilters')}
+                      >
+                        <i className="bi bi-x-circle" />
+                      </Button>
+                    )}
+
+                    <div style={{ marginBottom: '-0.5rem' }}>
+                      <Toolbar
+                        filter={searchQuery}
+                        onFilterChange={handleSearchChange}
+                        selectedRow={null}
+                        onActionClick={() => {}}
+                        showAddButton={false}
+                        onAddClick={() => {}}
+                        filterPlaceholder={t('search')}
+                        className="mb-0"
+                      />
+                    </div>
+                  </div>
+                </div>
               </BoxHeader>
 
               {isLoadingItems ? (
@@ -226,4 +273,3 @@ export default function OperatorPage() {
     </Container>
   );
 }
-

@@ -3,8 +3,10 @@ import { useState, useMemo, useCallback } from 'react';
 interface Item {
   id: string;
   name: string;
-  categoryId: string;
+  categoryId?: string;
   description?: string;
+  categories?: { id: string; name: string }[];
+  createdAt?: string | Date | null;
   [key: string]: any;
 }
 
@@ -18,18 +20,52 @@ export const useItemFilter = (
 ) => {
   const { searchFields = ['name', 'categoryId', 'description'] } = options;
   const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+
+  const availableCategories = useMemo(() => {
+    const seen = new Set<string>();
+    const result: { id: string; name: string }[] = [];
+    for (const item of items) {
+      for (const cat of item.categories ?? []) {
+        if (!seen.has(cat.id)) {
+          seen.add(cat.id);
+          result.push({ id: cat.id, name: cat.name });
+        }
+      }
+    }
+    return result.sort((a, b) => a.name.localeCompare(b.name));
+  }, [items]);
 
   const filteredItems = useMemo(() => {
-    if (!searchQuery.trim()) return items;
+    return items.filter((item) => {
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = searchFields.some((field) => {
+          const value = item[field as string];
+          return value && String(value).toLowerCase().includes(query);
+        });
+        if (!matchesSearch) return false;
+      }
 
-    const query = searchQuery.toLowerCase();
-    return items.filter((item) =>
-      searchFields.some((field) => {
-        const value = item[field];
-        return value && value.toLowerCase().includes(query);
-      })
-    );
-  }, [items, searchQuery, searchFields]);
+      if (categoryFilter) {
+        const matchesCategory = (item.categories ?? []).some(
+          (c: { id: string }) => c.id === categoryFilter
+        );
+        if (!matchesCategory) return false;
+      }
+
+      if (dateFrom || dateTo) {
+        const itemDate = item.createdAt ? new Date(item.createdAt) : null;
+        if (!itemDate) return false;
+        if (dateFrom && itemDate < new Date(dateFrom)) return false;
+        if (dateTo && itemDate > new Date(dateTo + 'T23:59:59')) return false;
+      }
+
+      return true;
+    });
+  }, [items, searchQuery, searchFields, categoryFilter, dateFrom, dateTo]);
 
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
@@ -39,10 +75,27 @@ export const useItemFilter = (
     setSearchQuery('');
   }, []);
 
+  const clearFilters = useCallback(() => {
+    setCategoryFilter('');
+    setDateFrom('');
+    setDateTo('');
+  }, []);
+
+  const hasActiveFilters = !!categoryFilter || !!dateFrom || !!dateTo;
+
   return {
     searchQuery,
     filteredItems,
     handleSearchChange,
     clearSearch,
+    categoryFilter,
+    setCategoryFilter,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    availableCategories,
+    clearFilters,
+    hasActiveFilters,
   };
 };

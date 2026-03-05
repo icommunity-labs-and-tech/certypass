@@ -509,7 +509,12 @@
     "logout": "Cerrar Sesión",
     "digitalPassport": "Pasaporte Digital",
     "backToList": "Volver al listado",
-    "description": "Descripción"
+    "description": "Descripción",
+    "filterByCategory": "Todas las categorías",
+    "dateFrom": "Desde",
+    "dateTo": "Hasta",
+    "clearFilters": "Limpiar filtros",
+    "category": "Categoría"
   },
   "states": {
     "title": "Estado",

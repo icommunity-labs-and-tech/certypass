@@ -505,7 +505,12 @@
     "logout": "Logout",
     "digitalPassport": "Digital Passport",
     "backToList": "Back to list",
-    "description": "Description"
+    "description": "Description",
+    "filterByCategory": "All categories",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "clearFilters": "Clear filters",
+    "category": "Category"
   },
   "states": {
     "title": "State",
