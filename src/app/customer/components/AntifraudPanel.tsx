@@ -163,16 +163,7 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
   }
 
   if (item.isFirstVerification) {
-    return (
-      <StatusCard
-        variant="success"
-        title={t('firstVerificationTitle')}
-        description={t('firstVerificationDescription')}
-        link={hasValidEvidence ? { href: getIbsUrl(item.antifraudEvidenceId!), label: t('viewEvidence') } : undefined}
-      >
-        {renderEvidenceDetails()}
-      </StatusCard>
-    );
+    return null;
   }
 
   return (

@@ -472,6 +472,8 @@
     "evidenceDate": "Fecha de la evidencia:",
     "firstVerificationTitle": "✓ Producto Original Verificado",
     "firstVerificationDescription": "Este es el primer registro de este producto en nuestro sistema. certypass garantiza la autenticidad de este artículo.",
+    "firstVerificationDisclaimer": "En caso de ser un producto falsificado o ya abierto anteriormente te habríamos mostrado otro mensaje.",
+    "understood": "Entendido",
     "verifyingEvidence": "Verificando evidencia...",
     "certificationError": "No se pudo verificar la certificación",
     "evidenceImageAlt": "Evidencia {index}",

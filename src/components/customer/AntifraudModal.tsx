@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import './antifraud.css';
 
 interface AntifraudModalProps {
@@ -10,6 +11,8 @@ interface AntifraudModalProps {
 }
 
 export function AntifraudModal({ isFirstVerification, onClose }: AntifraudModalProps) {
+  const t = useTranslations('customer');
+
   // Solo mostrar modal en primera verificación
   if (!isFirstVerification) {
     return null;
@@ -24,13 +27,11 @@ export function AntifraudModal({ isFirstVerification, onClose }: AntifraudModalP
               <path d="M20 6L9 17l-5-5" />
             </svg>
           </div>
-          <h2>✓ Producto Original Verificado</h2>
-          <p>
-            Este es el primer registro de este producto en nuestro sistema.
-            certypass garantiza la autenticidad de este artículo.
-          </p>
+          <h2>{t('firstVerificationTitle')}</h2>
+          <p>{t('firstVerificationDescription')}</p>
+          <p>{t('firstVerificationDisclaimer')}</p>
           <button className="antifraud-modal-button" onClick={onClose}>
-            Entendido
+            {t('understood')}
           </button>
         </div>
       </div>
