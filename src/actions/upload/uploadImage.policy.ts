@@ -19,10 +19,10 @@ export function createUploadPolicyService(): UploadPolicyService {
     limits: {
       maxImageBytes: 5 * 1024 * 1024,
       allowedMimePrefix: 'image/',
-      allowedKinds: ['product', 'item', 'issue'] as const,
+      allowedKinds: ['product', 'item', 'issue', 'fraud-report'] as const,
     },
     validateKind(kind: string): UploadType {
-      if (!['product', 'item', 'issue'].includes(kind)) {
+      if (!['product', 'item', 'issue', 'fraud-report'].includes(kind)) {
         throw new UploadPolicyViolation('invalidKind');
       }
       return kind as UploadType;

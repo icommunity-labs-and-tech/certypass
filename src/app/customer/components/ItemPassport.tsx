@@ -16,9 +16,10 @@ import { passportStyles } from '../styles/passportStyles';
 interface ItemPassportProps {
   item: ItemData;
   onBack: () => void;
+  showFraudReport?: boolean;
 }
 
-export function ItemPassport({ item, onBack }: ItemPassportProps) {
+export function ItemPassport({ item, onBack, showFraudReport = false }: ItemPassportProps) {
   const t = useTranslations('common');
   const tCustomer = useTranslations('customer');
   const router = useRouter();
@@ -128,7 +129,7 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
               {shouldShowAntifraud && (
                 <>
                   <div style={{ height: '1rem' }} />
-                  <AntifraudPanel item={item} />
+                  <AntifraudPanel item={item} showFraudReport={showFraudReport} />
                 </>
               )}
             </>
@@ -136,7 +137,7 @@ export function ItemPassport({ item, onBack }: ItemPassportProps) {
             <>
               {activeTab === 'info' && <ItemInfoSection item={item} isMobile={isMobile} />}
               {activeTab === 'history' && <ItemHistorySection states={item.states} />}
-              {activeTab === 'antifraud' && shouldShowAntifraud && <AntifraudPanel item={item} />}
+              {activeTab === 'antifraud' && shouldShowAntifraud && <AntifraudPanel item={item} showFraudReport={showFraudReport} />}
             </>
           )}
         </div>

@@ -67,7 +67,8 @@
     "auth": "Auth",
     "apiDocs": "API Docs",
     "exportQrs": "QRs",
-    "importProducts": "Import"
+    "importProducts": "Import",
+    "fraudReports": "Counterfeits"
   },
   "forms": {
     "addItem": "Add product",
@@ -486,6 +487,92 @@
       "preparingError": "Preparing error page"
     }
   },
+  "fraudReport": {
+    "button": "Report counterfeit",
+    "title": "Report Counterfeit",
+    "subtitle": "If you think this product is fake, help us investigate.",
+    "acquiredLabel": "Where did you acquire the product?",
+    "acquiredPlaceholder": "E.g.: Street market, downtown Madrid",
+    "locationLabel": "Location on map (optional)",
+    "useMyLocation": "Use my current location",
+    "locating": "Getting location...",
+    "locationSet": "Location set",
+    "mapHint": "Tap the map to move the marker to the exact location.",
+    "commentsLabel": "Additional comments (optional)",
+    "commentsPlaceholder": "Any detail that may help the investigation...",
+    "submit": "Submit report",
+    "submitting": "Submitting...",
+    "successTitle": "Report received",
+    "successMessage": "Thank you for your cooperation. We will investigate the case as soon as possible.",
+    "errorMessage": "Could not submit the report. Please try again.",
+    "locationDenied": "Could not get your location. You can describe it in the text field.",
+    "locationNotSupported": "Your device does not support geolocation.",
+    "close": "Close",
+    "photosLabel": "Photos (optional)",
+    "photosHint": "Add up to 5 photos of the product or purchase location. You can use your phone camera.",
+    "photosAdd": "Add photo"
+  },
+  "fraudReportAdmin": {
+    "title": "Counterfeit Reports",
+    "detailTitle": "Report Detail",
+    "pending": "pending",
+    "noReports": "No reports found.",
+    "notFound": "Report not found.",
+    "back": "Back",
+    "changeStatus": "Change status",
+    "saveStatus": "Save status",
+    "saving": "Saving...",
+    "whatIsFraudReports": "What are counterfeit reports?",
+    "fraudReportsDescription": "Counterfeit reports are alerts submitted by end consumers through the Digital Passport application, which they access by scanning the product QR code. From that app, if a user suspects the product is fake or was acquired through unauthorised channels, they can submit a report including a description of the purchase location, photos, GPS coordinates and comments. From here you can manage each report, change its status (Pending, Under Review, Confirmed or Dismissed) and investigate cases to protect your brand integrity.",
+    "charts": {
+      "statsTitle": "Statistics",
+      "statusTitle": "Status distribution",
+      "monthlyTitle": "Reports per month",
+      "total": "Total",
+      "reports": "Reports"
+    },
+    "widget": {
+      "pendingLabel": "pending reports",
+      "viewAll": "View all",
+      "noLocation": "No location",
+      "andMore": "and {count} more..."
+    },
+    "filterByDate": "Filter by date",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "clearDates": "Clear",
+    "pagination": {
+      "showing": "Showing {from}–{to} of {total}",
+      "perPage": "per page"
+    },
+    "reportedLocation": "Reported location",
+    "photoEvidence": "Photo evidence",
+    "photoAlt": "Photo",
+    "mapTitle": "Reports map",
+    "reportsWithLocation": "with location",
+    "status": {
+      "ALL": "All",
+      "PENDING": "Pending",
+      "UNDER_REVIEW": "Under review",
+      "CONFIRMED": "Confirmed",
+      "DISMISSED": "Dismissed"
+    },
+    "columns": {
+      "item": "Product",
+      "location": "Location",
+      "date": "Date",
+      "status": "Status"
+    },
+    "fields": {
+      "item": "Product",
+      "itemId": "Product ID",
+      "reportId": "Report ID",
+      "date": "Date",
+      "acquiredAt": "Acquisition location",
+      "locationName": "Place name",
+      "comments": "Comments"
+    }
+  },
   "operator": {
     "title": "certypass Operator",
     "welcome": "Welcome, {name}",
@@ -705,6 +792,7 @@
     "monthlyActivityTitle": "Monthly State Activity",
     "categoryDistributionTitle": "Distribution by Categories",
     "backupStatusByUserTitle": "States Created by User",
+    "fraudReportsWidgetTitle": "Counterfeit Reports",
     "loadingData": "Loading data...",
     "charts": {
       "monthlyActivity": {

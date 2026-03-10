@@ -137,9 +137,33 @@ model Item {
   Organization        Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   ItemCategory        ItemCategory[]
   State               State[]
+  FraudReport         FraudReport[]
 
   @@index([createdByUserId])
   @@index([organizationId])
+}
+
+model FraudReport {
+  id             String            @id @default(cuid())
+  itemId         String
+  organizationId String
+  acquiredAt     String?
+  latitude       Float?
+  longitude      Float?
+  locationName   String?
+  comments       String?
+  imageUrls      String[]
+  status         FraudReportStatus @default(PENDING)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  Item           Item              @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  Organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([itemId])
+  @@index([status])
+  @@index([organizationId, status])
+  @@index([createdAt])
 }
 
 model ItemCategory {
@@ -203,6 +227,7 @@ model Organization {
   Webhook           Webhook[]
   ImportJob         ImportJob[]
   SupportMessage    SupportMessage[]
+  FraudReport       FraudReport[]
 
   @@index([activa])
   @@index([slug])
@@ -400,4 +425,11 @@ enum ImportStatus {
   COMPLETED
   FAILED
   CANCELLED
+}
+
+enum FraudReportStatus {
+  PENDING
+  UNDER_REVIEW
+  CONFIRMED
+  DISMISSED
 }

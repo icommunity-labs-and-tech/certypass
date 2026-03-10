@@ -6,9 +6,11 @@ import type { ItemData } from '../types';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import { formatFullDateTime } from '../utils/dateFormatters';
 import { StatusCard } from './ui/StatusCard';
+import { ReportFraudButton } from './ReportFraudButton';
 
 interface AntifraudPanelProps {
   item: ItemData;
+  showFraudReport?: boolean;
 }
 
 interface EvidenceDetails {
@@ -75,7 +77,7 @@ const styles = {
 
 const getIbsUrl = (evidenceId: string) => `https://checker.icommunitylabs.com/lookup/${evidenceId}`;
 
-export function AntifraudPanel({ item }: AntifraudPanelProps) {
+export function AntifraudPanel({ item, showFraudReport = false }: AntifraudPanelProps) {
   const t = useTranslations('customer');
   const [evidenceDetails, setEvidenceDetails] = useState<EvidenceDetails>({ loading: false });
   const isMobile = useMobileDetection();
@@ -180,7 +182,12 @@ export function AntifraudPanel({ item }: AntifraudPanelProps) {
         </div>
       }
       link={hasValidEvidence ? { href: getIbsUrl(item.antifraudEvidenceId!), label: t('viewEvidence') } : undefined}
-      footer={<div style={styles.warningText}>{t('verificationWarning')}</div>}
+      footer={
+        <>
+          <div style={styles.warningText}>{t('verificationWarning')}</div>
+          {showFraudReport && <ReportFraudButton itemId={item.id} />}
+        </>
+      }
     >
       {renderEvidenceDetails()}
     </StatusCard>

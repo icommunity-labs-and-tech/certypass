@@ -67,7 +67,8 @@
     "auth": "Auth",
     "apiDocs": "API Docs",
     "exportQrs": "QRs",
-    "importProducts": "Importar"
+    "importProducts": "Importar",
+    "fraudReports": "Falsificaciones"
   },
   "forms": {
     "addItem": "Añadir producto",
@@ -490,6 +491,92 @@
       "preparingError": "Preparando página de error"
     }
   },
+  "fraudReport": {
+    "button": "Denunciar falsificación",
+    "title": "Denunciar Falsificación",
+    "subtitle": "Si crees que este producto es falso, ayúdanos a investigarlo.",
+    "acquiredLabel": "¿Dónde adquiriste el producto?",
+    "acquiredPlaceholder": "Ej: Mercadillo de la Plaza Mayor, Madrid",
+    "locationLabel": "Ubicación en el mapa (opcional)",
+    "useMyLocation": "Usar mi ubicación actual",
+    "locating": "Obteniendo ubicación...",
+    "locationSet": "Ubicación marcada",
+    "mapHint": "Toca el mapa para mover el marcador a la ubicación exacta.",
+    "commentsLabel": "Comentarios adicionales (opcional)",
+    "commentsPlaceholder": "Cualquier detalle que pueda ayudar a la investigación...",
+    "submit": "Enviar denuncia",
+    "submitting": "Enviando...",
+    "successTitle": "Denuncia recibida",
+    "successMessage": "Gracias por tu colaboración. Investigaremos el caso lo antes posible.",
+    "errorMessage": "No se pudo enviar la denuncia. Por favor, inténtalo de nuevo.",
+    "locationDenied": "No se pudo obtener tu ubicación. Puedes describirla en el campo de texto.",
+    "locationNotSupported": "Tu dispositivo no admite geolocalización.",
+    "close": "Cerrar",
+    "photosLabel": "Fotografías (opcional)",
+    "photosHint": "Añade hasta 5 fotos del producto o del lugar de compra. Puedes usar la cámara del móvil.",
+    "photosAdd": "Añadir foto"
+  },
+  "fraudReportAdmin": {
+    "title": "Denuncias de Falsificación",
+    "detailTitle": "Detalle de Denuncia",
+    "pending": "pendientes",
+    "noReports": "No hay denuncias registradas.",
+    "notFound": "Denuncia no encontrada.",
+    "back": "Volver",
+    "changeStatus": "Cambiar estado",
+    "saveStatus": "Guardar estado",
+    "saving": "Guardando...",
+    "whatIsFraudReports": "¿Qué son las denuncias de falsificación?",
+    "fraudReportsDescription": "Las denuncias de falsificación son alertas enviadas por consumidores finales a través de la aplicación de Pasaporte Digital, a la que acceden escaneando el código QR del producto. Desde esa aplicación, si el usuario sospecha que el producto es falso o fue adquirido en canales no autorizados, puede enviar una denuncia con descripción del lugar de compra, fotografías, coordenadas GPS y comentarios. Desde aquí puedes gestionar cada denuncia, cambiar su estado (Pendiente, En revisión, Confirmada o Descartada) e investigar los casos para proteger la integridad de tu marca.",
+    "charts": {
+      "statsTitle": "Estadísticas",
+      "statusTitle": "Distribución por estado",
+      "monthlyTitle": "Denuncias por mes",
+      "total": "Total",
+      "reports": "Denuncias"
+    },
+    "widget": {
+      "pendingLabel": "denuncias pendientes",
+      "viewAll": "Ver todas",
+      "noLocation": "Sin ubicación",
+      "andMore": "y {count} más..."
+    },
+    "filterByDate": "Filtrar por fecha",
+    "dateFrom": "Desde",
+    "dateTo": "Hasta",
+    "clearDates": "Limpiar",
+    "pagination": {
+      "showing": "Mostrando {from}–{to} de {total}",
+      "perPage": "por página"
+    },
+    "reportedLocation": "Ubicación reportada",
+    "photoEvidence": "Fotografías aportadas",
+    "photoAlt": "Fotografía",
+    "mapTitle": "Mapa de denuncias",
+    "reportsWithLocation": "con ubicación",
+    "status": {
+      "ALL": "Todos",
+      "PENDING": "Pendiente",
+      "UNDER_REVIEW": "En revisión",
+      "CONFIRMED": "Confirmada",
+      "DISMISSED": "Descartada"
+    },
+    "columns": {
+      "item": "Producto",
+      "location": "Ubicación",
+      "date": "Fecha",
+      "status": "Estado"
+    },
+    "fields": {
+      "item": "Producto",
+      "itemId": "ID del producto",
+      "reportId": "ID de denuncia",
+      "date": "Fecha",
+      "acquiredAt": "Lugar de adquisición",
+      "locationName": "Nombre del lugar",
+      "comments": "Comentarios"
+    }
+  },
   "operator": {
     "title": "Operador certypass",
     "welcome": "Bienvenido, {name}",
@@ -709,6 +796,7 @@
     "monthlyActivityTitle": "Actividad Mensual de Estados",
     "categoryDistributionTitle": "Distribución por Categorías",
     "backupStatusByUserTitle": "Estados creados por usuario",
+    "fraudReportsWidgetTitle": "Denuncias de Falsificación",
     "loadingData": "Cargando datos...",
     "charts": {
       "monthlyActivity": {

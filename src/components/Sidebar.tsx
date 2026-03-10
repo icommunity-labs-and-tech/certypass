@@ -10,12 +10,19 @@ import { Badge } from 'react-bootstrap';
 import Logo from './Logo';
 import './Sidebar.css';
 import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
+import { getFraudReportsPendingCount } from '@/actions/fraudReports/get-pending-count';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { isDesktop, closeMobile } = useSidebar();
   const { user, loading } = useAuthSeparated();
   const t = useTranslations('sidebar');
+  const [fraudPendingCount, setFraudPendingCount] = useState(0);
+
+  useEffect(() => {
+    getFraudReportsPendingCount().then(setFraudPendingCount);
+  }, [pathname]);
 
   const navLinks = [
     { href: '/dashboard', icon: 'bi-house', label: t('home') },
@@ -24,6 +31,7 @@ export default function Sidebar() {
     { href: '/dashboard/export-qrs', icon: 'bi-qr-code', label: t('exportQrs') },
     { href: '/dashboard/import-products', icon: 'bi-cloud-upload', label: t('importProducts') },
     { href: '/dashboard/users', icon: 'bi-people', label: t('users') },
+    { href: '/dashboard/fraud-reports', icon: 'bi-shield-exclamation', label: t('fraudReports'), badge: fraudPendingCount > 0 ? fraudPendingCount : undefined },
     { href: '/dashboard/profile', icon: 'bi-person', label: t('profile') },
   ];
 
@@ -67,18 +75,23 @@ export default function Sidebar() {
         </Navbar.Brand>
         <hr className="opacity-75 border" />
         <Nav className="flex-column mb-auto">
-          {navLinks.map(({ href, icon, label }) => (
+          {navLinks.map(({ href, icon, label, badge }) => (
             <Nav.Link
               key={href}
               as={Link}
               href={href}
-              className={`d-flex align-items-center px-3 py-2 rounded ${
+              className={`d-flex align-items-center justify-content-between px-3 py-2 rounded ${
                 pathname === href ? 'bg-primary text-white' : 'text-dark'
               }`}
               style={{ transition: 'background-color 0.2s' }}
               onClick={handleNavClick}
             >
-              <i className={`bi ${icon} me-2`} /> {label}
+              <span><i className={`bi ${icon} me-2`} />{label}</span>
+              {badge !== undefined && (
+                <Badge bg="warning" text="dark" style={{ fontSize: '0.7rem' }}>
+                  {badge}
+                </Badge>
+              )}
             </Nav.Link>
           ))}
         </Nav>

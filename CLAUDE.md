@@ -113,6 +113,17 @@ import { prisma } from "@/lib/prisma";
 import { createItemServiceImpl } from "@/domain/items/ItemServiceImpl";
 ```
 
+## Internationalisation (i18n)
+
+Locale files: `src/i18n/messages/es.json` and `src/i18n/messages/en.json`
+
+**Rules — enforce on every frontend change:**
+
+- Never hardcode user-visible strings in components. Always use `useTranslations` and `t('key')`.
+- When **adding** UI text: add the key to **both** locale files in the same change.
+- When **removing** UI elements: delete the corresponding keys from both locale files. Before deleting, search all files in the namespace to confirm no other component uses the key.
+- Keep keys minimal — no stale keys for removed features.
+
 ## Workflow
 
 After implementing a new feature or change, always run `npm run build` to verify the project compiles correctly before committing.

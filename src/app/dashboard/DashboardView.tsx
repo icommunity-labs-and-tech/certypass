@@ -8,7 +8,6 @@ import BoxTitle from '@/components/BoxTitle';
 import DashboardKPIs from '@/components/charts/DashboardKPIs';
 import MonthlyActivityChart from '@/components/charts/MonthlyActivityChart';
 import CategoryDistributionChart from '@/components/charts/CategoryDistributionChart';
-import { BackupStatusByUserChart } from '@/components/charts/BackupStatusByUserChart';
 import { useTutorialContext } from '@/lib/tutorial/TutorialProvider';
 import { shouldShowTour } from '@/lib/tutorial/tutorialStorage';
 import { TOUR_IDS, sidebarTour } from '@/lib/tutorial/tutorialConfig';
@@ -30,7 +29,7 @@ export default function DashboardClient({
   monthlyActivity,
   categoryDistribution,
   backupStatus: _backupStatus,
-  backupStatusByUser
+  backupStatusByUser: _backupStatusByUser,
 }: DashboardClientProps) {
   const t = useTranslations('dashboard');
   const { startTour } = useTutorialContext();
@@ -38,16 +37,11 @@ export default function DashboardClient({
   const hasStartedRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Activar tour del sidebar automáticamente en primera visita
-  // En móvil, abrir el sidebar primero para que los elementos sean visibles
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    // Verificar inmediatamente si ya iniciamos o está completado
     if (hasStartedRef.current) return;
     if (!shouldShowTour(TOUR_IDS.SIDEBAR_TOUR)) return;
 
-    // Marcar como iniciado ANTES de crear el timeout para evitar duplicados
     hasStartedRef.current = true;
 
     const startTutorial = () => {
@@ -60,27 +54,18 @@ export default function DashboardClient({
       }
     };
 
-    // Limpiar timeout anterior si existe
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-    // En móvil, abrir el sidebar antes de iniciar el tutorial
     if (!isDesktop && !isOpenMobile) {
-      toggle(); // Abrir sidebar
-      // Esperar a que el sidebar se abra y luego iniciar el tutorial
+      toggle();
       timeoutRef.current = setTimeout(startTutorial, 2500);
     } else {
-      // En desktop o si el sidebar ya está abierto, esperar el delay normal
       timeoutRef.current = setTimeout(startTutorial, 2000);
     }
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  // Solo ejecutar una vez al montar el componente
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -95,14 +80,14 @@ export default function DashboardClient({
         </Col>
       </Row>
 
-      <Row className="mb-2">
-        <Col md={6}>
+      <Row className="mb-4">
+        <Col md={8}>
           <Box>
             <BoxTitle message={t('monthlyActivityTitle')} />
             <MonthlyActivityChart data={monthlyActivity} />
           </Box>
         </Col>
-        <Col md={6}>
+        <Col md={4}>
           <Box>
             <BoxTitle message={t('categoryDistributionTitle')} />
             <CategoryDistributionChart data={categoryDistribution} />
@@ -110,14 +95,6 @@ export default function DashboardClient({
         </Col>
       </Row>
 
-      <Row className="mb-4">
-        <Col md={12}>
-          <Box>
-            <BoxTitle message={t('backupStatusByUserTitle')} />
-            <BackupStatusByUserChart data={backupStatusByUser} />
-          </Box>
-        </Col>
-      </Row>
     </>
   );
 }

@@ -153,7 +153,7 @@ export default function VerifyItemPage({ params }: { params: Promise<{ id: strin
     <div className="customer-container">
       <div className="customer-content">
         <div className="passport-section">
-          <ItemPassport item={itemData} onBack={handleBack} />
+          <ItemPassport item={itemData} onBack={handleBack} showFraudReport />
         </div>
       </div>
       
