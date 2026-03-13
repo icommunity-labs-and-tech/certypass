@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateApiToken, ApiTokenAuthResult } from './middleware';
 import { trackApiCall } from './trackApiCall';
+import { runInSandbox } from '@/lib/sandbox/context';
 
 /**
- * Wrapper for API route handlers that automatically tracks API calls
- * 
+ * Wrapper for API route handlers that automatically tracks API calls.
+ *
+ * Sandbox requests (authenticated via filesystem token) skip DB tracking
+ * entirely and run inside the sandbox async context so that any code
+ * deeper in the stack can detect the sandbox mode via `isSandboxRequest()`.
+ *
  * Usage:
  * ```ts
  * export const GET = withApiTracking(async (request, auth, params) => {
@@ -24,7 +29,7 @@ export function withApiTracking<T extends Record<string, any>>(
     request: NextRequest,
     context: { params: Promise<T> }
   ): Promise<NextResponse> => {
-    // Validate API token first
+    // Validate API token (checks filesystem sandbox store first, then DB)
     const auth = await validateApiToken(request);
     if (!auth) {
       return NextResponse.json(
@@ -33,18 +38,19 @@ export function withApiTracking<T extends Record<string, any>>(
       );
     }
 
-    // Get params
     const params = await context.params;
-    
-    // Get method and path
     const method = request.method;
     const path = new URL(request.url).pathname;
 
+    // ── Sandbox: skip tracking, run in sandbox context ────────────────────
+    if (auth.isSandbox) {
+      return runInSandbox(() => handler(request, auth, params));
+    }
+
+    // ── Production: execute handler + fire-and-forget tracking ───────────
     try {
-      // Execute the handler
       const response = await handler(request, auth, params);
-      
-      // Track the API call (fire and forget)
+
       trackApiCall({
         apiTokenId: auth.tokenId,
         organizationId: auth.organizationId,
@@ -57,11 +63,11 @@ export function withApiTracking<T extends Record<string, any>>(
 
       return response;
     } catch (error) {
-      // Track error responses too
-      const statusCode = error instanceof Error && 'status' in error 
-        ? (error as any).status 
-        : 500;
-      
+      const statusCode =
+        error instanceof Error && 'status' in error
+          ? (error as any).status
+          : 500;
+
       trackApiCall({
         apiTokenId: auth.tokenId,
         organizationId: auth.organizationId,
@@ -76,4 +82,3 @@ export function withApiTracking<T extends Record<string, any>>(
     }
   };
 }
-

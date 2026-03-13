@@ -19,6 +19,15 @@ const nextConfig: NextConfig = {
       'storage.googleapis.com',
     ],
   },
+  // /api/v1-sandbox/** → /api/v1/** (same handlers; sandbox mode is determined by the auth token)
+  async rewrites() {
+    return [
+      {
+        source: '/api/v1-sandbox/:path*',
+        destination: '/api/v1/:path*',
+      },
+    ];
+  },
   // Configuración de headers para Cloud Run
   async headers() {
     return [

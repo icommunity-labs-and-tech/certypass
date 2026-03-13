@@ -33,19 +33,19 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *         schema:
  *           type: string
  *         description: Filter events by event type (optional)
- *         example: item.created
+ *         example: product.created
  *       - in: query
  *         name: entityType
  *         schema:
  *           type: string
  *         description: Filter events by entity type (optional)
- *         example: Item
+ *         example: Product
  *       - in: query
  *         name: entityId
  *         schema:
  *           type: string
  *         description: Filter events by entity ID (optional)
- *         example: ITEM-001
+ *         example: PROD-001
  *     responses:
  *       '200':
  *         description: List of events retrieved successfully (paginated)

@@ -57,7 +57,7 @@ export default function Sidebar() {
     { href: '/dashboard/developer/events', icon: 'bi-calendar-event', label: t('events'), external: false },
     { href: '/dashboard/developer/webhooks', icon: 'bi-box-arrow-up-right', label: t('webhooks'), external: false },
     { href: '/dashboard/developer/auth', icon: 'bi-key', label: t('auth'), external: false },
-    { href: '/api/v1/docs', icon: 'bi-book', label: t('apiDocs'), external: true },
+    { href: '/dashboard/developer/api', icon: 'bi-book', label: t('apiDocs'), external: false },
   ];
 
   const handleNavClick = () => {

@@ -17,8 +17,8 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *         name: itemId
  *         schema:
  *           type: string
- *         description: Filter states by item ID (optional)
- *         example: ITEM-001
+ *         description: Filter states by product ID (optional)
+ *         example: PROD-001
  *       - in: query
  *         name: cursor
  *         schema:

@@ -1057,6 +1057,83 @@
         "data": "Datos:",
         "close": "Cerrar"
       }
+    },
+    "api": {
+      "title": "API REST",
+      "subtitle": "Integra CertyPass en tu plataforma mediante nuestra API REST",
+      "description": "La API REST de CertyPass te permite crear productos, añadir estados certificados y consultar datos de tu organización de forma programática. Puedes integrarla en tus propias aplicaciones usando un token de autenticación.",
+      "openDocs": "Abrir documentación interactiva",
+      "capabilities": {
+        "title": "¿Qué puedes hacer con la API?",
+        "createProducts": {
+          "title": "Crear productos",
+          "description": "Registra nuevos productos en el sistema indicando su identificador, nombre y descripción."
+        },
+        "addStates": {
+          "title": "Añadir estados",
+          "description": "Asocia estados certificados a los productos usando los tipos de estado configurados en tu organización."
+        },
+        "queryData": {
+          "title": "Consultar datos",
+          "description": "Lista y filtra productos con paginación por cursor, busca por nombre o categoría."
+        },
+        "tokenAuth": {
+          "title": "Autenticación por token",
+          "description": "Cada llamada se autentica con un Bearer token de API asociado a tu organización."
+        }
+      },
+      "sandbox": {
+        "title": "Entorno de pruebas (Sandbox)",
+        "badge": "Incluido",
+        "description": "La documentación interactiva incluye un entorno sandbox preconfigurado. Puedes hacer llamadas reales a la API sin que los datos se persistan en la base de datos de producción: todo se almacena temporalmente en el servidor y se descarta.",
+        "features": {
+          "noRealData": {
+            "title": "Sin datos reales",
+            "description": "Los productos y estados que crees en el sandbox no aparecen en tu dashboard."
+          },
+          "ephemeral": {
+            "title": "Entorno efímero",
+            "description": "Los datos del sandbox se eliminan automáticamente al reiniciar el servidor."
+          },
+          "noDb": {
+            "title": "Sin impacto en base de datos",
+            "description": "Ninguna llamada sandbox escribe en la base de datos de producción."
+          },
+          "realStatusTypes": {
+            "title": "Tipos de estado reales",
+            "description": "El sandbox lee los tipos de estado que hayas configurado en tu organización para que las pruebas sean representativas."
+          }
+        },
+        "howTo": {
+          "title": "Cómo abrir el entorno de pruebas",
+          "step1": "Haz clic en <strong>Abrir entorno de pruebas</strong> para acceder a la documentación interactiva.",
+          "step2": "Al abrirse, el token de sandbox estará preconfigurado en el panel de autenticación — no necesitas crear ni pegar ningún token.",
+          "step3": "Selecciona el servidor <strong>Sandbox</strong> en el selector de la documentación para apuntar a <code>/api/v1-sandbox</code> — o usa esa URL directamente desde tus propias herramientas.",
+          "step4": "Ejecuta los endpoints directamente desde el navegador. Los datos creados son temporales y no afectan a producción.",
+          "cta": "Abrir entorno de pruebas"
+        }
+      },
+      "auth": {
+        "title": "Autenticación",
+        "description": "Todas las peticiones a la API deben incluir un token en la cabecera Authorization:",
+        "hint": "Gestiona tus tokens en la sección",
+        "hintLink": "Tokens de API →"
+      }
+    }
+  },
+  "usersPage": {
+    "charts": {
+      "loading": "Cargando datos...",
+      "totalUsers": "Total Usuarios",
+      "admins": "Administradores",
+      "operators": "Operadores",
+      "certificateSigners": "Firman Certificado",
+      "roleDistribution": "Distribución de Roles",
+      "monthlyRegistrations": "Altas por Mes",
+      "roleAdmin": "Administrador",
+      "roleOperator": "Operador",
+      "noData": "Sin datos disponibles",
+      "registrations": "Altas"
     }
   }
 }

@@ -2,15 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withApiTracking } from '@/lib/auth/api-tokens/withApiTracking';
 import { getItem } from '@/actions/items';
 import { decodeUrlParam } from '@/lib/api/decode-param';
+import { itemRepositoryFilesystem } from '@/infrastructure/filesystem/repositories/ItemRepositoryFilesystem';
+import { isSandboxRequest } from '@/lib/sandbox/context';
 
 /**
  * @swagger
- * /items/{id}:
+ * /products/{id}:
  *   get:
- *     summary: Get an item by ID
- *     description: Retrieves detailed information about a specific item. Requires a valid API token.
+ *     summary: Get a product by ID
+ *     description: Retrieves detailed information about a specific product. Requires a valid API token.
  *     tags:
- *       - Items
+ *       - Products
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -19,11 +21,11 @@ import { decodeUrlParam } from '@/lib/api/decode-param';
  *         required: true
  *         schema:
  *           type: string
- *         description: Unique identifier of the item
- *         example: ITEM-001
+ *         description: Unique identifier of the product
+ *         example: PROD-001
  *     responses:
  *       '200':
- *         description: Item retrieved successfully
+ *         description: Product retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -31,7 +33,7 @@ import { decodeUrlParam } from '@/lib/api/decode-param';
  *               properties:
  *                 id:
  *                   type: string
- *                   example: ITEM-001
+ *                   example: PROD-001
  *                 name:
  *                   type: string
  *                   example: Solar Panel 300W
@@ -60,7 +62,7 @@ import { decodeUrlParam } from '@/lib/api/decode-param';
  *                 code:
  *                   type: string
  *       '404':
- *         description: Item not found
+ *         description: Product not found
  *         content:
  *           application/json:
  *             schema:
@@ -78,22 +80,25 @@ export const GET = withApiTracking(async (
 ) => {
   try {
     const id = decodeUrlParam(params.id);
-    const item = await getItem(id);
-    
-    if (!item) {
-      return NextResponse.json(
-        { error: 'Item no encontrado' },
-        { status: 404 }
-      );
+
+    // ── Sandbox: read from filesystem ──────────────────────────────────
+    if (isSandboxRequest()) {
+      const item = await itemRepositoryFilesystem.getById(id, auth.organizationId);
+      if (!item) {
+        return NextResponse.json({ error: 'Item not found in sandbox' }, { status: 404 });
+      }
+      return NextResponse.json(item);
     }
-    
+
+    // ── Production ─────────────────────────────────────────────────────
+    const item = await getItem(id);
+    if (!item) {
+      return NextResponse.json({ error: 'Item no encontrado' }, { status: 404 });
+    }
     return NextResponse.json(item);
   } catch (error) {
     console.error('Error fetching item:', error);
-    return NextResponse.json(
-      { error: 'Item no encontrado' },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: 'Item no encontrado' }, { status: 404 });
   }
 });
 

@@ -43,12 +43,12 @@ const manualOpenApiSpec = {
   },
   tags: [
     {
-      name: 'Items',
-      description: 'Operations related to items management',
+      name: 'Products',
+      description: 'Operations related to products management',
     },
     {
       name: 'States',
-      description: 'Operations related to item states',
+      description: 'Operations related to product states',
     },
     {
       name: 'Categories',
@@ -64,44 +64,44 @@ const manualOpenApiSpec = {
     },
   ],
   paths: {
-    '/items': {
+    '/products': {
       get: {
-        summary: 'List all items',
-        description: 'Retrieves a list of all items in the system. Requires a valid API token.',
-        operationId: 'listItems',
-        tags: ['Items'],
+        summary: 'List all products',
+        description: 'Retrieves a list of all products in the system. Requires a valid API token.',
+        operationId: 'listProducts',
+        tags: ['Products'],
         security: [{ BearerAuth: [] }],
             parameters: [
               {
                 name: 'categoryId',
                 in: 'query',
                 schema: { type: 'string' },
-                description: 'Filter items by category ID (optional)',
+                description: 'Filter products by category ID (optional)',
               },
               {
                 name: 'q',
                 in: 'query',
                 schema: { type: 'string' },
-                description: 'Search query to filter items by name or ID (optional)',
+                description: 'Search query to filter products by name or ID (optional)',
               },
               {
                 name: 'cursor',
                 in: 'query',
                 schema: { type: 'string' },
-                description: 'Cursor for pagination (ID of the last item from previous page)',
-                example: 'ITEM-001',
+                description: 'Cursor for pagination (ID of the last product from previous page)',
+                example: 'PROD-001',
               },
               {
                 name: 'limit',
                 in: 'query',
                 schema: { type: 'integer', minimum: 1, maximum: 100, default: 20 },
-                description: 'Maximum number of items to return',
+                description: 'Maximum number of products to return',
                 example: 20,
               },
             ],
             responses: {
               '200': {
-                description: 'List of items retrieved successfully (paginated)',
+                description: 'List of products retrieved successfully (paginated)',
                 content: {
                   'application/json': {
                     schema: {
@@ -112,7 +112,7 @@ const manualOpenApiSpec = {
                           items: {
                             type: 'object',
                             properties: {
-                              id: { type: 'string', example: 'ITEM-001' },
+                              id: { type: 'string', example: 'PROD-001' },
                               name: { type: 'string', example: 'Solar Panel 300W' },
                               description: { type: 'string', example: 'High efficiency solar panel' },
                               imageUrl: { type: 'string', nullable: true },
@@ -123,12 +123,12 @@ const manualOpenApiSpec = {
                         nextCursor: {
                           type: 'string',
                           nullable: true,
-                          description: 'ID of the last item in this page, use this as cursor for next page',
-                          example: 'ITEM-020',
+                          description: 'ID of the last product in this page, use this as cursor for next page',
+                          example: 'PROD-020',
                         },
                         hasNextPage: {
                           type: 'boolean',
-                          description: 'Whether there are more items available',
+                          description: 'Whether there are more products available',
                           example: true,
                         },
                       },
@@ -142,10 +142,10 @@ const manualOpenApiSpec = {
         },
       },
       post: {
-        summary: 'Create a new item',
-        description: 'Creates a new item in the system. Requires a valid API token.',
-        operationId: 'createItem',
-        tags: ['Items'],
+        summary: 'Create a new product',
+        description: 'Creates a new product in the system. Requires a valid API token.',
+        operationId: 'createProduct',
+        tags: ['Products'],
         security: [{ BearerAuth: [] }],
         requestBody: {
           required: true,
@@ -157,17 +157,17 @@ const manualOpenApiSpec = {
                 properties: {
                   id: {
                     type: 'string',
-                    description: 'Unique identifier for the item',
-                    example: 'ITEM-001',
+                    description: 'Unique identifier for the product',
+                    example: 'PROD-001',
                   },
                   name: {
                     type: 'string',
-                    description: 'Name of the item',
+                    description: 'Name of the product',
                     example: 'Solar Panel 300W',
                   },
                   description: {
                     type: 'string',
-                    description: 'Description of the item',
+                    description: 'Description of the product',
                     example: 'High efficiency solar panel',
                   },
                   categoryIds: {
@@ -179,7 +179,7 @@ const manualOpenApiSpec = {
                   imageUrl: {
                     type: 'string',
                     format: 'uri',
-                    description: 'URL of the item image',
+                    description: 'URL of the product image',
                     example: 'https://example.com/image.jpg',
                   },
                   templateFields: {
@@ -189,7 +189,7 @@ const manualOpenApiSpec = {
                   },
                   itemTemplate: {
                     type: 'array',
-                    description: 'Item template configuration',
+                    description: 'Product template configuration',
                     items: { type: 'object' },
                   },
                 },
@@ -197,7 +197,7 @@ const manualOpenApiSpec = {
               examples: {
                 basic: {
                   value: {
-                    id: 'ITEM-001',
+                    id: 'PROD-001',
                     name: 'Solar Panel 300W',
                     description: 'High efficiency solar panel',
                     categoryIds: ['cat-001'],
@@ -209,7 +209,7 @@ const manualOpenApiSpec = {
         },
         responses: {
           '201': {
-            description: 'Item created successfully',
+            description: 'Product created successfully',
             content: {
               'application/json': {
                 schema: {
@@ -223,7 +223,7 @@ const manualOpenApiSpec = {
                   },
                 },
                 example: {
-                  id: 'ITEM-001',
+                  id: 'PROD-001',
                   name: 'Solar Panel 300W',
                   description: 'High efficiency solar panel',
                   imageUrl: null,
@@ -269,7 +269,7 @@ const manualOpenApiSpec = {
             },
           },
           '409': {
-            description: 'Conflict - item with this ID already exists',
+            description: 'Conflict - product with this ID already exists',
             content: {
               'application/json': {
                 schema: {
@@ -307,26 +307,26 @@ const manualOpenApiSpec = {
         },
       },
     },
-    '/items/{id}': {
+    '/products/{id}': {
       get: {
-        summary: 'Get an item by ID',
-        description: 'Retrieves detailed information about a specific item. Requires a valid API token.',
-        operationId: 'getItemById',
-        tags: ['Items'],
+        summary: 'Get a product by ID',
+        description: 'Retrieves detailed information about a specific product. Requires a valid API token.',
+        operationId: 'getProductById',
+        tags: ['Products'],
         security: [{ BearerAuth: [] }],
         parameters: [
           {
             name: 'id',
             in: 'path',
             required: true,
-            description: 'Item ID',
+            description: 'Product ID',
             schema: { type: 'string' },
-            example: 'ITEM-001',
+            example: 'PROD-001',
           },
         ],
         responses: {
           '200': {
-            description: 'Item retrieved successfully',
+            description: 'Product retrieved successfully',
             content: {
               'application/json': {
                 schema: {
@@ -361,7 +361,7 @@ const manualOpenApiSpec = {
             },
           },
           '404': {
-            description: 'Item not found',
+            description: 'Product not found',
             content: {
               'application/json': {
                 schema: {
@@ -376,21 +376,21 @@ const manualOpenApiSpec = {
         },
       },
     },
-    '/items/{id}/states': {
+    '/products/{id}/states': {
       post: {
-        summary: 'Add a state to an item',
-        description: 'Adds a new state to an item. **NOT YET IMPLEMENTED** - This endpoint requires dynamic template validation based on StatusType configuration.',
-        operationId: 'createItemState',
-        tags: ['Items'],
+        summary: 'Add a state to a product',
+        description: 'Adds a new state to a product. Select a status type from the options — each one defines the exact fields required in `templateConfig`.',
+        operationId: 'createProductState',
+        tags: ['Products'],
         security: [{ BearerAuth: [] }],
         parameters: [
           {
             name: 'id',
             in: 'path',
             required: true,
-            description: 'Item ID',
+            description: 'Product ID',
             schema: { type: 'string' },
-            example: 'ITEM-001',
+            example: 'PROD-001',
           },
         ],
         responses: {
@@ -412,7 +412,7 @@ const manualOpenApiSpec = {
                   code: 'NOT_IMPLEMENTED',
                   message: 'State creation API is not yet implemented. This requires dynamic template validation based on StatusType configuration.',
                   details: {
-                    itemId: 'ITEM-001',
+                    itemId: 'PROD-001',
                     note: 'The templateConfig structure is dynamic and depends on the StatusType.template field.',
                   },
                 },
@@ -434,8 +434,8 @@ const manualOpenApiSpec = {
                 name: 'itemId',
                 in: 'query',
                 schema: { type: 'string' },
-                description: 'Filter states by item ID (optional)',
-                example: 'ITEM-001',
+                description: 'Filter states by product ID (optional)',
+                example: 'PROD-001',
               },
               {
                 name: 'cursor',
@@ -721,11 +721,11 @@ const manualOpenApiSpec = {
         },
       },
     },
-    '/categories/{id}/items/{itemId}': {
+    '/categories/{id}/products/{productId}': {
       post: {
-        summary: 'Attach an item to a category',
-        description: 'Adds an item to a category. Requires a valid API token.',
-        operationId: 'attachItemToCategory',
+        summary: 'Attach a product to a category',
+        description: 'Adds a product to a category. Requires a valid API token.',
+        operationId: 'attachProductToCategory',
         tags: ['Categories'],
         security: [{ BearerAuth: [] }],
         parameters: [
@@ -738,17 +738,17 @@ const manualOpenApiSpec = {
             example: 'category-001',
           },
           {
-            name: 'itemId',
+            name: 'productId',
             in: 'path',
             required: true,
             schema: { type: 'string' },
-            description: 'Unique identifier of the item',
-            example: 'ITEM-001',
+            description: 'Unique identifier of the product',
+            example: 'PROD-001',
           },
         ],
         responses: {
           '200': {
-            description: 'Item attached to category successfully',
+            description: 'Product attached to category successfully',
             content: {
               'application/json': {
                 schema: {
@@ -775,7 +775,7 @@ const manualOpenApiSpec = {
             },
           },
           '404': {
-            description: 'Category or item not found',
+            description: 'Category or product not found',
             content: {
               'application/json': {
                 schema: {
@@ -793,9 +793,9 @@ const manualOpenApiSpec = {
         },
       },
       delete: {
-        summary: 'Detach an item from a category',
-        description: 'Removes an item from a category. Requires a valid API token.',
-        operationId: 'detachItemFromCategory',
+        summary: 'Detach a product from a category',
+        description: 'Removes a product from a category. Requires a valid API token.',
+        operationId: 'detachProductFromCategory',
         tags: ['Categories'],
         security: [{ BearerAuth: [] }],
         parameters: [
@@ -808,17 +808,17 @@ const manualOpenApiSpec = {
             example: 'category-001',
           },
           {
-            name: 'itemId',
+            name: 'productId',
             in: 'path',
             required: true,
             schema: { type: 'string' },
-            description: 'Unique identifier of the item',
-            example: 'ITEM-001',
+            description: 'Unique identifier of the product',
+            example: 'PROD-001',
           },
         ],
         responses: {
           '200': {
-            description: 'Item detached from category successfully',
+            description: 'Product detached from category successfully',
             content: {
               'application/json': {
                 schema: {
@@ -845,7 +845,7 @@ const manualOpenApiSpec = {
             },
           },
           '404': {
-            description: 'Category or item not found',
+            description: 'Category or product not found',
             content: {
               'application/json': {
                 schema: {
@@ -890,21 +890,21 @@ const manualOpenApiSpec = {
             in: 'query',
             schema: { type: 'string' },
             description: 'Filter events by event type (optional)',
-            example: 'item.created',
+            example: 'product.created',
           },
           {
             name: 'entityType',
             in: 'query',
             schema: { type: 'string' },
             description: 'Filter events by entity type (optional)',
-            example: 'Item',
+            example: 'Product',
           },
           {
             name: 'entityId',
             in: 'query',
             schema: { type: 'string' },
             description: 'Filter events by entity ID (optional)',
-            example: 'ITEM-001',
+            example: 'PROD-001',
           },
         ],
         responses: {
@@ -969,7 +969,7 @@ const manualOpenApiSpec = {
     '/fraud-reports': {
       get: {
         summary: 'List fraud reports',
-        description: 'Retrieves a list of fraud reports for the organization. Optionally filter by status or item ID. Requires a valid API token.',
+        description: 'Retrieves a list of fraud reports for the organization. Optionally filter by status or product ID. Requires a valid API token.',
         operationId: 'listFraudReports',
         tags: ['FraudReports'],
         security: [{ BearerAuth: [] }],
@@ -985,8 +985,8 @@ const manualOpenApiSpec = {
             name: 'itemId',
             in: 'query',
             schema: { type: 'string' },
-            description: 'Filter reports by item ID (optional)',
-            example: 'ITEM-001',
+            description: 'Filter reports by product ID (optional)',
+            example: 'PROD-001',
           },
         ],
         responses: {
@@ -1003,7 +1003,7 @@ const manualOpenApiSpec = {
                         type: 'object',
                         properties: {
                           id: { type: 'string', example: 'clxyz123' },
-                          itemId: { type: 'string', example: 'ITEM-001' },
+                          itemId: { type: 'string', example: 'PROD-001' },
                           item: {
                             type: 'object',
                             properties: {
@@ -1048,8 +1048,8 @@ const manualOpenApiSpec = {
                 type: 'object',
                 required: ['itemId'],
                 properties: {
-                  itemId: { type: 'string', description: 'ID of the item being reported as fraudulent', example: 'ITEM-001' },
-                  acquiredAt: { type: 'string', description: 'Date when the item was acquired (optional)', example: '2024-01-15' },
+                  itemId: { type: 'string', description: 'ID of the product being reported as fraudulent', example: 'PROD-001' },
+                  acquiredAt: { type: 'string', description: 'Date when the product was acquired (optional)', example: '2024-01-15' },
                   latitude: { type: 'number', description: 'Latitude of the reported location (optional)', example: 40.4168 },
                   longitude: { type: 'number', description: 'Longitude of the reported location (optional)', example: -3.7038 },
                   locationName: { type: 'string', description: 'Human-readable name of the location (optional)', example: 'Madrid, España' },

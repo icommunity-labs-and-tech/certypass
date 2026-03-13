@@ -1053,6 +1053,83 @@
         "data": "Data:",
         "close": "Close"
       }
+    },
+    "api": {
+      "title": "REST API",
+      "subtitle": "Integrate CertyPass into your platform via our REST API",
+      "description": "The CertyPass REST API lets you create products, add certified states, and query your organization's data programmatically. You can integrate it into your own applications using an authentication token.",
+      "openDocs": "Open interactive documentation",
+      "capabilities": {
+        "title": "What can you do with the API?",
+        "createProducts": {
+          "title": "Create products",
+          "description": "Register new products in the system by specifying their identifier, name, and description."
+        },
+        "addStates": {
+          "title": "Add states",
+          "description": "Attach certified states to products using the status types configured in your organization."
+        },
+        "queryData": {
+          "title": "Query data",
+          "description": "List and filter products with cursor pagination, search by name or category."
+        },
+        "tokenAuth": {
+          "title": "Token authentication",
+          "description": "Each call is authenticated with a Bearer API token associated with your organization."
+        }
+      },
+      "sandbox": {
+        "title": "Testing environment (Sandbox)",
+        "badge": "Included",
+        "description": "The interactive documentation includes a pre-configured sandbox environment. You can make real API calls without data persisting in the production database: everything is stored temporarily on the server and discarded.",
+        "features": {
+          "noRealData": {
+            "title": "No real data",
+            "description": "Products and states you create in the sandbox do not appear in your dashboard."
+          },
+          "ephemeral": {
+            "title": "Ephemeral environment",
+            "description": "Sandbox data is automatically discarded when the server restarts."
+          },
+          "noDb": {
+            "title": "No database impact",
+            "description": "No sandbox call writes to the production database."
+          },
+          "realStatusTypes": {
+            "title": "Real status types",
+            "description": "The sandbox reads the status types you have configured in your organization so tests are representative."
+          }
+        },
+        "howTo": {
+          "title": "How to open the testing environment",
+          "step1": "Click <strong>Open testing environment</strong> to access the interactive documentation.",
+          "step2": "When it opens, the sandbox token is already pre-configured in the authentication panel — you don't need to create or paste any token.",
+          "step3": "Select the <strong>Sandbox</strong> server in the documentation selector to point to <code>/api/v1-sandbox</code> — or use that URL directly from your own tools.",
+          "step4": "Run endpoints directly from the browser. Any data you create is temporary and does not affect production.",
+          "cta": "Open testing environment"
+        }
+      },
+      "auth": {
+        "title": "Authentication",
+        "description": "All API requests must include a token in the Authorization header:",
+        "hint": "Manage your tokens in the",
+        "hintLink": "API Tokens →"
+      }
+    }
+  },
+  "usersPage": {
+    "charts": {
+      "loading": "Loading data...",
+      "totalUsers": "Total Users",
+      "admins": "Administrators",
+      "operators": "Operators",
+      "certificateSigners": "Certificate Signers",
+      "roleDistribution": "Role Distribution",
+      "monthlyRegistrations": "Monthly Registrations",
+      "roleAdmin": "Administrator",
+      "roleOperator": "Operator",
+      "noData": "No data available",
+      "registrations": "Registrations"
     }
   }
 }

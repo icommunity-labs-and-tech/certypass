@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createItemServiceImpl } from '@/domain/items/ItemServiceImpl';
 import { createEvidenceServiceImpl } from '@/domain/evidence/EvidenceServiceImpl';
 import { itemRepository } from '@/infrastructure/prisma/repositories/ItemRepositoryPrisma';
+import { itemRepositoryFilesystem } from '@/infrastructure/filesystem/repositories/ItemRepositoryFilesystem';
 import { userRepository } from '@/infrastructure/prisma/repositories/UserRepositoryPrisma';
 import { icommunityService } from '@/infrastructure/icommunity/ICommunityServiceImpl';
 import { validateApiToken } from '@/lib/auth/api-tokens/middleware';
@@ -10,12 +11,12 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
 
 /**
  * @swagger
- * /items:
+ * /products:
  *   get:
- *     summary: List all items
- *     description: Retrieves a list of all items in the system. Requires a valid API token.
+ *     summary: List all products
+ *     description: Retrieves a list of all products in the system. Requires a valid API token.
  *     tags:
- *       - Items
+ *       - Products
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -23,20 +24,20 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *         name: categoryId
  *         schema:
  *           type: string
- *         description: Filter items by category ID (optional)
+ *         description: Filter products by category ID (optional)
  *         example: cat-001
  *       - in: query
  *         name: q
  *         schema:
  *           type: string
- *         description: Search query to filter items by name or ID (optional)
+ *         description: Search query to filter products by name or ID (optional)
  *         example: solar
  *       - in: query
  *         name: cursor
  *         schema:
  *           type: string
- *         description: Cursor for pagination (ID of the last item from previous page)
- *         example: ITEM-001
+ *         description: Cursor for pagination (ID of the last product from previous page)
+ *         example: PROD-001
  *       - in: query
  *         name: limit
  *         schema:
@@ -44,11 +45,11 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *           minimum: 1
  *           maximum: 100
  *           default: 20
- *         description: Maximum number of items to return
+ *         description: Maximum number of products to return
  *         example: 20
  *     responses:
  *       '200':
- *         description: List of items retrieved successfully (paginated)
+ *         description: List of products retrieved successfully (paginated)
  *         content:
  *           application/json:
  *             schema:
@@ -61,7 +62,7 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *                     properties:
  *                       id:
  *                         type: string
- *                         example: ITEM-001
+ *                         example: PROD-001
  *                       name:
  *                         type: string
  *                         example: Solar Panel 300W
@@ -77,11 +78,11 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *                 nextCursor:
  *                   type: string
  *                   nullable: true
- *                   description: ID of the last item in this page, use this as cursor for next page
- *                   example: ITEM-020
+ *                   description: ID of the last product in this page, use this as cursor for next page
+ *                   example: PROD-020
  *                 hasNextPage:
  *                   type: boolean
- *                   description: Whether there are more items available
+ *                   description: Whether there are more products available
  *                   example: true
  *       '401':
  *         description: Unauthorized - invalid or missing API token
@@ -97,10 +98,10 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *       '500':
  *         description: Internal server error
  *   post:
- *     summary: Create a new item
- *     description: Creates a new item in the system. Requires a valid API token.
+ *     summary: Create a new product
+ *     description: Creates a new product in the system. Requires a valid API token.
  *     tags:
- *       - Items
+ *       - Products
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -116,15 +117,15 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *             properties:
  *               id:
  *                 type: string
- *                 description: Unique identifier for the item
- *                 example: ITEM-001
+ *                 description: Unique identifier for the product
+ *                 example: PROD-001
  *               name:
  *                 type: string
- *                 description: Name of the item
+ *                 description: Name of the product
  *                 example: Solar Panel 300W
  *               description:
  *                 type: string
- *                 description: Description of the item
+ *                 description: Description of the product
  *                 example: High efficiency solar panel
  *               categoryIds:
  *                 type: array
@@ -135,7 +136,7 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *               imageUrl:
  *                 type: string
  *                 format: uri
- *                 description: URL of the item image
+ *                 description: URL of the product image
  *                 example: https://example.com/image.jpg
  *               templateFields:
  *                 type: object
@@ -143,12 +144,12 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *                 additionalProperties: true
  *               itemTemplate:
  *                 type: array
- *                 description: Item template configuration
+ *                 description: Product template configuration
  *                 items:
  *                   type: object
  *     responses:
  *       '201':
- *         description: Item created successfully
+ *         description: Product created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -189,13 +190,12 @@ import { parseCursorPaginationParams } from '@/lib/api/cursor-pagination';
  *                 code:
  *                   type: string
  *       '409':
- *         description: Conflict - item with this ID already exists
+ *         description: Conflict - product with this ID already exists
  *       '500':
  *         description: Internal server error
  */
 export async function GET(request: NextRequest) {
   try {
-    // Validate API token
     const auth = await validateApiToken(request);
     if (!auth) {
       return NextResponse.json(
@@ -209,6 +209,21 @@ export async function GET(request: NextRequest) {
     const q = searchParams.get('q');
     const paginationParams = parseCursorPaginationParams(searchParams);
 
+    // ── Sandbox: read from filesystem only ──────────────────────────────
+    if (auth.isSandbox) {
+      const repo = itemRepositoryFilesystem;
+      let result;
+      if (q) {
+        result = await repo.searchPaginated(q, auth.organizationId, paginationParams);
+      } else if (categoryId) {
+        result = await repo.listByCategoryPaginated(categoryId, auth.organizationId, paginationParams);
+      } else {
+        result = await repo.listPaginated(auth.organizationId, paginationParams);
+      }
+      return NextResponse.json(result);
+    }
+
+    // ── Production: delegate to server actions (Prisma) ─────────────────
     let result;
     if (q) {
       const { searchItemsPaginated } = await import('@/actions/items/searchPaginated');
@@ -286,7 +301,32 @@ export async function POST(request: NextRequest) {
       itemTemplate: body.itemTemplate || undefined,
     };
 
-    // Create services with organizationId from API token
+    // ── Sandbox: write to filesystem, skip evidence service ─────────────
+    if (auth.isSandbox) {
+      const existing = await itemRepositoryFilesystem.getById(createRequest.customId, organizationId);
+      if (existing) {
+        return NextResponse.json(
+          { error: `Item with ID "${createRequest.customId}" already exists in the sandbox`, code: 'ITEM_EXISTS' },
+          { status: 409 }
+        );
+      }
+      const sandboxItem = await itemRepositoryFilesystem.create({
+        id: createRequest.customId,
+        organizationId,
+        name: createRequest.name,
+        description: createRequest.description,
+        imageUrl: createRequest.imageUrl ?? null,
+        templateFields: createRequest.templateFields ?? null,
+        itemTemplate: createRequest.itemTemplate ?? [],
+        createdByUserId: 'sandbox',
+      });
+      return NextResponse.json(
+        { id: sandboxItem.id, name: sandboxItem.name, description: sandboxItem.description, imageUrl: sandboxItem.imageUrl, itemTemplate: sandboxItem.itemTemplate },
+        { status: 201 }
+      );
+    }
+
+    // ── Production: full service with evidence ───────────────────────────
     const evidenceService = createEvidenceServiceImpl({ icommunityService });
     const itemService = createItemServiceImpl({
       itemRepository,
@@ -297,7 +337,7 @@ export async function POST(request: NextRequest) {
     // Set organizationId context for this API request
     const { setApiOrganizationId } = await import('@/lib/auth/tenant');
     setApiOrganizationId(organizationId);
-    
+
     try {
       const result = await itemService.createItem(createRequest);
       return NextResponse.json(result, { status: 201 });

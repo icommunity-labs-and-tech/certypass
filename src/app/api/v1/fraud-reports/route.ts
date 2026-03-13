@@ -11,7 +11,7 @@ const VALID_STATUSES: FraudReportStatus[] = ['PENDING', 'UNDER_REVIEW', 'CONFIRM
  * /fraud-reports:
  *   get:
  *     summary: List fraud reports
- *     description: Retrieves a list of fraud reports for the organization. Optionally filter by status or item ID. Requires a valid API token.
+ *     description: Retrieves a list of fraud reports for the organization. Optionally filter by status or product ID. Requires a valid API token.
  *     tags:
  *       - FraudReports
  *     security:
@@ -28,8 +28,8 @@ const VALID_STATUSES: FraudReportStatus[] = ['PENDING', 'UNDER_REVIEW', 'CONFIRM
  *         name: itemId
  *         schema:
  *           type: string
- *         description: Filter reports by item ID (optional)
- *         example: ITEM-001
+ *         description: Filter reports by product ID (optional)
+ *         example: PROD-001
  *     responses:
  *       '200':
  *         description: List of fraud reports retrieved successfully
@@ -118,7 +118,7 @@ const VALID_STATUSES: FraudReportStatus[] = ['PENDING', 'UNDER_REVIEW', 'CONFIRM
  *         description: Internal server error
  *   post:
  *     summary: Create a fraud report
- *     description: Creates a new fraud report for an item in the organization. Requires a valid API token. This is typically submitted from the Digital Passport app when a user reports a counterfeit item.
+ *     description: Creates a new fraud report for a product in the organization. Requires a valid API token. This is typically submitted from the Digital Passport app when a user reports a counterfeit product.
  *     tags:
  *       - FraudReports
  *     security:

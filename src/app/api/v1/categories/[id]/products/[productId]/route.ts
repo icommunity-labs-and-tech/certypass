@@ -4,10 +4,10 @@ import { attachItemToCategory, detachItemFromCategory } from '@/actions/categori
 
 /**
  * @swagger
- * /categories/{id}/items/{itemId}:
+ * /categories/{id}/products/{productId}:
  *   post:
- *     summary: Attach an item to a category
- *     description: Adds an item to a category. Requires a valid API token.
+ *     summary: Attach a product to a category
+ *     description: Adds a product to a category. Requires a valid API token.
  *     tags:
  *       - Categories
  *     security:
@@ -21,15 +21,15 @@ import { attachItemToCategory, detachItemFromCategory } from '@/actions/categori
  *         description: Unique identifier of the category
  *         example: category-001
  *       - in: path
- *         name: itemId
+ *         name: productId
  *         required: true
  *         schema:
  *           type: string
- *         description: Unique identifier of the item
- *         example: ITEM-001
+ *         description: Unique identifier of the product
+ *         example: PRODUCT-001
  *     responses:
  *       '200':
- *         description: Item attached to category successfully
+ *         description: Product attached to category successfully
  *         content:
  *           application/json:
  *             schema:
@@ -50,7 +50,7 @@ import { attachItemToCategory, detachItemFromCategory } from '@/actions/categori
  *                 code:
  *                   type: string
  *       '404':
- *         description: Category or item not found
+ *         description: Category or product not found
  *         content:
  *           application/json:
  *             schema:
@@ -61,8 +61,8 @@ import { attachItemToCategory, detachItemFromCategory } from '@/actions/categori
  *       '500':
  *         description: Internal server error
  *   delete:
- *     summary: Detach an item from a category
- *     description: Removes an item from a category. Requires a valid API token.
+ *     summary: Detach a product from a category
+ *     description: Removes a product from a category. Requires a valid API token.
  *     tags:
  *       - Categories
  *     security:
@@ -76,15 +76,15 @@ import { attachItemToCategory, detachItemFromCategory } from '@/actions/categori
  *         description: Unique identifier of the category
  *         example: category-001
  *       - in: path
- *         name: itemId
+ *         name: productId
  *         required: true
  *         schema:
  *           type: string
- *         description: Unique identifier of the item
- *         example: ITEM-001
+ *         description: Unique identifier of the product
+ *         example: PRODUCT-001
  *     responses:
  *       '200':
- *         description: Item detached from category successfully
+ *         description: Product detached from category successfully
  *         content:
  *           application/json:
  *             schema:
@@ -105,7 +105,7 @@ import { attachItemToCategory, detachItemFromCategory } from '@/actions/categori
  *                 code:
  *                   type: string
  *       '404':
- *         description: Category or item not found
+ *         description: Category or product not found
  *         content:
  *           application/json:
  *             schema:
@@ -118,10 +118,9 @@ import { attachItemToCategory, detachItemFromCategory } from '@/actions/categori
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string; itemId: string }> }
+  { params }: { params: Promise<{ id: string; productId: string }> }
 ) {
   try {
-    // Validate API token
     const auth = await validateApiToken(request);
     if (!auth) {
       return NextResponse.json(
@@ -130,13 +129,13 @@ export async function POST(
       );
     }
 
-    const { id: categoryId, itemId } = await params;
-    await attachItemToCategory(categoryId, itemId);
-    
+    const { id: categoryId, productId } = await params;
+    await attachItemToCategory(categoryId, productId);
+
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error attaching item to category:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Error al añadir item a la categoría';
+    console.error('Error attaching product to category:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Error al añadir producto a la categoría';
     return NextResponse.json(
       { error: errorMessage },
       { status: errorMessage.includes('no encontrada') || errorMessage.includes('not found') ? 404 : 500 }
@@ -146,10 +145,9 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string; itemId: string }> }
+  { params }: { params: Promise<{ id: string; productId: string }> }
 ) {
   try {
-    // Validate API token
     const auth = await validateApiToken(request);
     if (!auth) {
       return NextResponse.json(
@@ -158,17 +156,16 @@ export async function DELETE(
       );
     }
 
-    const { id: categoryId, itemId } = await params;
-    await detachItemFromCategory(categoryId, itemId);
-    
+    const { id: categoryId, productId } = await params;
+    await detachItemFromCategory(categoryId, productId);
+
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error detaching item from category:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Error al remover item de la categoría';
+    console.error('Error detaching product from category:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Error al remover producto de la categoría';
     return NextResponse.json(
       { error: errorMessage },
       { status: errorMessage.includes('no encontrada') || errorMessage.includes('not found') ? 404 : 500 }
     );
   }
 }
-
