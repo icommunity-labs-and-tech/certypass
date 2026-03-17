@@ -807,7 +807,8 @@
       "categoryDistribution": {
         "items": "Items:",
         "percentage": "Porcentaje:",
-        "emptyMessage": "No hay datos de categorías disponibles"
+        "emptyMessage": "No hay datos de categorías disponibles",
+        "others": "Otros"
       },
       "backupStatusByUser": {
         "totalStates": "Total Estados",
@@ -1124,16 +1125,34 @@
   "usersPage": {
     "charts": {
       "loading": "Cargando datos...",
-      "totalUsers": "Total Usuarios",
+      "statsTitle": "Estadísticas",
+      "total": "Total",
+      "roleAll": "Todos los roles",
+      "newThisMonth": "Nuevos este mes",
       "admins": "Administradores",
       "operators": "Operadores",
-      "certificateSigners": "Firman Certificado",
       "roleDistribution": "Distribución de Roles",
       "monthlyRegistrations": "Altas por Mes",
       "roleAdmin": "Administrador",
       "roleOperator": "Operador",
-      "noData": "Sin datos disponibles",
-      "registrations": "Altas"
+      "registrations": "Altas",
+      "monthlyVerifications": "Verificaciones por mes",
+      "verifications": "Verificaciones"
+    }
+  },
+  "itemsPage": {
+    "charts": {
+      "loading": "Cargando datos...",
+      "statsTitle": "Estadísticas",
+      "total": "Total",
+      "withCategory": "Con categoría",
+      "uncategorized": "Sin categoría",
+      "withImage": "Con imagen",
+      "categoryDistribution": "Por categoría",
+      "allCategories": "Todas las categorías",
+      "monthlyCreations": "Altas por mes",
+      "products": "Productos",
+      "others": "Otros"
     }
   }
 }

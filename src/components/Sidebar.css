@@ -6,10 +6,12 @@
   border-right: 1px solid rgba(255,255,255,0.55);
   backdrop-filter: saturate(1.2) blur(14px);
   -webkit-backdrop-filter: saturate(1.2) blur(14px);
-  box-shadow: 
+  box-shadow:
     4px 0 24px rgba(13,110,253,0.12),
     2px 0 12px rgba(0,0,0,0.08),
     inset -1px 0 0 rgba(255,255,255,0.3);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Estilos específicos para móvil */

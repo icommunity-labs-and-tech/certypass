@@ -803,7 +803,8 @@
       "categoryDistribution": {
         "items": "Items:",
         "percentage": "Percentage:",
-        "emptyMessage": "No category data available"
+        "emptyMessage": "No category data available",
+        "others": "Others"
       },
       "backupStatusByUser": {
         "totalStates": "Total States",
@@ -1120,16 +1121,34 @@
   "usersPage": {
     "charts": {
       "loading": "Loading data...",
-      "totalUsers": "Total Users",
+      "statsTitle": "Statistics",
+      "total": "Total",
+      "roleAll": "All roles",
+      "newThisMonth": "New this month",
       "admins": "Administrators",
       "operators": "Operators",
-      "certificateSigners": "Certificate Signers",
       "roleDistribution": "Role Distribution",
       "monthlyRegistrations": "Monthly Registrations",
       "roleAdmin": "Administrator",
       "roleOperator": "Operator",
-      "noData": "No data available",
-      "registrations": "Registrations"
+      "registrations": "Registrations",
+      "monthlyVerifications": "Verifications per month",
+      "verifications": "Verifications"
+    }
+  },
+  "itemsPage": {
+    "charts": {
+      "loading": "Loading data...",
+      "statsTitle": "Statistics",
+      "total": "Total",
+      "withCategory": "With category",
+      "uncategorized": "Uncategorized",
+      "withImage": "With image",
+      "categoryDistribution": "By category",
+      "allCategories": "All categories",
+      "monthlyCreations": "Monthly creations",
+      "products": "Products",
+      "others": "Others"
     }
   }
 }

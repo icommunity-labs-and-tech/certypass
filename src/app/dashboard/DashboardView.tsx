@@ -73,10 +73,7 @@ export default function DashboardClient({
     <>
       <Row className="mb-2">
         <Col md={12}>
-          <Box>
-            <BoxTitle message={t('metrics')} />
-            <DashboardKPIs kpis={kpis} />
-          </Box>
+          <DashboardKPIs kpis={kpis} />
         </Col>
       </Row>
 

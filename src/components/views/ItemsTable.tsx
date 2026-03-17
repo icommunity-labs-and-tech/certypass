@@ -39,15 +39,21 @@ interface ItemsTableProps {
   customActions?: Array<{ label: string; onClick: (row: any) => void }>;
   customColumns?: Array<{ key: string; label: string; render: (item: any) => React.ReactNode }>;
   allowTemplateEditing?: boolean;
+  externalData?: any[];
+  onDataChange?: () => void;
+  showDescription?: boolean;
 }
 
-export default function ItemsTable({ 
+export default function ItemsTable({
   title,
   showBox = true,
   onItemSelect,
   customActions = [],
   customColumns = [],
-  allowTemplateEditing = true
+  allowTemplateEditing = true,
+  externalData,
+  onDataChange,
+  showDescription = true,
 }: ItemsTableProps) {
   const t = useTranslations('tables');
   const tModals = useTranslations('modals');
@@ -90,10 +96,13 @@ export default function ItemsTable({
     entityName: 'Producto',
     redirectPath: '/dashboard/items',
     onSuccess: (deleted) => {
-      // Actualizar la lista local inmediatamente con el id eliminado
-      const deletedId = (deleted?.id || entityToDelete?.id);
-      if (deletedId) {
-        setItems(prev => prev.filter(item => item.id !== deletedId));
+      if (externalData !== undefined) {
+        onDataChange?.();
+      } else {
+        const deletedId = (deleted?.id || entityToDelete?.id);
+        if (deletedId) {
+          setItems(prev => prev.filter(item => item.id !== deletedId));
+        }
       }
     },
     onError: (error) => {
@@ -102,6 +111,10 @@ export default function ItemsTable({
   });
 
   useEffect(() => {
+    if (externalData !== undefined) {
+      setIsLoading(false);
+      return;
+    }
     const loadData = async () => {
       try {
         if (showTutorialExamples) {
@@ -124,10 +137,10 @@ export default function ItemsTable({
     };
 
     loadData();
-  }, [showTutorialExamples, organizationSector]);
+  }, [externalData, showTutorialExamples, organizationSector]);
 
   // Los items se pasan sin filtrar, el filtrado se hace en ItemsTableCustom
-  const filteredItems = items;
+  const filteredItems = externalData !== undefined ? externalData : items;
 
   // Función para generar etiqueta automáticamente del nombre
   const generateLabel = (name: string): string => {
@@ -326,8 +339,11 @@ export default function ItemsTable({
   };
 
   const handleItemCreated = (newItem: any) => {
-    // Actualizar la lista local de items con el nuevo producto
-    setItems(prev => [newItem, ...prev]);
+    if (externalData !== undefined) {
+      onDataChange?.();
+    } else {
+      setItems(prev => [newItem, ...prev]);
+    }
   };
 
   const toggleField = (key: FieldKey) => {
@@ -379,7 +395,7 @@ export default function ItemsTable({
     <>
       <KycInfoBanner />
 
-      {showBox && (
+      {showBox && showDescription && (
         <Box>
           <h6 className="mb-2">{t('whatIsInventory')}</h6>
           <Divider />

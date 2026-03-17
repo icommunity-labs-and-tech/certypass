@@ -1,9 +1,7 @@
 'use client'
 
-import { ItemsTable } from '@/components/views';
+import ItemsPageClient from './ItemsPageClient';
 
 export default function Page() {
-  return <ItemsTable />;
+  return <ItemsPageClient />;
 }
-
-

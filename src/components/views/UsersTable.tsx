@@ -39,15 +39,21 @@ interface UsersTableProps {
   customActions?: Array<{ label: string; onClick: (row: any) => void }>;
   customColumns?: Array<{ key: string; label: string; render: (user: any) => React.ReactNode }>;
   allowTemplateEditing?: boolean;
+  externalData?: any[];
+  onDataChange?: () => void;
+  showDescription?: boolean;
 }
 
-export default function UsersTable({ 
-  title, 
-  showBox = true, 
-  onUserSelect, 
-  customActions = [], 
+export default function UsersTable({
+  title,
+  showBox = true,
+  onUserSelect,
+  customActions = [],
   customColumns = [],
-  allowTemplateEditing = true 
+  allowTemplateEditing = true,
+  externalData,
+  onDataChange,
+  showDescription = true,
 }: UsersTableProps) {
   const t = useTranslations('tables');
   const tModals = useTranslations('modals');
@@ -89,8 +95,9 @@ export default function UsersTable({
     entityName: 'Usuario',
     redirectPath: '/dashboard/users',
     onSuccess: () => {
-      // Actualizar la lista local después de eliminar
-      if (entityToDelete) {
+      if (externalData !== undefined) {
+        onDataChange?.();
+      } else if (entityToDelete) {
         setUsers(prev => prev.filter(user => user.id !== entityToDelete.id));
       }
     },
@@ -100,6 +107,10 @@ export default function UsersTable({
   });
 
   useEffect(() => {
+    if (externalData !== undefined) {
+      setIsLoading(false);
+      return;
+    }
     const load = async () => {
       try {
         const result = await getUsers();
@@ -107,7 +118,6 @@ export default function UsersTable({
           setUsers(result.users);
         } else {
           console.error('Error loading users:', result.error);
-          // Si hay error de autenticación, redirigir al login
           if (result.error?.includes('No autorizado') || result.error?.includes('Solo los administradores')) {
             window.location.href = '/auth/admin/login';
           }
@@ -119,7 +129,7 @@ export default function UsersTable({
       }
     };
     load();
-  }, []);
+  }, [externalData]);
 
   const handleAddUser = async (formData: any) => {
     try {
@@ -130,9 +140,12 @@ export default function UsersTable({
       
       const result = await createUser(formDataObj);
       if (result.success && result.user) {
-        // Actualizar la lista de usuarios
-        setUsers(prev => [result.user, ...prev]);
-        
+        if (externalData !== undefined) {
+          onDataChange?.();
+        } else {
+          setUsers(prev => [result.user, ...prev]);
+        }
+
         // Mostrar modal con credenciales si hay contraseña temporal
         if (result.user.temporaryPassword) {
           setNewUserCredentials({
@@ -227,7 +240,7 @@ export default function UsersTable({
       )}
 
       <GenericTable
-        initialData={users}
+        initialData={externalData !== undefined ? externalData : users}
         title={defaultTitle}
         icon="bi-people-fill"
         formTemplate={userFormTemplate}
@@ -272,7 +285,7 @@ export default function UsersTable({
 
   return (
     <>
-      {showBox && (
+      {showBox && showDescription && (
         <Box>
           <h6 className="mb-2">{t('whatIsUserManagement')}</h6>
           <Divider />

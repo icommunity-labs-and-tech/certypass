@@ -227,14 +227,14 @@ export default function FraudReportsPageClient() {
                   </button>
                 )}
               </div>
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={330}>
                 <PieChart>
                   <Pie
                     data={statusPieData}
                     cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={85}
+                    cy="43%"
+                    innerRadius="33%"
+                    outerRadius="54%"
                     dataKey="value"
                     paddingAngle={3}
                     style={{ cursor: 'pointer' }}

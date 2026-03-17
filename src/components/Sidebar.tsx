@@ -68,7 +68,7 @@ export default function Sidebar() {
   };
 
   return (
-    <Container fluid className="sidebar-wrap min-vh-100 p-3 d-flex flex-column" data-tour="sidebar">
+    <Container fluid className="sidebar-wrap h-100 p-3 d-flex flex-column" data-tour="sidebar">
       <div className="px-2">
         <Navbar.Brand className="d-flex align-items-center mb-3">
           <Logo href="/dashboard" width={120} height={40} priority />
