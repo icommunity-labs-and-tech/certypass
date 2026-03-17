@@ -277,7 +277,7 @@
     "login": {
       "admin": {
         "title": "Dashboard Admin",
-        "subtitle": "Acceso exclusivo para administradores",
+        "subtitle": "Panel de Administrador",
         "emailLabel": "Email Administrativo",
         "emailPlaceholder": "admin@empresa.com",
         "passwordLabel": "Contraseña",

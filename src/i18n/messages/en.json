@@ -273,7 +273,7 @@
     "login": {
       "admin": {
         "title": "Admin Dashboard",
-        "subtitle": "Exclusive access for administrators",
+        "subtitle": "Administrator Panel",
         "emailLabel": "Administrative Email",
         "emailPlaceholder": "admin@company.com",
         "passwordLabel": "Password",

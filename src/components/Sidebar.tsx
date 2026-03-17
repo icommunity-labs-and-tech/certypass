@@ -50,7 +50,7 @@ export default function Sidebar() {
 
   const appLinks = [
     { href: '/customer', icon: 'bi-person-badge', label: t('appCustomer') },
-    { href: '/operator?admin-access=true', icon: 'bi-tools', label: t('appOperator') },
+    { href: '/auth/operator/login?skip=1', icon: 'bi-tools', label: t('appOperator') },
   ];
 
   const developerLinks: Array<{ href: string; icon: string; label: string; external?: boolean }> = [
