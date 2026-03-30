@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { getFraudReportsPendingCount } from '@/actions/fraudReports/get-pending-count';
 
-export default function Sidebar() {
+export default function Sidebar({ logoUrl }: { logoUrl?: string | null }) {
   const pathname = usePathname();
   const { isDesktop, closeMobile } = useSidebar();
   const { user, loading } = useAuthSeparated();
@@ -71,7 +71,7 @@ export default function Sidebar() {
     <Container fluid className="sidebar-wrap h-100 p-3 d-flex flex-column" data-tour="sidebar">
       <div className="px-2">
         <Navbar.Brand className="d-flex align-items-center mb-3">
-          <Logo href="/dashboard" width={120} height={40} priority />
+          <Logo href="/dashboard" width={120} height={40} priority src={logoUrl ?? undefined} alt="Logo" />
         </Navbar.Brand>
         <hr className="opacity-75 border" />
         <Nav className="flex-column mb-auto">

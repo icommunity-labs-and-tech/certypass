@@ -326,7 +326,42 @@
           "connectionError": "Error de conexión"
         }
       },
-      "loading": "Cargando..."
+      "loading": "Cargando...",
+      "org": {
+        "admin": {
+          "subtitle": "Panel de Administrador",
+          "emailPlaceholder": "admin@empresa.com",
+          "passwordPlaceholder": "••••••••",
+          "accessing": "Accediendo...",
+          "access": "Acceder",
+          "operatorLink": "¿Eres operador?",
+          "accessHere": "Accede aquí",
+          "poweredBy": "Certificación impulsada por",
+          "errors": {
+            "accessDenied": "No tienes permisos para acceder al dashboard",
+            "unauthorized": "Debes iniciar sesión como administrador para continuar",
+            "invalidCredentials": "Credenciales inválidas",
+            "loginError": "Error al iniciar sesión"
+          }
+        },
+        "operator": {
+          "subtitle": "Acceso para operadores",
+          "emailPlaceholder": "tu@email.com",
+          "passwordPlaceholder": "••••••••",
+          "accessing": "Accediendo...",
+          "access": "Acceder",
+          "adminLink": "¿Eres administrador?",
+          "accessHere": "Accede aquí",
+          "poweredBy": "Certificación impulsada por",
+          "errors": {
+            "accessDenied": "No tienes permisos para acceder a la aplicación de operadores",
+            "unauthorized": "Debes iniciar sesión como operador para continuar",
+            "invalidCredentials": "Credenciales inválidas",
+            "loginError": "Error al iniciar sesión"
+          }
+        },
+        "notFound": "Organización no encontrada"
+      }
     },
     "activate": {
       "validatingToken": "Validando token...",
@@ -884,6 +919,31 @@
     "accountInfo": "Información de la Cuenta",
     "created": "Creada:",
     "lastUpdated": "Última actualización:",
+    "branding": {
+      "title": "Identidad visual",
+      "description": "Personaliza el logo que verán los administradores y operadores de tu organización.",
+      "currentLogo": "Logo actual",
+      "noLogo": "Sin logo personalizado",
+      "uploadLogo": "Subir logo",
+      "deleteLogo": "Usar logo de CertyPass",
+      "uploading": "Subiendo...",
+      "deleting": "Eliminando...",
+      "uploadSuccess": "Logo actualizado correctamente",
+      "deleteSuccess": "Logo eliminado correctamente",
+      "uploadError": "Error al subir el logo",
+      "deleteError": "Error al eliminar el logo",
+      "formatHint": "PNG, JPG o WebP. Máximo 2 MB. Recomendado: fondo transparente.",
+      "colors": "Colores corporativos",
+      "colorPrimary": "Color primario",
+      "colorSecondary": "Color secundario",
+      "colorPrimaryHint": "Fondo del panel y botón de acceso",
+      "colorSecondaryHint": "Acento del gradiente (opcional)",
+      "colorsSave": "Guardar colores",
+      "colorsSaving": "Guardando...",
+      "colorsSuccess": "Colores actualizados correctamente",
+      "colorsError": "Error al guardar los colores",
+      "colorsReset": "Restablecer"
+    },
     "changePassword": "Cambio de contraseña",
     "changePasswordDescription": "Cambia tu contraseña para mantener la seguridad de tu cuenta",
     "kyc": {

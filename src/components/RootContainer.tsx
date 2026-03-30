@@ -11,8 +11,10 @@ export default function RootContainer({ children }: RootContainerProps) {
   const pathname = usePathname();
 
   const isDashboard = pathname?.startsWith('/dashboard');
+  const isOrgLogin = pathname?.startsWith('/org/');
+  const isAuthLogin = pathname?.startsWith('/auth/');
 
-  if (isDashboard) {
+  if (isDashboard || isOrgLogin || isAuthLogin) {
     return <>{children}</>;
   }
 

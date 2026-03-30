@@ -209,6 +209,9 @@ model Organization {
   configuracion      Json?
   signatureID        String?
   kycURL            String?
+  logoUrl           String?
+  brandColorPrimary  String?
+  brandColorSecondary String?
   verificationStatus VerificationStatus @default(NOT_VERIFIED)
   sectorId          String?
   createdAt         DateTime           @default(now())

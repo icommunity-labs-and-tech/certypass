@@ -7,8 +7,17 @@ import { useAuthSeparated, AuthProvider } from '@/hooks/useAuthSeparated';
 import { useTranslations } from 'next-intl';
 import LoginPageLayout from '@/components/auth/LoginPageLayout';
 
-function OperatorLoginContent() {
-  const t = useTranslations('auth.login.operator');
+interface OrgLoginFormProps {
+  slug: string;
+  orgName: string;
+  logoUrl: string | null;
+  role: 'admin' | 'operator';
+  brandColor?: string;
+  brandColorSecondary?: string;
+}
+
+function OrgLoginContent({ slug, orgName, logoUrl, role, brandColor, brandColorSecondary }: OrgLoginFormProps) {
+  const t = useTranslations(role === 'admin' ? 'auth.login.org.admin' : 'auth.login.org.operator');
   const tCommon = useTranslations('common.actions');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,8 +31,10 @@ function OperatorLoginContent() {
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
-    if (user && !loading && user.role === 'USER') router.push('/operator');
-  }, [user, loading, router]);
+    if (!user || loading) return;
+    if (role === 'admin' && user.role === 'ADMIN') router.push('/dashboard');
+    if (role === 'operator' && user.role === 'USER') router.push('/operator');
+  }, [user, loading, router, role]);
 
   useEffect(() => {
     const e = searchParams.get('error');
@@ -36,9 +47,12 @@ function OperatorLoginContent() {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await login(email, password, 'operator');
-      if (result.success) { router.push('/operator'); }
-      else { setError(result.error || t('errors.invalidCredentials')); }
+      const result = await login(email, password, role);
+      if (result.success) {
+        router.push(role === 'admin' ? '/dashboard' : '/operator');
+      } else {
+        setError(result.error || t('errors.invalidCredentials'));
+      }
     } catch {
       setError(t('errors.loginError'));
     } finally {
@@ -56,17 +70,26 @@ function OperatorLoginContent() {
     );
   }
 
+  const crossLink = role === 'admin'
+    ? { href: `/org/${slug}/operator`, label: t('operatorLink'), cta: t('accessHere') }
+    : { href: `/org/${slug}/admin`, label: t('adminLink'), cta: t('accessHere') };
+
   return (
     <LoginPageLayout
-      role="operator"
+      logoUrl={logoUrl}
+      orgName={orgName}
+      brandColor={brandColor}
+      brandColorSecondary={brandColorSecondary}
+      poweredByText={t('poweredBy')}
+      role={role}
       subtitle={t('subtitle')}
       emailPlaceholder={t('emailPlaceholder')}
       passwordPlaceholder={t('passwordPlaceholder')}
       accessText={t('access')}
       accessingText={t('accessing')}
-      crossLinkLabel={t('adminLink')}
-      crossLinkCta={t('accessHere')}
-      crossLinkHref="/auth/admin/login"
+      crossLinkLabel={crossLink.label}
+      crossLinkCta={crossLink.cta}
+      crossLinkHref={crossLink.href}
       email={email}
       password={password}
       isLoading={isLoading}
@@ -78,18 +101,15 @@ function OperatorLoginContent() {
   );
 }
 
-export default function OperatorLoginPage() {
-  const tCommon = useTranslations('common.actions');
+export default function OrgLoginForm(props: OrgLoginFormProps) {
   return (
     <AuthProvider>
       <Suspense fallback={
         <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-          <Spinner animation="border" variant="primary">
-            <span className="visually-hidden">{tCommon('loading')}</span>
-          </Spinner>
+          <Spinner animation="border" variant="primary" />
         </div>
       }>
-        <OperatorLoginContent />
+        <OrgLoginContent {...props} />
       </Suspense>
     </AuthProvider>
   );

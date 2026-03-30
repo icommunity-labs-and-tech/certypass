@@ -9,24 +9,32 @@ interface LogoProps {
   height?: number;
   className?: string;
   priority?: boolean;
+  src?: string;
+  alt?: string;
 }
 
-export default function Logo({ 
-  href = '/dashboard', 
-  width = 120, 
+export default function Logo({
+  href = '/dashboard',
+  width = 120,
   height = 40,
   className = '',
-  priority = false
+  priority = false,
+  src,
+  alt,
 }: LogoProps) {
+  const resolvedSrc = src || '/logo.webp';
+  const resolvedAlt = alt || 'Logo';
+
   const logoElement = (
     <Image
-      src="/logo.webp"
-      alt="CertyPass Logo"
+      src={resolvedSrc}
+      alt={resolvedAlt}
       width={width}
       height={height}
       style={{ objectFit: 'contain', maxWidth: '100%' }}
       priority={priority}
       className={className}
+      unoptimized={!!src}
     />
   );
 
