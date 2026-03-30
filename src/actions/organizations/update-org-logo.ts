@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { requireOrganizationId, getCurrentTenant } from '@/lib/auth/tenant';
-import { getStorage } from '@/lib/storage';
+import { storageService } from '@/lib/services/storage';
 
 const MAX_LOGO_BYTES = 2 * 1024 * 1024; // 2 MB
 
@@ -30,8 +30,7 @@ export async function updateOrgLogo(
       return { error: 'El logo debe ser menor a 2 MB' };
     }
 
-    const storage = getStorage();
-    const saved = await storage.saveImage(file, 'org-logo');
+    const saved = await storageService.saveImageFor('org-logo', file);
 
     await prisma.organization.update({
       where: { id: organizationId },
@@ -41,6 +40,7 @@ export async function updateOrgLogo(
     return { logoUrl: saved.url };
   } catch (error) {
     console.error('Error updating org logo:', error);
-    return { error: 'Error al guardar el logo' };
+    const message = error instanceof Error ? error.message : 'Error desconocido';
+    return { error: `Error al guardar el logo: ${message}` };
   }
 }
