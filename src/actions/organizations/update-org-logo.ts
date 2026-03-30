@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { requireOrganizationId, getCurrentTenant } from '@/lib/auth/tenant';
-import { storageService } from '@/lib/services/storage';
+import { getStorage } from '@/lib/storage';
 
 const MAX_LOGO_BYTES = 2 * 1024 * 1024; // 2 MB
 
@@ -30,7 +30,8 @@ export async function updateOrgLogo(
       return { error: 'El logo debe ser menor a 2 MB' };
     }
 
-    const saved = await storageService.saveImageFor('org-logo', file);
+    const storage = getStorage();
+    const saved = await storage.saveImage(file, 'org-logo' as any);
 
     await prisma.organization.update({
       where: { id: organizationId },
