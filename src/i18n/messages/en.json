@@ -938,7 +938,12 @@
       "colorsSaving": "Saving...",
       "colorsSuccess": "Colors updated successfully",
       "colorsError": "Error saving colors",
-      "colorsReset": "Reset"
+      "colorsReset": "Reset",
+      "loginUrls": "Access URLs",
+      "loginUrlsDescription": "Share these URLs with your users so they can log in with your organization's branding.",
+      "loginUrlAdmin": "Admin panel",
+      "loginUrlOperator": "Operator panel",
+      "loginUrlCopied": "URL copied"
     },
     "changePassword": "Change Password",
     "changePasswordDescription": "Change your password to maintain the security of your account",

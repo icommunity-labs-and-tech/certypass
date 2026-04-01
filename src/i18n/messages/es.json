@@ -942,7 +942,12 @@
       "colorsSaving": "Guardando...",
       "colorsSuccess": "Colores actualizados correctamente",
       "colorsError": "Error al guardar los colores",
-      "colorsReset": "Restablecer"
+      "colorsReset": "Restablecer",
+      "loginUrls": "URLs de acceso",
+      "loginUrlsDescription": "Comparte estas URLs con tus usuarios para que accedan con el branding de tu organización.",
+      "loginUrlAdmin": "Panel de administrador",
+      "loginUrlOperator": "Panel de operador",
+      "loginUrlCopied": "URL copiada"
     },
     "changePassword": "Cambio de contraseña",
     "changePasswordDescription": "Cambia tu contraseña para mantener la seguridad de tu cuenta",

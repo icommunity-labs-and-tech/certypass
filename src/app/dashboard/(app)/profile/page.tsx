@@ -37,6 +37,7 @@ export default async function ProfilePage() {
         select: {
           id: true,
           nombre: true,
+          slug: true,
           signatureID: true,
           kycURL: true,
           verificationStatus: true,
