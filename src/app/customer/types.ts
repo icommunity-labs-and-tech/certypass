@@ -51,4 +51,21 @@ export type ItemData = {
     description: string;
   };
   states: StateData[];
+  energyCertifications?: EnergyCertification[];
+};
+
+export type EnergyCertification = {
+  id: string;
+  co2eKg: number;
+  scope: string;
+  systemBoundary: string;
+  calculationMethodology: string | null;
+  verifierBody: string | null;
+  verificationStandard: string | null;
+  verificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  periodStart: string;
+  periodEnd: string;
+  consumptionKwh: number;
+  energyCarrier: string;
+  createdAt: string;
 };

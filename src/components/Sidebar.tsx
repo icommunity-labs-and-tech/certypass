@@ -12,8 +12,9 @@ import './Sidebar.css';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { getFraudReportsPendingCount } from '@/actions/fraudReports/get-pending-count';
+import type { OrgModules } from '@/app/dashboard/(app)/layout';
 
-export default function Sidebar({ logoUrl }: { logoUrl?: string | null }) {
+export default function Sidebar({ logoUrl, modules }: { logoUrl?: string | null; modules?: OrgModules }) {
   const pathname = usePathname();
   const { isDesktop, closeMobile } = useSidebar();
   const { user, loading } = useAuthSeparated();
@@ -24,14 +25,24 @@ export default function Sidebar({ logoUrl }: { logoUrl?: string | null }) {
     getFraudReportsPendingCount().then(setFraudPendingCount);
   }, [pathname]);
 
+  const showPassport = modules?.passport !== false;
+  const showEnergy = modules?.energy === true;
+
   const navLinks = [
     { href: '/dashboard', icon: 'bi-house', label: t('home') },
-    { href: '/dashboard/status-types', icon: 'bi-collection', label: t('statusTypes') },
-    { href: '/dashboard/items', icon: 'bi-list-columns', label: t('products') },
-    { href: '/dashboard/export-qrs', icon: 'bi-qr-code', label: t('exportQrs') },
-    { href: '/dashboard/import-products', icon: 'bi-cloud-upload', label: t('importProducts') },
+    ...(showPassport ? [
+      { href: '/dashboard/status-types', icon: 'bi-collection', label: t('statusTypes') },
+      { href: '/dashboard/items', icon: 'bi-list-columns', label: t('products') },
+      { href: '/dashboard/export-qrs', icon: 'bi-qr-code', label: t('exportQrs') },
+      { href: '/dashboard/import-products', icon: 'bi-cloud-upload', label: t('importProducts') },
+      { href: '/dashboard/fraud-reports', icon: 'bi-shield-exclamation', label: t('fraudReports'), badge: fraudPendingCount > 0 ? fraudPendingCount : undefined },
+    ] : []),
+    ...(showEnergy ? [
+      { href: '/dashboard/energy/sources', icon: 'bi-lightning-charge', label: t('energySources') },
+      { href: '/dashboard/energy/consumption', icon: 'bi-speedometer2', label: t('energyConsumption') },
+      { href: '/dashboard/energy/emissions', icon: 'bi-cloud', label: t('emissions') },
+    ] : []),
     { href: '/dashboard/users', icon: 'bi-people', label: t('users') },
-    { href: '/dashboard/fraud-reports', icon: 'bi-shield-exclamation', label: t('fraudReports'), badge: fraudPendingCount > 0 ? fraudPendingCount : undefined },
     { href: '/dashboard/profile', icon: 'bi-person', label: t('profile') },
   ];
 

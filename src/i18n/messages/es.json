@@ -68,7 +68,10 @@
     "apiDocs": "API Docs",
     "exportQrs": "QRs",
     "importProducts": "Importar",
-    "fraudReports": "Falsificaciones"
+    "fraudReports": "Falsificaciones",
+    "energySources": "Fuentes de Energía",
+    "energyConsumption": "Consumo Energético",
+    "emissions": "Emisiones CO₂"
   },
   "forms": {
     "addItem": "Añadir producto",
@@ -524,7 +527,8 @@
       "tryWithCode": "Intentar con código: {code}",
       "loading": "Cargando...",
       "preparingError": "Preparando página de error"
-    }
+    },
+    "tabEnergy": "Certificación Energética"
   },
   "fraudReport": {
     "button": "Denunciar falsificación",
@@ -1218,6 +1222,45 @@
       "monthlyCreations": "Altas por mes",
       "products": "Productos",
       "others": "Otros"
+    }
+  },
+  "energy": {
+    "sources": {
+      "title": "Fuentes de Energía",
+      "total": "fuentes",
+      "empty": "No hay fuentes de energía registradas",
+      "emptyHint": "Registra fuentes via API o contacta con tu administrador",
+      "capacity": "Capacidad",
+      "location": "Ubicación",
+      "installedAt": "Instalación",
+      "added": "Registrada",
+      "renewableShare": "E. renovable",
+      "countryOfOrigin": "País origen"
+    },
+    "consumption": {
+      "title": "Consumo Energético",
+      "total": "total",
+      "empty": "No hay registros de consumo",
+      "emptyHint": "Los registros de consumo se crean via POST /api/v1/energy/consumption",
+      "period": "Período",
+      "kwh": "kWh",
+      "cost": "Coste",
+      "source": "Fuente",
+      "item": "Equipo",
+      "recorded": "Registrado",
+      "lifecycleStage": "Etapa ciclo de vida"
+    },
+    "emissions": {
+      "title": "Emisiones de CO₂",
+      "total": "total",
+      "empty": "No hay registros de emisiones",
+      "emptyHint": "Los registros de emisiones se crean via POST /api/v1/emissions",
+      "period": "Período",
+      "factor": "Factor emisión",
+      "methodology": "Metodología",
+      "status": "Estado",
+      "recorded": "Registrado",
+      "systemBoundary": "Frontera del sistema"
     }
   }
 }

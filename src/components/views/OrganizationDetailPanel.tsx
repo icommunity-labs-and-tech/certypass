@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Card, Row, Col, Badge, Spinner, Alert, Table, Modal } from 'react-bootstrap';
 import { getOrganizationById, deleteOrganization, type OrganizationDetail } from '@/actions/organizations';
+import { updateOrgModules } from '@/actions/organizations/update-modules';
 import Box from '@/components/Box';
 
 interface OrganizationDetailPanelProps {
@@ -18,6 +19,7 @@ export default function OrganizationDetailPanel({ organizationId }: Organization
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [savingModules, setSavingModules] = useState(false);
 
   useEffect(() => {
     loadOrganization();
@@ -281,6 +283,41 @@ export default function OrganizationDetailPanel({ organizationId }: Organization
           </Card>
         </Col>
       </Row>
+
+      {/* Módulos */}
+      <Card className="mt-3">
+        <Card.Header>
+          <h5 className="mb-0"><i className="bi bi-puzzle me-2" />Módulos</h5>
+        </Card.Header>
+        <Card.Body>
+          {(['passport', 'energy'] as const).map((mod) => {
+            const modules = organization.configuracion?.modules ?? {};
+            const defaultOn = mod === 'passport';
+            const enabled = modules[mod] !== undefined ? modules[mod] : defaultOn;
+            return (
+              <div key={mod} className="form-check form-switch mb-2">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  id={`module-${mod}`}
+                  checked={enabled}
+                  disabled={savingModules}
+                  onChange={async (e) => {
+                    setSavingModules(true);
+                    await updateOrgModules(organization.id, { [mod]: e.target.checked });
+                    await loadOrganization();
+                    setSavingModules(false);
+                  }}
+                />
+                <label className="form-check-label" htmlFor={`module-${mod}`}>
+                  {mod === 'passport' ? '📄 Pasaporte Digital (DPP)' : '⚡ Certificación Energética (ESPR)'}
+                </label>
+              </div>
+            );
+          })}
+        </Card.Body>
+      </Card>
 
       {/* Modal de confirmación de eliminación */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>

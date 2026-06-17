@@ -7,31 +7,59 @@ import PageBody from '@/components/Body';
 import { SidebarProvider, useSidebar } from '@/components/SidebarContext';
 import { AuthProvider } from '@/hooks/useAuthSeparated';
 import { TutorialProvider } from '@/lib/tutorial/TutorialProvider';
+import type { OrgModules } from './layout';
 
 interface AppShellProps {
   children: React.ReactNode;
   logoUrl?: string | null;
+  brandColorPrimary?: string | null;
+  brandColorSecondary?: string | null;
+  modules?: OrgModules;
 }
 
-export default function AppShell({ children, logoUrl }: AppShellProps) {
+export default function AppShell({ children, logoUrl, brandColorPrimary, brandColorSecondary, modules }: AppShellProps) {
   return (
     <AuthProvider>
       <SidebarProvider>
         <TutorialProvider>
-          <Shell logoUrl={logoUrl}>{children}</Shell>
+          <Shell logoUrl={logoUrl} brandColorPrimary={brandColorPrimary} brandColorSecondary={brandColorSecondary} modules={modules}>
+            {children}
+          </Shell>
         </TutorialProvider>
       </SidebarProvider>
     </AuthProvider>
   );
 }
 
-function Shell({ children, logoUrl }: AppShellProps) {
+function hexToRgb(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `${r},${g},${b}`;
+}
+
+function Shell({ children, logoUrl, brandColorPrimary, brandColorSecondary, modules }: AppShellProps) {
+  const primary = brandColorPrimary ?? '#0d6efd';
+  const secondary = brandColorSecondary ?? '#6c757d';
   const SIDEBAR_WIDTH = 250;
   const { isDesktop, isOpenMobile, isCollapsedDesktop, closeMobile } = useSidebar();
   const sidebarVisible = isDesktop ? !isCollapsedDesktop : isOpenMobile;
 
+  const brandStyle = {
+    '--bs-primary': primary,
+    '--bs-primary-rgb': hexToRgb(primary),
+    '--bs-secondary': secondary,
+  } as React.CSSProperties;
+
   return (
-    <div className="d-flex" style={{ minHeight: '100vh' }}>
+    <div className="d-flex" style={{ minHeight: '100vh', ...brandStyle }}>
+      <style>{`
+        .bg-primary { background-color: ${primary} !important; }
+        .text-primary { color: ${primary} !important; }
+        .btn-primary { background-color: ${primary} !important; border-color: ${primary} !important; }
+        .btn-primary:hover { filter: brightness(0.9); }
+        .nav-link.bg-primary { background-color: ${primary} !important; }
+      `}</style>
       <div
         className="p-0"
         style={{
@@ -43,7 +71,7 @@ function Shell({ children, logoUrl }: AppShellProps) {
           zIndex: 1050,
         }}
       >
-        <Sidebar logoUrl={logoUrl} />
+        <Sidebar logoUrl={logoUrl} modules={modules} />
       </div>
 
       {!isDesktop && isOpenMobile && (

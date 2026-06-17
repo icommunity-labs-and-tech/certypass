@@ -3,6 +3,11 @@
 import { prisma } from "@/lib/prisma";
 import { isSuperAdmin } from "@/lib/auth/tenant";
 
+export interface OrgModuleConfig {
+  passport?: boolean;
+  energy?: boolean;
+}
+
 export interface OrganizationDetail {
   id: string;
   nombre: string;
@@ -10,6 +15,7 @@ export interface OrganizationDetail {
   plan: string;
   activa: boolean;
   dominio: string | null;
+  configuracion: { modules?: OrgModuleConfig } | null;
   createdAt: Date;
   updatedAt: Date;
   userCount: number;
@@ -52,6 +58,7 @@ export async function getOrganizationById(id: string): Promise<GetOrganizationRe
         plan: true,
         activa: true,
         dominio: true,
+        configuracion: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -131,6 +138,9 @@ export async function getOrganizationById(id: string): Promise<GetOrganizationRe
       adminActivated: firstAdmin ? firstAdmin.status === 'ACTIVE' : false,
       adminEmail: firstAdmin?.email || null,
       adminName: firstAdmin?.name || null,
+      configuracion: (organization.configuracion && typeof organization.configuracion === 'object')
+        ? organization.configuracion as { modules?: OrgModuleConfig }
+        : null,
     };
     
     return {

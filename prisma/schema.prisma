@@ -138,6 +138,7 @@ model Item {
   ItemCategory        ItemCategory[]
   State               State[]
   FraudReport         FraudReport[]
+  EnergySource        EnergySource[]
 
   @@index([createdByUserId])
   @@index([organizationId])
@@ -435,4 +436,119 @@ enum FraudReportStatus {
   UNDER_REVIEW
   CONFIRMED
   DISMISSED
+}
+
+// ── Energy Certification Module (ESPR-aligned) ───────────────────────────────
+
+model EnergySource {
+  id                  String        @id @default(cuid())
+  // Identity
+  name                String
+  energyCarrier       EnergyCarrier
+  generationTechnology String?      // e.g. photovoltaic, wind_onshore, ccgt
+  capacityKw          Float?
+  location            String?
+  installationDate    DateTime?
+  // ESPR / EU energy taxonomy
+  renewableShare      Float?        // 0–100 %
+  guaranteeOfOriginId String?       // GO / RECs certificate reference
+  countryOfOrigin     String?       // ISO 3166-1 alpha-2
+  gridEmissionFactor  Float?        // gCO2eq/kWh (IEA, national grid)
+  // Relations — itemId required: every source is a physical asset
+  itemId              String
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  Item              Item               @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  EnergyConsumption EnergyConsumption[]
+
+  @@index([itemId])
+}
+
+enum EnergyCarrier {
+  ELECTRICITY
+  NATURAL_GAS
+  HYDROGEN
+  SOLAR_THERMAL
+  DISTRICT_HEATING
+  DISTRICT_COOLING
+  BIOMASS
+  OIL
+  COAL
+  OTHER
+}
+
+model EnergyConsumption {
+  id                  String         @id @default(cuid())
+  // energySourceId required: every consumption comes from a source
+  energySourceId      String
+  periodStart         DateTime
+  periodEnd           DateTime
+  // Energy quantity — kWh primary, MJ for ESPR compliance (1 kWh = 3.6 MJ)
+  consumptionKwh      Float
+  consumptionMj       Float?
+  lifecycleStage      LifecycleStage
+  measurementStandard String?        // EN 50598, IEC 61724, ISO 50001…
+  operatingConditions Json?          // rated load, temperature, etc.
+  // Optional financials (not ESPR-required but useful)
+  costAmount          Float?
+  currency            String?        // ISO 4217
+  createdAt           DateTime       @default(now())
+
+  EnergySource   EnergySource    @relation(fields: [energySourceId], references: [id], onDelete: Cascade)
+  EmissionRecord EmissionRecord[]
+
+  @@index([energySourceId])
+  @@index([periodStart, periodEnd])
+}
+
+enum LifecycleStage {
+  MANUFACTURING
+  TRANSPORT
+  USE
+  MAINTENANCE
+  END_OF_LIFE
+}
+
+model EmissionRecord {
+  id                         String                     @id @default(cuid())
+  // energyConsumptionId required: every emission traces to a consumption
+  energyConsumptionId        String
+  // Carbon footprint — ISO 14067 / GHG Protocol
+  co2eKg                     Float                      // CO2 equivalent (includes CH4, N2O…)
+  scope                      EmissionScope              // GHG Protocol scope 1/2/3
+  systemBoundary             SystemBoundary             // cradle-to-gate, cradle-to-grave…
+  emissionFactor             Float?                     // kgCO2e/kWh (or per unit)
+  emissionFactorSource       String?                    // DEFRA, IEA, IPCC AR6…
+  calculationMethodology     String?                    // ISO 14067, GHG Protocol, PEFCR…
+  gwpCharacterizationFactors String?                    // IPCC AR6 (default), AR5…
+  functionalUnit             String?                    // e.g. "1 kWh delivered"
+  // Third-party verification — ISO 14064-3
+  verificationStatus         EmissionVerificationStatus @default(PENDING)
+  verifierBody               String?
+  verificationStandard       String?                    // ISO 14064-3, etc.
+  createdAt                  DateTime                   @default(now())
+
+  EnergyConsumption EnergyConsumption @relation(fields: [energyConsumptionId], references: [id], onDelete: Cascade)
+
+  @@index([energyConsumptionId])
+}
+
+enum EmissionScope {
+  SCOPE_1
+  SCOPE_2
+  SCOPE_3
+}
+
+enum SystemBoundary {
+  CRADLE_TO_GATE
+  CRADLE_TO_GRAVE
+  GATE_TO_GATE
+  CRADLE_TO_CRADLE
+}
+
+enum EmissionVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
 }

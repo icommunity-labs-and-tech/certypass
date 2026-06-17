@@ -68,7 +68,10 @@
     "apiDocs": "API Docs",
     "exportQrs": "QRs",
     "importProducts": "Import",
-    "fraudReports": "Counterfeits"
+    "fraudReports": "Counterfeits",
+    "energySources": "Energy Sources",
+    "energyConsumption": "Energy Consumption",
+    "emissions": "CO₂ Emissions"
   },
   "forms": {
     "addItem": "Add product",
@@ -520,7 +523,8 @@
       "tryWithCode": "Try with code: {code}",
       "loading": "Loading...",
       "preparingError": "Preparing error page"
-    }
+    },
+    "tabEnergy": "Energy Certification"
   },
   "fraudReport": {
     "button": "Report counterfeit",
@@ -1214,6 +1218,45 @@
       "monthlyCreations": "Monthly creations",
       "products": "Products",
       "others": "Others"
+    }
+  },
+  "energy": {
+    "sources": {
+      "title": "Energy Sources",
+      "total": "sources",
+      "empty": "No energy sources registered",
+      "emptyHint": "Register sources via API or contact your administrator",
+      "capacity": "Capacity",
+      "location": "Location",
+      "installedAt": "Installed",
+      "added": "Registered",
+      "renewableShare": "Renewable share",
+      "countryOfOrigin": "Country of origin"
+    },
+    "consumption": {
+      "title": "Energy Consumption",
+      "total": "total",
+      "empty": "No consumption records",
+      "emptyHint": "Consumption records are created via POST /api/v1/energy/consumption",
+      "period": "Period",
+      "kwh": "kWh",
+      "cost": "Cost",
+      "source": "Source",
+      "item": "Device",
+      "recorded": "Recorded",
+      "lifecycleStage": "Lifecycle stage"
+    },
+    "emissions": {
+      "title": "CO₂ Emissions",
+      "total": "total",
+      "empty": "No emission records",
+      "emptyHint": "Emission records are created via POST /api/v1/emissions",
+      "period": "Period",
+      "factor": "Emission factor",
+      "methodology": "Methodology",
+      "status": "Status",
+      "recorded": "Recorded",
+      "systemBoundary": "System boundary"
     }
   }
 }

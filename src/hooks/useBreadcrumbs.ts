@@ -96,7 +96,11 @@ export function useBreadcrumbs() {
       'auth': 'Autenticación',
       'login': 'Iniciar Sesión',
       'signup': 'Registrarse',
-      'logout': 'Cerrar Sesión'
+      'logout': 'Cerrar Sesión',
+      'energy': 'Energía',
+      'sources': 'Fuentes de Energía',
+      'consumption': 'Consumo Energético',
+      'emissions': 'Emisiones CO₂',
     };
 
     return routeLabels[segment] || segment[0].toUpperCase() + segment.slice(1);

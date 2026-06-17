@@ -37,6 +37,21 @@ export async function GET(
             email: true,
           }
         },
+        EnergySource: {
+          include: {
+            EnergyConsumption: {
+              include: {
+                EmissionRecord: {
+                  where: { verificationStatus: 'VERIFIED' },
+                  orderBy: { createdAt: 'desc' },
+                  take: 5,
+                },
+              },
+              orderBy: { createdAt: 'desc' },
+              take: 10,
+            },
+          },
+        },
         State: {
           include: {
             StatusType: true,
@@ -89,6 +104,25 @@ export async function GET(
         name: 'Sin categoría',
         description: '',
       },
+      energyCertifications: (item as any).EnergySource?.flatMap((src: any) =>
+        src.EnergyConsumption?.flatMap((c: any) =>
+          c.EmissionRecord?.map((e: any) => ({
+            id: e.id,
+            co2eKg: e.co2eKg,
+            scope: e.scope,
+            systemBoundary: e.systemBoundary,
+            calculationMethodology: e.calculationMethodology,
+            verifierBody: e.verifierBody,
+            verificationStandard: e.verificationStandard,
+            verificationStatus: e.verificationStatus,
+            periodStart: c.periodStart,
+            periodEnd: c.periodEnd,
+            consumptionKwh: c.consumptionKwh,
+            energyCarrier: src.energyCarrier,
+            createdAt: e.createdAt,
+          })) ?? []
+        ) ?? []
+      ) ?? [],
       states: item.State.map((state) => ({
         id: state.id,
         title: state.title,

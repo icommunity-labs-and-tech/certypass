@@ -74,8 +74,20 @@ async function verifyOperatorJWT(token: string) {
   }
 }
 
+// Domains that map to a specific org slug for host-based routing
+const HOST_ORG_MAP: Record<string, string> = {
+  'datia.icommunitylabs.com': 'datia',
+};
+
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const host = request.headers.get('host') ?? '';
+  const hostSlug = HOST_ORG_MAP[host];
+
+  // Host-based routing: redirect bare root to the org login
+  if (hostSlug && (pathname === '/' || pathname === '/apps')) {
+    return NextResponse.redirect(new URL(`/org/${hostSlug}/admin`, request.url));
+  }
 
   // Detectar idioma
   const locale = getLocale(request);
@@ -98,6 +110,8 @@ export async function middleware(request: NextRequest) {
     '/scanner',
     '/logout',
     '/apps',
+    '/org',
+    '/energy',
   ];
 
   // Verificar si la ruta actual es pública

@@ -50,7 +50,15 @@ export default function WebhooksPageClient() {
     headers: '',
   });
 
-  const availableEvents = ['item.created', 'state.created'];
+  const availableEvents = [
+    'item.created',
+    'state.created',
+    'energy_source_event',
+    'energy_consumption_event',
+    'co2_emission_event',
+    'co2_certification_event',
+    'maintenance_event',
+  ];
 
   const loadWebhooks = async () => {
     setLoading(true);
