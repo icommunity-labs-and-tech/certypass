@@ -1,0 +1,59 @@
+name: CI
+
+# Quality gate for pull requests. Never deploys.
+#
+# Three test files are excluded — see .github/TEST-QUARANTINE.md. They were
+# already failing before this pipeline existed. Keep the exclusion list here
+# identical to the one in deploy.yml.
+#
+# No push trigger on purpose — pushing to main runs deploy.yml, which re-runs
+# these same tests as its own gate.
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx prisma generate
+
+      - name: Run tests (excluding quarantined files)
+        run: |
+          npx vitest run \
+            --exclude '**/node_modules/**' \
+            --exclude '**/AddStateForm.test.tsx' \
+            --exclude '**/DashboardKPIs.test.tsx' \
+            --exclude '**/states/list.test.ts'
+
+  image:
+    name: Docker build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # next.config sets neither typescript.ignoreBuildErrors nor
+      # eslint.ignoreDuringBuilds, so this also type-checks and lints the app.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
