@@ -290,10 +290,16 @@ export default function OrganizationDetailPanel({ organizationId }: Organization
           <h5 className="mb-0"><i className="bi bi-puzzle me-2" />Módulos</h5>
         </Card.Header>
         <Card.Body>
-          {(['passport', 'energy'] as const).map((mod) => {
+          {(['passport', 'energy', 'certEthereum', 'certIsbe'] as const).map((mod) => {
             const modules = organization.configuracion?.modules ?? {};
-            const defaultOn = mod === 'passport';
+            const defaultOn = mod === 'passport' || mod === 'certEthereum';
             const enabled = modules[mod] !== undefined ? modules[mod] : defaultOn;
+            const labels: Record<typeof mod, string> = {
+              passport: '📄 Pasaporte Digital (DPP)',
+              energy: '⚡ Certificación Energética (ESPR)',
+              certEthereum: '🔗 Certificación en Ethereum',
+              certIsbe: '🔷 Certificación en ISBE',
+            };
             return (
               <div key={mod} className="form-check form-switch mb-2">
                 <input
@@ -311,7 +317,7 @@ export default function OrganizationDetailPanel({ organizationId }: Organization
                   }}
                 />
                 <label className="form-check-label" htmlFor={`module-${mod}`}>
-                  {mod === 'passport' ? '📄 Pasaporte Digital (DPP)' : '⚡ Certificación Energética (ESPR)'}
+                  {labels[mod]}
                 </label>
               </div>
             );

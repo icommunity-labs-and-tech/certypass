@@ -131,7 +131,7 @@ export async function POST(
   // ── 5. Create evidence in iCommunity and anchor to blockchain ──
   try {
     const evidenceService = createEvidenceServiceImpl({ icommunityService });
-    const evidenceID = await evidenceService.createStateEvidence({
+    const { evidenceId: evidenceID } = await evidenceService.createStateEvidence({
       signatureID: org.signatureID,
       title: state.title,
       description: state.description,

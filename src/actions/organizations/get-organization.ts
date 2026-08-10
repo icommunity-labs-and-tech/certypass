@@ -6,6 +6,8 @@ import { isSuperAdmin } from "@/lib/auth/tenant";
 export interface OrgModuleConfig {
   passport?: boolean;
   energy?: boolean;
+  certEthereum?: boolean;
+  certIsbe?: boolean;
 }
 
 export interface OrganizationDetail {

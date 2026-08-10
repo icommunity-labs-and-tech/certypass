@@ -120,25 +120,26 @@ model Issue {
 }
 
 model Item {
-  id                  String         @id
+  id                  String              @id
   name                String
   description         String?
   imageUrl            String?
   templateFields      Json?
-  createdAt           DateTime       @default(now())
+  createdAt           DateTime            @default(now())
   updatedAt           DateTime
-  itemTemplate        Json           @default("[]")
+  itemTemplate        Json                @default("[]")
   evidenceID          String?
   evidenceDataJson    String?
   createdByUserId     String?
   organizationId      String
   antifraudEvidenceId String?
-  User                User?          @relation(fields: [createdByUserId], references: [id])
-  Organization        Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  User                User?               @relation(fields: [createdByUserId], references: [id])
+  Organization        Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   ItemCategory        ItemCategory[]
   State               State[]
   FraudReport         FraudReport[]
   EnergySource        EnergySource[]
+  IsbeCertification   IsbeCertification[]
 
   @@index([createdByUserId])
   @@index([organizationId])
@@ -200,38 +201,39 @@ model Notification {
 }
 
 model Organization {
-  id                String             @id
-  nombre            String
-  slug              String             @unique
-  dominio           String?            @unique
-  activa            Boolean            @default(true)
-  plan              String             @default("basic")
-  limites           Json?
-  configuracion      Json?
-  signatureID        String?
-  kycURL            String?
-  logoUrl           String?
-  brandColorPrimary  String?
+  id                  String              @id
+  nombre              String
+  slug                String              @unique
+  dominio             String?             @unique
+  activa              Boolean             @default(true)
+  plan                String              @default("basic")
+  limites             Json?
+  configuracion       Json?
+  signatureID         String?
+  kycURL              String?
+  logoUrl             String?
+  brandColorPrimary   String?
   brandColorSecondary String?
-  verificationStatus VerificationStatus @default(NOT_VERIFIED)
-  sectorId          String?
-  createdAt         DateTime           @default(now())
-  updatedAt          DateTime
-  ApiCall           ApiCall[]
-  ApiToken          ApiToken[]
-  Category          Category[]
-  EventLog          EventLog[]
-  Invitation        Invitation[]
-  Issue             Issue[]
-  Item              Item[]
-  Notification      Notification[]
-  Sector            Sector?            @relation(fields: [sectorId], references: [id])
-  StatusType        StatusType[]
-  User              User[]
-  Webhook           Webhook[]
-  ImportJob         ImportJob[]
-  SupportMessage    SupportMessage[]
-  FraudReport       FraudReport[]
+  verificationStatus  VerificationStatus  @default(NOT_VERIFIED)
+  sectorId            String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime
+  ApiCall             ApiCall[]
+  ApiToken            ApiToken[]
+  Category            Category[]
+  EventLog            EventLog[]
+  Invitation          Invitation[]
+  Issue               Issue[]
+  Item                Item[]
+  Notification        Notification[]
+  Sector              Sector?             @relation(fields: [sectorId], references: [id])
+  StatusType          StatusType[]
+  User                User[]
+  Webhook             Webhook[]
+  ImportJob           ImportJob[]
+  SupportMessage      SupportMessage[]
+  FraudReport         FraudReport[]
+  IsbeCertification   IsbeCertification[]
 
   @@index([activa])
   @@index([slug])
@@ -240,12 +242,12 @@ model Organization {
 }
 
 model Sector {
-  id            String         @id
-  name          String         @unique
-  slug          String         @unique
-  description   String         @default("")
-  createdAt     DateTime       @default(now())
-  Organization  Organization[]
+  id           String         @id
+  name         String         @unique
+  slug         String         @unique
+  description  String         @default("")
+  createdAt    DateTime       @default(now())
+  Organization Organization[]
 }
 
 model SupportMessage {
@@ -278,27 +280,54 @@ model PasswordResetToken {
 }
 
 model State {
-  id              String     @id
-  itemId          String
-  statusTypeId    String
-  title           String
-  description     String
-  evidenceID      String
-  backed          Boolean    @default(false)
-  backedAt        DateTime?
-  imageUrls       Json?
-  templateConfig  Json?
-  createdAt       DateTime   @default(now())
-  createdByUserId String?
-  issueDataJson   String?
-  User            User?      @relation(fields: [createdByUserId], references: [id])
-  Item            Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  StatusType      StatusType @relation(fields: [statusTypeId], references: [id], onDelete: Cascade)
+  id                String              @id
+  itemId            String
+  statusTypeId      String
+  title             String
+  description       String
+  // Nullable: a State certified only via ISBE (see Organization.configuracion
+  // "certIsbe") has no Ethereum evidence at all — IsbeCertification carries
+  // that result instead, in its own table (see feedback_blockchain_apps_independientes).
+  evidenceID        String?
+  backed            Boolean             @default(false)
+  backedAt          DateTime?
+  imageUrls         Json?
+  templateConfig    Json?
+  createdAt         DateTime            @default(now())
+  createdByUserId   String?
+  issueDataJson     String?
+  User              User?               @relation(fields: [createdByUserId], references: [id])
+  Item              Item                @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  StatusType        StatusType          @relation(fields: [statusTypeId], references: [id], onDelete: Cascade)
+  IsbeCertification IsbeCertification[]
 
   @@index([createdAt])
   @@index([createdByUserId])
   @@index([itemId])
   @@index([statusTypeId])
+}
+
+// ISBE's own certification result — deliberately its own table, not columns
+// bolted onto Item/State: same "each provider is its own complete app, its
+// own data model" rule already used for Ethereum evidence.
+model IsbeCertification {
+  id             String       @id @default(cuid())
+  organizationId String
+  itemId         String?
+  stateId        String?
+  hash           String
+  executionId    Int
+  txHash         String?
+  status         String       @default("pending") // pending | sent | confirmed | failed
+  createdAt      DateTime     @default(now())
+  Organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  Item           Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  State          State?       @relation(fields: [stateId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([itemId])
+  @@index([stateId])
+  @@index([hash])
 }
 
 model StatusType {
@@ -441,25 +470,25 @@ enum FraudReportStatus {
 // ── Energy Certification Module (ESPR-aligned) ───────────────────────────────
 
 model EnergySource {
-  id                  String        @id @default(cuid())
+  id                   String        @id @default(cuid())
   // Identity
-  name                String
-  energyCarrier       EnergyCarrier
-  generationTechnology String?      // e.g. photovoltaic, wind_onshore, ccgt
-  capacityKw          Float?
-  location            String?
-  installationDate    DateTime?
+  name                 String
+  energyCarrier        EnergyCarrier
+  generationTechnology String? // e.g. photovoltaic, wind_onshore, ccgt
+  capacityKw           Float?
+  location             String?
+  installationDate     DateTime?
   // ESPR / EU energy taxonomy
-  renewableShare      Float?        // 0–100 %
-  guaranteeOfOriginId String?       // GO / RECs certificate reference
-  countryOfOrigin     String?       // ISO 3166-1 alpha-2
-  gridEmissionFactor  Float?        // gCO2eq/kWh (IEA, national grid)
+  renewableShare       Float? // 0–100 %
+  guaranteeOfOriginId  String? // GO / RECs certificate reference
+  countryOfOrigin      String? // ISO 3166-1 alpha-2
+  gridEmissionFactor   Float? // gCO2eq/kWh (IEA, national grid)
   // Relations — itemId required: every source is a physical asset
-  itemId              String
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  itemId               String
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
 
-  Item              Item               @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  Item              Item                @relation(fields: [itemId], references: [id], onDelete: Cascade)
   EnergyConsumption EnergyConsumption[]
 
   @@index([itemId])
@@ -488,14 +517,14 @@ model EnergyConsumption {
   consumptionKwh      Float
   consumptionMj       Float?
   lifecycleStage      LifecycleStage
-  measurementStandard String?        // EN 50598, IEC 61724, ISO 50001…
-  operatingConditions Json?          // rated load, temperature, etc.
+  measurementStandard String? // EN 50598, IEC 61724, ISO 50001…
+  operatingConditions Json? // rated load, temperature, etc.
   // Optional financials (not ESPR-required but useful)
   costAmount          Float?
-  currency            String?        // ISO 4217
+  currency            String? // ISO 4217
   createdAt           DateTime       @default(now())
 
-  EnergySource   EnergySource    @relation(fields: [energySourceId], references: [id], onDelete: Cascade)
+  EnergySource   EnergySource     @relation(fields: [energySourceId], references: [id], onDelete: Cascade)
   EmissionRecord EmissionRecord[]
 
   @@index([energySourceId])
@@ -515,18 +544,18 @@ model EmissionRecord {
   // energyConsumptionId required: every emission traces to a consumption
   energyConsumptionId        String
   // Carbon footprint — ISO 14067 / GHG Protocol
-  co2eKg                     Float                      // CO2 equivalent (includes CH4, N2O…)
-  scope                      EmissionScope              // GHG Protocol scope 1/2/3
-  systemBoundary             SystemBoundary             // cradle-to-gate, cradle-to-grave…
-  emissionFactor             Float?                     // kgCO2e/kWh (or per unit)
-  emissionFactorSource       String?                    // DEFRA, IEA, IPCC AR6…
-  calculationMethodology     String?                    // ISO 14067, GHG Protocol, PEFCR…
-  gwpCharacterizationFactors String?                    // IPCC AR6 (default), AR5…
-  functionalUnit             String?                    // e.g. "1 kWh delivered"
+  co2eKg                     Float // CO2 equivalent (includes CH4, N2O…)
+  scope                      EmissionScope // GHG Protocol scope 1/2/3
+  systemBoundary             SystemBoundary // cradle-to-gate, cradle-to-grave…
+  emissionFactor             Float? // kgCO2e/kWh (or per unit)
+  emissionFactorSource       String? // DEFRA, IEA, IPCC AR6…
+  calculationMethodology     String? // ISO 14067, GHG Protocol, PEFCR…
+  gwpCharacterizationFactors String? // IPCC AR6 (default), AR5…
+  functionalUnit             String? // e.g. "1 kWh delivered"
   // Third-party verification — ISO 14064-3
   verificationStatus         EmissionVerificationStatus @default(PENDING)
   verifierBody               String?
-  verificationStandard       String?                    // ISO 14064-3, etc.
+  verificationStandard       String? // ISO 14064-3, etc.
   createdAt                  DateTime                   @default(now())
 
   EnergyConsumption EnergyConsumption @relation(fields: [energyConsumptionId], references: [id], onDelete: Cascade)

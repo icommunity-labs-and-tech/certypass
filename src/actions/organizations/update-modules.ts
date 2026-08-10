@@ -5,7 +5,7 @@ import { getCurrentUserWithDetails } from '@/lib/auth/shared/session';
 
 export async function updateOrgModules(
   organizationId: string,
-  modules: { passport?: boolean; energy?: boolean }
+  modules: { passport?: boolean; energy?: boolean; certEthereum?: boolean; certIsbe?: boolean }
 ) {
   const user = await getCurrentUserWithDetails();
   if (!user || user.role !== 'SUPER_ADMIN') {

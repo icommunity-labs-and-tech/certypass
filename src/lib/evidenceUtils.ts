@@ -1,6 +1,18 @@
 // Shared evidence utilities and constants
 
+import { createHash } from 'crypto';
+
 export const MAX_EVIDENCE_BYTES = 100 * 1024 * 1024; // 100MB
+
+/**
+ * Hashes the same bytes that get uploaded as item_data.json/issue_data.json
+ * (pretty-printed, indent 2), so an ISBE timestamp always matches what
+ * Ethereum evidence certifies for the same object.
+ */
+export function hashDataObject(obj: Record<string, unknown>): string {
+  const bytes = Buffer.from(JSON.stringify(obj, null, 2), 'utf8');
+  return '0x' + createHash('sha256').update(bytes).digest('hex');
+}
 
 export function detectImageExt(contentType: string): string {
   const ct = (contentType || '').toLowerCase();

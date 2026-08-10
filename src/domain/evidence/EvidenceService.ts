@@ -15,11 +15,17 @@ export interface EvidenceFile {
   file: string; // base64 encoded
 }
 
+export interface EvidenceResult {
+  evidenceId: string;
+  /** sha256 (0x-prefixed hex) of the item_data.json/issue_data.json exactly as uploaded — usable as-is for ISBE's timestampHash. */
+  contentHash: string;
+}
+
 export interface EvidenceService {
   createItemEvidence(
     input: EvidencePayloadInput
-  ): Promise<string>;
+  ): Promise<EvidenceResult>;
   createStateEvidence(
     input: EvidencePayloadInput
-  ): Promise<string>;
+  ): Promise<EvidenceResult>;
 }

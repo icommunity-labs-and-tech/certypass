@@ -9,6 +9,8 @@ import { getCurrentUserWithDetails } from '@/lib/auth/shared/session';
 import { generateStateTitle } from './stateUtils';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
+import { isbeService } from '@/infrastructure/isbe/IsbeServiceImpl';
+import { buildIssueDataObject, hashDataObject } from '@/lib/evidenceUtils';
 
 export function createStateServiceImpl(deps: {
   stateRepository: StateRepository;
@@ -34,13 +36,14 @@ export function createStateServiceImpl(deps: {
         const user = await userRepo.getById(currentUser.id);
         const userId = user.id;
 
-        // 2. Get organization and validate signature
+        // 2. Get organization and validate provider(s)
         const organization = await prisma.organization.findUnique({
           where: { id: organizationId },
           select: {
             id: true,
             signatureID: true,
             verificationStatus: true,
+            configuracion: true,
           },
         });
 
@@ -48,23 +51,39 @@ export function createStateServiceImpl(deps: {
           throw new StateInputError('name', 'Organización no encontrada');
         }
 
-        if (!organization.signatureID) {
+        const modules = (organization.configuracion as { modules?: { certEthereum?: boolean; certIsbe?: boolean } } | null)?.modules ?? {};
+        const useEthereum = modules.certEthereum !== false; // default true — preserva el comportamiento actual
+        const useIsbe = modules.certIsbe === true; // default false — opt-in
+
+        if (!useEthereum && !useIsbe) {
           throw new OrganizationNotVerifiedError(
             organization.id,
-            'no_signature',
-            'No se pudo certificar la evidencia: tu organización no tiene una firma verificada. Completa el KYC de la organización.'
+            'no_provider',
+            'La organización no tiene ningún proveedor de certificación activado.'
           );
         }
 
-        if (organization.verificationStatus !== 'VERIFIED') {
-          throw new OrganizationNotVerifiedError(
-            organization.id,
-            'not_verified',
-            'La firma de tu organización no está verificada. Completa el proceso KYC de la organización antes de crear estados.'
-          );
-        }
+        let signatureID: string | undefined;
 
-        const signatureID = organization.signatureID;
+        if (useEthereum) {
+          if (!organization.signatureID) {
+            throw new OrganizationNotVerifiedError(
+              organization.id,
+              'no_signature',
+              'No se pudo certificar la evidencia: tu organización no tiene una firma verificada. Completa el KYC de la organización.'
+            );
+          }
+
+          if (organization.verificationStatus !== 'VERIFIED') {
+            throw new OrganizationNotVerifiedError(
+              organization.id,
+              'not_verified',
+              'La firma de tu organización no está verificada. Completa el proceso KYC de la organización antes de crear estados.'
+            );
+          }
+
+          signatureID = organization.signatureID;
+        }
 
         // 3. Get statusType to generate title
         let statusType;
@@ -97,7 +116,7 @@ export function createStateServiceImpl(deps: {
             statusTypeId: data.statusTypeId,
             itemId: data.itemId,
             imageUrls: data.imageUrls ?? [],
-            evidenceID: 'pending',
+            evidenceID: useEthereum ? 'pending' : null,
             createdByUserId: userId,
             templateConfig: data.templateConfig ?? null,
           });
@@ -119,47 +138,79 @@ export function createStateServiceImpl(deps: {
         };
 
         try {
-          // 6. Create evidence with rollback on failure
-          let evidenceID: string;
-          try {
-            evidenceID = await evidence.createStateEvidence({
-              signatureID,
-              title: created.title,
-              description: created.description,
-              imageUrls: Array.isArray(created.imageUrls) ? created.imageUrls.filter((url): url is string => typeof url === 'string') : [],
-              metadata: {
-                type: 'state_creation',
-                stateId: created.id,
-                itemId: created.itemId,
-                statusTypeId: created.statusTypeId,
-                createdAt: created.createdAt.toISOString(),
-                ...data.metadata,
-              },
-            });
+          // 6. Create certification(s) with the selected provider(s)
+          const imageUrls = Array.isArray(created.imageUrls) ? created.imageUrls.filter((url): url is string => typeof url === 'string') : [];
+          const mergedMetadata: Record<string, unknown> = {
+            type: 'state_creation',
+            stateId: created.id,
+            itemId: created.itemId,
+            statusTypeId: created.statusTypeId,
+            createdAt: created.createdAt.toISOString(),
+            ...data.metadata,
+          };
 
-            // Validate evidenceID
-            if (!evidenceID || typeof evidenceID !== 'string' || evidenceID.trim() === '') {
-              // Rollback: eliminar el state si el evidenceID es inválido
-              await rollback();
-              throw new StateCreationRollbackError(
-                created.id,
-                'evidence_failed',
-                `Invalid evidenceID returned: ${evidenceID}`
-              );
+          let evidenceID: string | null = null;
+          try {
+            let contentHash: string | null = null;
+
+            if (useEthereum) {
+              const evidenceResult = await evidence.createStateEvidence({
+                signatureID: signatureID as string,
+                title: created.title,
+                description: created.description,
+                imageUrls,
+                metadata: mergedMetadata,
+              });
+              evidenceID = evidenceResult.evidenceId;
+              contentHash = evidenceResult.contentHash;
+
+              // Validate evidenceID
+              if (!evidenceID || typeof evidenceID !== 'string' || evidenceID.trim() === '') {
+                throw new StateCreationRollbackError(
+                  created.id,
+                  'evidence_failed',
+                  `Invalid evidenceID returned: ${evidenceID}`
+                );
+              }
+
+              // Update state with evidenceID
+              try {
+                await stateRepo.updateEvidenceId(created.id, organizationId, evidenceID);
+              } catch (e) {
+                const errorMessage = e instanceof Error ? e.message : String(e);
+                throw new StateCreationRollbackError(
+                  created.id,
+                  'db_error',
+                  `Failed to update state with evidence: ${errorMessage}`
+                );
+              }
             }
 
-            // Update state with evidenceID
-            try {
-              await stateRepo.updateEvidenceId(created.id, organizationId, evidenceID);
-            } catch (e) {
-              // Rollback: eliminar el state si falla la actualización
-              await rollback();
-              const errorMessage = e instanceof Error ? e.message : String(e);
-              throw new StateCreationRollbackError(
-                created.id,
-                'db_error',
-                `Failed to update state with evidence: ${errorMessage}`
-              );
+            if (useIsbe) {
+              const hash = contentHash ?? hashDataObject(buildIssueDataObject({
+                description: created.description,
+                imageUrls,
+                id: mergedMetadata.id as string | undefined,
+                itemId: created.itemId,
+                title: created.title,
+                createdAt: created.createdAt.toISOString(),
+                templateConfig: mergedMetadata.templateConfig,
+                itemEvidenceID: mergedMetadata.itemEvidenceID as string | null | undefined,
+                itemName: mergedMetadata.itemName as string | undefined,
+                itemCreatedAt: mergedMetadata.itemCreatedAt as string | undefined,
+              }));
+
+              const timestamp = await isbeService.timestampHash(hash);
+              await prisma.isbeCertification.create({
+                data: {
+                  organizationId,
+                  stateId: created.id,
+                  hash,
+                  executionId: timestamp.executionId,
+                  txHash: timestamp.txHash,
+                  status: timestamp.status || 'pending',
+                },
+              });
             }
           } catch (e) {
             await rollback();

@@ -1,14 +1,14 @@
-import { EvidenceService, type EvidencePayloadInput, type EvidenceFile } from './EvidenceService';
+import { EvidenceService, type EvidencePayloadInput, type EvidenceFile, type EvidenceResult } from './EvidenceService';
 import { EvidenceInputError, ImageFetchError, ImageSizeExceededError, EvidenceBuildError } from './errors';
 import { ICommunityConfigError, ICommunityHTTPError } from '../../infrastructure/icommunity/errors';
 import type { ICommunityService } from '../../infrastructure/icommunity/ICommunityService';
-import { MAX_EVIDENCE_BYTES, buildIssueDataObject, buildItemDataObject, detectImageExt } from '@/lib/evidenceUtils';
+import { MAX_EVIDENCE_BYTES, buildIssueDataObject, buildItemDataObject, detectImageExt, hashDataObject } from '@/lib/evidenceUtils';
 import { getBaseUrl, toAbsoluteUrl } from '@/lib/http';
 
 async function buildFiles(
   input: EvidencePayloadInput,
   baseUrl: string
-): Promise<EvidenceFile[]> {
+): Promise<{ files: EvidenceFile[]; contentHash: string }> {
   // Validate input
   if (!input.signatureID) {
     throw new EvidenceInputError('signatureID', 'signatureID is required');
@@ -154,7 +154,7 @@ async function buildFiles(
     );
   }
 
-  return files;
+  return { files, contentHash: hashDataObject(json) };
 }
 
 async function createEvidenceWithRetry(
@@ -192,13 +192,14 @@ export function createEvidenceServiceImpl(deps: {
   const { icommunityService: icommunity } = deps;
 
   return {
-    async createItemEvidence(input: EvidencePayloadInput): Promise<string> {
+    async createItemEvidence(input: EvidencePayloadInput): Promise<EvidenceResult> {
       try {
         const baseUrl = await getBaseUrl();
-        const files = await buildFiles(input, baseUrl);
-        return await createEvidenceWithRetry(icommunity, input.signatureID, input.title, files);
+        const { files, contentHash } = await buildFiles(input, baseUrl);
+        const evidenceId = await createEvidenceWithRetry(icommunity, input.signatureID, input.title, files);
+        return { evidenceId, contentHash };
       } catch (error) {
-        if (error instanceof EvidenceInputError || error instanceof ImageFetchError || 
+        if (error instanceof EvidenceInputError || error instanceof ImageFetchError ||
             error instanceof ImageSizeExceededError || error instanceof EvidenceBuildError ||
             error instanceof ICommunityConfigError || error instanceof ICommunityHTTPError) {
           throw error;
@@ -207,13 +208,14 @@ export function createEvidenceServiceImpl(deps: {
       }
     },
 
-    async createStateEvidence(input: EvidencePayloadInput): Promise<string> {
+    async createStateEvidence(input: EvidencePayloadInput): Promise<EvidenceResult> {
       try {
         const baseUrl = await getBaseUrl();
-        const files = await buildFiles(input, baseUrl);
-        return await createEvidenceWithRetry(icommunity, input.signatureID, input.title, files);
+        const { files, contentHash } = await buildFiles(input, baseUrl);
+        const evidenceId = await createEvidenceWithRetry(icommunity, input.signatureID, input.title, files);
+        return { evidenceId, contentHash };
       } catch (error) {
-        if (error instanceof EvidenceInputError || error instanceof ImageFetchError || 
+        if (error instanceof EvidenceInputError || error instanceof ImageFetchError ||
             error instanceof ImageSizeExceededError || error instanceof EvidenceBuildError ||
             error instanceof ICommunityConfigError || error instanceof ICommunityHTTPError) {
           throw error;
