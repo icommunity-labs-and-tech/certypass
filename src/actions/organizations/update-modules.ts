@@ -1,14 +1,13 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { getCurrentUserWithDetails } from '@/lib/auth/shared/session';
+import { isSuperAdmin } from '@/lib/auth/tenant';
 
 export async function updateOrgModules(
   organizationId: string,
   modules: { passport?: boolean; energy?: boolean; certEthereum?: boolean; certIsbe?: boolean }
 ) {
-  const user = await getCurrentUserWithDetails();
-  if (!user || user.role !== 'SUPER_ADMIN') {
+  if (!(await isSuperAdmin())) {
     return { success: false, error: 'Unauthorized' };
   }
 
