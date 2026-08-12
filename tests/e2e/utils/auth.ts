@@ -6,8 +6,8 @@ export async function loginAdmin(page: Page, email: string, password: string) {
   await page.waitForSelector('input[type="email"]', { timeout: 10000 });
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
-  await page.click('button:has-text("Acceder al Dashboard")');
-  
+  await page.click('button[type="submit"]');
+
   // Wait for navigation with retry logic
   try {
     await page.waitForURL(/\/dashboard(\/.*)?$/, { timeout: 15000 });
@@ -17,6 +17,22 @@ export async function loginAdmin(page: Page, email: string, password: string) {
     await page.waitForTimeout(2000);
     await page.waitForURL(/\/dashboard(\/.*)?$/, { timeout: 10000 });
   }
+}
+
+export async function loginSuperadmin(page: Page, email: string, password: string) {
+  await page.goto('/auth/superadmin/login', { waitUntil: 'networkidle' });
+  await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+  await page.fill('input[type="email"]', email);
+  await page.fill('input[type="password"]', password);
+  await page.click('button[type="submit"]');
+
+  // '/auth/superadmin/login' itself contains "superadmin", so a loose
+  // '**/superadmin**' pattern matches before the redirect happens. Require
+  // the path to start with /superadmin AND not still be the login page.
+  await page.waitForURL(
+    (url) => url.pathname.startsWith('/superadmin') && !url.pathname.includes('login'),
+    { timeout: 15000 }
+  );
 }
 
 export async function loginOperator(page: Page, email: string, password: string) {

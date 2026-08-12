@@ -6,6 +6,7 @@ import { StateData } from '../../types';
 import { TimestampBadge } from './TimestampBadge';
 import { VerifiedBadge } from './VerifiedBadge';
 import { EvidenceVerification } from '../EvidenceVerification';
+import { IsbeVerification } from '../IsbeVerification';
 import { timelineStyles } from '../../styles/passportStyles';
 import GeolocationMap from '@/components/GeolocationMapClient';
 import { extractGeolocationField } from '@/lib/template-helpers';
@@ -41,7 +42,7 @@ export function TimelineItem({ state, loadStatus = 'loaded' }: TimelineItemProps
           }}
         >
           {state.title}
-          {state.evidenceID && <VerifiedBadge title={t('stateVerified')} size="sm" />}
+          {(state.evidenceID || state.isbeCertification) && <VerifiedBadge title={t('stateVerified')} size="sm" />}
         </h5>
 
         <p style={{ color: '#64748b', margin: '0 0 0.75rem', lineHeight: '1.5' }}>
@@ -101,6 +102,10 @@ export function TimelineItem({ state, loadStatus = 'loaded' }: TimelineItemProps
             createdAt={state.createdAt}
             createdBy={state.createdBy}
           />
+        )}
+
+        {!state.evidenceID && state.isbeCertification && !isPending && (
+          <IsbeVerification hash={state.isbeCertification.hash} createdBy={state.createdBy} />
         )}
       </div>
     </div>

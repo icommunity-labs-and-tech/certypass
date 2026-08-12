@@ -510,10 +510,13 @@
     "firstVerificationDisclaimer": "If it were a counterfeit product or one that had been opened before, we would have shown you a different message.",
     "understood": "Understood",
     "verifyingEvidence": "Verifying evidence...",
+    "verifyingIsbeCertification": "Verifying ISBE certification...",
     "certificationError": "Could not verify the certification",
     "evidenceImageAlt": "Evidence {index}",
     "loadingCertification": "Loading certification...",
     "blockchainCertification": "Blockchain certification",
+    "isbeCertification": "ISBE certification",
+    "isbeCertificationPending": "ISBE certification (pending)",
     "signer": "Signer",
     "noHistory": "No history available for this product",
     "error": {

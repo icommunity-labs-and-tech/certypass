@@ -514,10 +514,13 @@
     "firstVerificationDisclaimer": "En caso de ser un producto falsificado o ya abierto anteriormente te habríamos mostrado otro mensaje.",
     "understood": "Entendido",
     "verifyingEvidence": "Verificando evidencia...",
+    "verifyingIsbeCertification": "Verificando certificación ISBE...",
     "certificationError": "No se pudo verificar la certificación",
     "evidenceImageAlt": "Evidencia {index}",
     "loadingCertification": "Cargando certificación...",
     "blockchainCertification": "Certificación blockchain",
+    "isbeCertification": "Certificación ISBE",
+    "isbeCertificationPending": "Certificación ISBE (pendiente)",
     "signer": "Firmante",
     "noHistory": "No hay historial disponible para este producto",
     "error": {

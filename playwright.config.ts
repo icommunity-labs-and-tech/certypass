@@ -38,9 +38,21 @@ export default defineConfig({
       testMatch: '**/complete-state-certification.spec.ts',
       timeout: 120000, // 2 minutos para tests de certificación
       retries: 1, // Retry una vez para manejar fallos de red
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         // Configuración específica para tests de certificación
+        trace: 'retain-on-failure',
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
+      },
+    },
+    {
+      name: 'isbe-live',
+      testMatch: '**/isbe-certypass-flow.spec.ts',
+      timeout: 180000, // llamadas reales a la API de ISBE (asíncrona, con polling) + creación real de item
+      retries: 0, // corre contra datos reales de producción, no reintentar a ciegas
+      use: {
+        ...devices['Desktop Chrome'],
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',

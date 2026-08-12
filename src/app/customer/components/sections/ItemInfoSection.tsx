@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { ItemData } from '../../types';
 import { EvidenceVerification } from '../EvidenceVerification';
+import { IsbeVerification } from '../IsbeVerification';
 import { passportStyles } from '../../styles/passportStyles';
 import GeolocationMap from '@/components/GeolocationMapClient';
 
@@ -61,16 +62,20 @@ export function ItemInfoSection({ item, isMobile }: ItemInfoSectionProps) {
         </div>
       )}
 
-      {item.evidenceID && (
+      {(item.evidenceID || item.isbeCertification) && (
         <div style={passportStyles.infoSection}>
           <h4 style={passportStyles.infoSectionTitle}>{t('productCertification')}</h4>
-          <EvidenceVerification
-            evidenceId={item.evidenceID}
-            type="item"
-            entityId={item.id}
-            createdAt={item.createdAt}
-            createdBy={item.createdBy}
-          />
+          {item.evidenceID ? (
+            <EvidenceVerification
+              evidenceId={item.evidenceID}
+              type="item"
+              entityId={item.id}
+              createdAt={item.createdAt}
+              createdBy={item.createdBy}
+            />
+          ) : (
+            <IsbeVerification hash={item.isbeCertification!.hash} createdBy={item.createdBy} />
+          )}
         </div>
       )}
     </div>

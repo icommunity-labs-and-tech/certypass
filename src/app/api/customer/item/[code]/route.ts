@@ -52,6 +52,10 @@ export async function GET(
             },
           },
         },
+        IsbeCertification: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
         State: {
           include: {
             StatusType: true,
@@ -60,6 +64,10 @@ export async function GET(
                 name: true,
                 email: true,
               }
+            },
+            IsbeCertification: {
+              orderBy: { createdAt: 'desc' },
+              take: 1,
             },
           },
           orderBy: {
@@ -92,6 +100,13 @@ export async function GET(
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
       evidenceID: (item as any).evidenceID || null,
+      isbeCertification: item.IsbeCertification[0]
+        ? {
+            hash: item.IsbeCertification[0].hash,
+            status: item.IsbeCertification[0].status,
+            txHash: item.IsbeCertification[0].txHash,
+          }
+        : null,
       antifraudEvidenceId: antifraudEvidenceId || null,
       isFirstVerification: isFirstVerification,
       createdBy: item.User || null,
@@ -128,6 +143,13 @@ export async function GET(
         title: state.title,
         description: state.description,
         evidenceID: state.evidenceID,
+        isbeCertification: state.IsbeCertification[0]
+          ? {
+              hash: state.IsbeCertification[0].hash,
+              status: state.IsbeCertification[0].status,
+              txHash: state.IsbeCertification[0].txHash,
+            }
+          : null,
         backed: state.backed,
         backedAt: state.backedAt,
         imageUrls: state.imageUrls,

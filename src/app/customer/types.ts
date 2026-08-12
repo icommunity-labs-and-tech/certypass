@@ -1,3 +1,9 @@
+export type IsbeCertificationData = {
+  hash: string;
+  status: string;
+  txHash: string | null;
+};
+
 export interface ItemState {
   id: string;
   title: string;
@@ -6,6 +12,7 @@ export interface ItemState {
   backed?: boolean;
   backedAt?: string;
   evidenceID?: string;
+  isbeCertification?: IsbeCertificationData | null;
   imageUrls?: string[];
 }
 
@@ -20,6 +27,7 @@ export type StateData = {
   title: string;
   description: string;
   evidenceID: string;
+  isbeCertification?: IsbeCertificationData | null;
   backed: boolean;
   backedAt: string | null;
   imageUrls: string[];
@@ -42,6 +50,7 @@ export type ItemData = {
   createdAt: string;
   updatedAt: string;
   evidenceID?: string | null;
+  isbeCertification?: IsbeCertificationData | null;
   antifraudEvidenceId?: string | null;
   isFirstVerification: boolean;
   createdBy?: { name: string; email: string } | null;

@@ -114,7 +114,7 @@ export function ItemPassport({ item, onBack, showFraudReport = false }: ItemPass
               }}
             >
               {item.name}
-              {item.evidenceID && <VerifiedBadge title={tCustomer('verifiedProduct')} />}
+              {(item.evidenceID || item.isbeCertification) && <VerifiedBadge title={tCustomer('verifiedProduct')} />}
             </h3>
             <p style={passportStyles.itemDescription}>{item.description || t('noDescription')}</p>
             <div style={passportStyles.itemMeta}>
