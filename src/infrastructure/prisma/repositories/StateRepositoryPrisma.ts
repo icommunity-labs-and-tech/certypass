@@ -42,7 +42,11 @@ export const stateRepository: StateRepository = {
           statusTypeId: input.statusTypeId,
           itemId: input.itemId,
           imageUrls: input.imageUrls ?? [],
-          evidenceID: input.evidenceID ?? 'pending',
+          // OJO: `input.evidenceID` puede ser `null` explícito (organización
+          // solo-ISBE, sin Ethereum) — `??` trataría ese null igual que un
+          // undefined y lo pisaría con 'pending'. Solo se aplica el default
+          // cuando el campo directamente no viene informado.
+          evidenceID: input.evidenceID === undefined ? 'pending' : input.evidenceID,
           createdByUserId: input.createdByUserId,
           templateConfig: (input.templateConfig ?? null) as any,
         },
