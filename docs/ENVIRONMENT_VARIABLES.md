@@ -98,7 +98,7 @@ OPERATOR_JWT_SECRET="mi-secreto-operator-456"
 DATABASE_URL="postgresql://usuario:password@localhost:5432/miapp"
 
 # Configuración de Mailgun (emails)
-MAILGUN_API_KEY="fc97eb228d0246cd94daff9d3cc63759-826eddfb-affbba41"
+MAILGUN_API_KEY="key-1234567890abcdef"
 MAILGUN_DOMAIN="icommunity.io"
 MAILGUN_FROM_EMAIL="ibs@icommunity.io"
 MAILGUN_FROM_NAME="certypass"

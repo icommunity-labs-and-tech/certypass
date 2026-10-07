@@ -9,9 +9,12 @@ config();
 
 import { mailgunService } from '../src/lib/services/mailgun';
 
-// Configurar variables de entorno si no están definidas
+// Variables de entorno: MAILGUN_API_KEY no tiene valor de respaldo. Usar un
+// secreto real como fallback en un script versionado es lo que filtró la clave
+// que Mailgun desactivó el 2026-10-07.
 if (!process.env.MAILGUN_API_KEY) {
-  process.env.MAILGUN_API_KEY = 'fc97eb228d0246cd94daff9d3cc63759-826eddfb-affbba41';
+  console.error('MAILGUN_API_KEY no está definida. Añádela a tu .env antes de ejecutar este script.');
+  process.exit(1);
 }
 if (!process.env.MAILGUN_DOMAIN) {
   process.env.MAILGUN_DOMAIN = 'icommunity.io';
